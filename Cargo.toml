@@ -1,4 +1,9 @@
 [package]
-edition = "2019"
-name = "Ape Rust"
+edition = "2018"
+name = "ApeRust"
 version = "1.3.0"
+
+
+[lib]
+crate-type=["lib"]
+path="src/pdx/ape/lib.rs"

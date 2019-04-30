@@ -1,0 +1,13 @@
+[package]
+edition = "2018"
+name = "ape_demo"
+version = "1.3.0"
+
+
+[[bin]]
+name = "ape_demo"
+path = "src/main.rs"
+
+
+[dependencies]
+ApeRust = { path = "../.." }

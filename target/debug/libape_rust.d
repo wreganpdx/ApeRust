@@ -1,0 +1,1 @@
+C:\Users\Will\ Regan\documents\github\ApeRust\target\debug\libape_rust.rlib: C:\Users\Will\ Regan\documents\github\ApeRust\src/pdx/ape/lib.rs C:\Users\Will\ Regan\documents\github\ApeRust\src/pdx/ape\vector.rs
