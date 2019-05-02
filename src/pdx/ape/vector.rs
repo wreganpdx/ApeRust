@@ -30,9 +30,8 @@ impl vector
         vector { x: x, y: y }
     }
 
-    pub fn set_to(mut self:vector, px: f64, py: f64)
+    pub fn set_to(&mut self, px: f64, py: f64)
     {
-
 		self.x = px;
 		self.y = py;
 	}

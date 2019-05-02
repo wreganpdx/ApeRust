@@ -4,10 +4,12 @@ use ApeRust::vector::vector;
 fn main() 
 {
     let mut v:vector = vector::new(2.0,4.0);
-    let mut v2:vector = vector::new(0.0,0.0);
-    let mut v3:vector = vector::new(0.0,0.0);
-    let mut v4:vector = vector::new(0.0,0.0);
-    let mut v5:vector = vector::new(0.0,0.0);
+    let mut v2:vector = vector::new(3.0,4.0);
+    let mut v3:vector = vector::new(5.0,6.0);
+    let mut v4:vector = vector::new(7.0,8.0);
+    let mut v5:vector = vector::new(9.0,10.0);
+    v.set_to(4.0, 5.0);
+    println!("set to 4, 5 = {:?} ", v);
     v2.copy(&v);
     v2.plusEquals(&v);
     v3.copy(&v2);
