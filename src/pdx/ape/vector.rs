@@ -16,7 +16,7 @@ Final Project
 use std::fmt;
 
 #[allow(unused_variables)]
-
+#[derive(Default)]
 pub struct vector
 {
     x:f64,
