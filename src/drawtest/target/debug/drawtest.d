@@ -1,1 +1,1 @@
-/home/tyler/Documents/Rust/finalproj/ApeRust/src/drawtest/target/debug/drawtest: /home/tyler/Documents/Rust/finalproj/ApeRust/src/drawtest/src/main.rs
+C:\Users\Will\ Regan\Documents\GitHub\ApeRust\src\drawtest\target\debug\drawtest.pdb: C:\Users\Will\ Regan\Documents\GitHub\ApeRust\src\drawtest\src\main.rs

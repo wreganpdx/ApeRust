@@ -15,3 +15,10 @@ Final Project
  * For more information, see  https://github.com/arctwelve/ape-js-port/tree/master/org/cove/ape
  */
 
+use crate::vector::vector; 
+
+struct circle_body
+{
+    pos:vector,
+    circle:CircleArc,
+}

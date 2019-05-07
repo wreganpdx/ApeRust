@@ -1,5 +1,6 @@
 extern crate ApeRust;
 use ApeRust::vector::vector;
+use ApeRust::APEngine::APEngine;
 
 fn main() 
 {
@@ -8,6 +9,9 @@ fn main()
     let mut v3:vector = vector::new(5.0,6.0);
     let mut v4:vector = vector::new(7.0,8.0);
     let mut v5:vector = vector::new(9.0,10.0);
+    let mut ap:APEngine = APEngine::new();
+
+    ap.init(0.25);
     
     println!("v = {:?}, v2 = {:?}, v3 = {:?} , v4 = {:?} , v5 = {:?}  ", v, v2, v3, v4, v5);
     v.set_to(4.0, 5.0);
@@ -31,5 +35,6 @@ fn main()
     v5 = v5.normalize();
     v5 = v5.rotate(&0.52);
     println!("Hello, World! {:?}, {:?}, {}, {}, {:?}, {:?}, {:?}, {:?}", c, t, v2.cross(&v), v2.dot(&v), v2.plus(&v), v2.minus(&v), v3, v5);
+  
 
 }
