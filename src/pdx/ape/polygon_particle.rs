@@ -28,7 +28,7 @@ struct polygon_particle
     original_vertices:Vec<vector>,
     vertices:Vec<vector>,
     numVertices:i64,
-    axes:Vec<vector,
+    axes:Vec<vector>,
     curr:vector,
     prev:vector,
     temp:vector,
@@ -47,7 +47,6 @@ struct polygon_particle
     right_max:f64,
     multi_sampe:i64,
     coll:collision,
-    pinned:bool,
     pin:vector,
 }
 
@@ -63,88 +62,90 @@ impl particle for polygon_particle
     
     fn get_mass(&self)-> f64
     {
-        //not implimented
-        return 0.0;
+        return self.mass;
     }
     fn set_mass(&mut self, m:f64)
     {
-        //not implimented
+        self.mass = m;
     }
 
-	fn get_elasticity()-> f64
+	fn get_elasticity(&self)-> f64
     {
-        //not implimented
+        return self.elasticity;
     }
 	fn set_elasticity(&mut self, e:f64)
     {
-        //not implimented
+        self.elasticity = e;
     }
 
-	fn get_curr()-> vector
+	fn get_curr(&self)-> vector
     {
-        //not implimented
+        return self.curr;
     }
 	fn set_curr(&mut self, c:vector)
     {
-        //not implimented
+        self.curr.copy(c);
     }
 
-	fn get_position()-> vector
+	fn get_position(&self)-> vector
     {
-        //not implimented
+        return vector::new().copy(self);
     }
 	fn set_position(&mut self, c:vector)
     {
-        //not implimented
+        self.curr.copy(c);
+        self.prev.copy(c);
     }
 
-	fn get_prev()-> vector
+	fn get_prev(&self)-> vector
     {
-
+        return self.prev;
     }
 	fn set_prev(&mut self, p:vector)
     {
-
+         self.prev = p;
     }
 
-	fn get_px()-> f64
+	fn get_px(&self)-> f64
     {
-
+        return self.curr.x;
     }
-	fn set_px(&mut self, f:f64)
+	fn set_px(&mut self, x:f64)
     {
-
-    }
-
-	fn get_py()-> f64
-    {
-
-    }
-	fn set_py(&mut self, f:f64)
-    {
-
+        self.curr.x = x;
+        self.prev.x = x;
     }
 
-	fn get_curr_x()-> f64
+	fn get_py(&self)-> f64
     {
-
+        return self.curr.y;
     }
-	fn set_curr_x(&mut self, f:f64)
+	fn set_py(&mut self, y:f64)
     {
-
+        self.curr.y = y;
+        self.prev.y = y;
     }
 
-	fn get_curr_y()-> f64
+	fn get_curr_x(&self)-> f64
     {
-
+        return self.curr.x;
     }
-	fn set_curr_y(&mut self, f:f64)
+	fn set_curr_x(&mut self, x:f64)
     {
+        self.curr.x = x;
+    }
 
+	fn get_curr_y(&mut self)-> f64
+    {
+        return self.curr.y;
+    }
+	fn set_curr_y(&mut self, y:f64)
+    {
+        self.curr.y = y;
     }
     
 
-	fn get_samp()-> vector
+	fn get_samp(&self)-> vector
     {
 
     }
@@ -153,7 +154,7 @@ impl particle for polygon_particle
 
     }
 
-	fn get_interval()-> interval
+	fn get_interval(&self)-> interval
     {
 
     }
@@ -162,7 +163,7 @@ impl particle for polygon_particle
 
     }
 
-	fn get_temp()-> vector
+	fn get_temp(&self)-> vector
     {
 
     }
@@ -171,7 +172,7 @@ impl particle for polygon_particle
 
     }
 
-	fn get_forces()-> vector
+	fn get_forces(&self)-> vector
     {
 
     }
@@ -180,7 +181,7 @@ impl particle for polygon_particle
 
     }
 
-	fn get_collision()-> collision
+	fn get_collision(&self)-> collision
     {
 
     }
@@ -192,7 +193,7 @@ impl particle for polygon_particle
 	//fn get_parent()-> particle_collection;
 	//fn set_parent(&mut self, pc:particle_collection);
 
-	fn get_kfr()-> f64
+	fn get_kfr(&self)-> f64
     {
 
     }
@@ -201,7 +202,7 @@ impl particle for polygon_particle
 
     }
 
-	fn get_inv_mass()-> f64
+	fn get_inv_mass(&self)-> f64
     {
 
     }
@@ -210,7 +211,7 @@ impl particle for polygon_particle
 
     }
 
-	fn get_friction()-> f64
+	fn get_friction(&self)-> f64
     {
 
     }
@@ -219,7 +220,7 @@ impl particle for polygon_particle
 
     }
 
-	fn get_fixed()-> bool
+	fn get_fixed(&self)-> bool
     {
 
     }
@@ -228,7 +229,7 @@ impl particle for polygon_particle
 
     }
 
-	fn get_collidable()-> bool
+	fn get_collidable(&self)-> bool
     {
 
     }
@@ -237,7 +238,7 @@ impl particle for polygon_particle
 
     }
 
-	fn get_pinned()-> bool
+	fn get_pinned(&self)-> bool
     {
 
     }
@@ -249,7 +250,7 @@ impl particle for polygon_particle
 	//fn get_pinned_to()-> particle;
 	//fn set_pinned_to(&mut self, p:particle);
 
-	fn get_pin()-> vector
+	fn get_pin(&self)-> vector
     {
 
     }
@@ -258,7 +259,7 @@ impl particle for polygon_particle
 
     }
 
-	fn get_center()-> vector
+	fn get_center(&self)-> vector
     {
 
     }
@@ -267,7 +268,7 @@ impl particle for polygon_particle
 
     }
 
-	fn get_multi_sample()-> i64
+	fn get_multi_sample(&self)-> i64
     {
 
     }
@@ -276,7 +277,7 @@ impl particle for polygon_particle
 
     }
 
-	fn get_smashable()-> bool
+	fn get_smashable(&self)-> bool
     {
 
     }
@@ -285,7 +286,7 @@ impl particle for polygon_particle
 
     }
 
-	fn get_max_exit_velocity()-> f64
+	fn get_max_exit_velocity(&self)-> f64
     {
 
     }
@@ -294,7 +295,7 @@ impl particle for polygon_particle
 
     }
 
-	fn get_velocity()-> vector
+	fn get_velocity(&self)-> vector
     {
 
     }
@@ -303,7 +304,7 @@ impl particle for polygon_particle
 
     }
 
-	fn get_at_rest()-> bool
+	fn get_at_rest(&self)-> bool
     {
 
     }
@@ -312,7 +313,7 @@ impl particle for polygon_particle
 
     }
 
-	fn get_rest_loops()-> i64
+	fn get_rest_loops(&self)-> i64
     {
 
     }
@@ -321,7 +322,7 @@ impl particle for polygon_particle
 
     }
 
-	fn get_rest_count()-> i64
+	fn get_rest_count(&self)-> i64
     {
 
     }
@@ -330,7 +331,7 @@ impl particle for polygon_particle
 
     }
 
-	fn get_left_max_x()-> i64
+	fn get_left_max_x(&self)-> i64
     {
 
     }
@@ -339,7 +340,7 @@ impl particle for polygon_particle
 
     }
 
-	fn get_right_max_x()-> i64
+	fn get_right_max_x(&self)-> i64
     {
 
     }
@@ -375,32 +376,32 @@ impl particle for polygon_particle
 
     }
 
-	fn get_inv_inertia()->f64
+	fn get_inv_inertia(&self)->f64
     {
 
     }
 
-	fn get_ang_velocity()->f64
+	fn get_ang_velocity(&self)->f64
     {
 
     }
 
-	fn set_ang_velocity(a:f64)
+	fn set_ang_velocity(&mut self, a:f64)
     {
 
     }
 
-	fn get_radian()->f64
+	fn get_radian(&self)->f64
     {
 
     }
 
-	fn get_left_most_x_value():f64
+	fn get_left_most_x_value(&self)->f64
     {
 
     }
 
-	fn get_right_most_x_value():f64
+	fn get_right_most_x_value(&self)->f64
     {
 
     }

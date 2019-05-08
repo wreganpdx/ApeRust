@@ -4,4 +4,4 @@ pub mod CircleBody;
 pub mod particle;
 pub mod interval;
 pub mod collision;
-pub mod polygon_particle
+pub mod polygon_particle;
