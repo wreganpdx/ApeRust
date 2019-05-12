@@ -26,7 +26,8 @@ impl App {
         let (x, y) = (args.width / 2.0,
                       args.height / 2.0);
 
-        self.gl.draw(args.viewport(), |c, gl| {
+        self.gl.draw(args.viewport(), |c, gl| 
+        {
             // Clear the screen.
             clear(GREEN, gl);
 
@@ -67,6 +68,7 @@ fn main() {
     let mut events = Events::new(EventSettings::new());
     while let Some(e) = events.next(&mut window) {
         if let Some(r) = e.render_args() {
+          
             app.render(&r);
         }
 

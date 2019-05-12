@@ -30,6 +30,11 @@ impl vector
         vector { x: x, y: y }
     }
 
+    pub fn clone(&self) -> vector 
+    {
+        return vector::new(self.x, self.y);
+    }
+
     pub fn set_to(&mut self, px: f64, py: f64)
     {
 		self.x = px;
@@ -57,7 +62,7 @@ impl vector
 	}
 
     		
-	pub fn plusEquals(&mut self, v:&vector)->&vector 
+	pub fn plus_equals(&mut self, v:&vector)->&vector 
     {
         self.x += v.x;
         self.y += v.y;
@@ -69,7 +74,7 @@ impl vector
 		return vector::new(self.x - v.x, self.y - v.y);  
 	}
 
-    pub fn minusEquals(&mut self, v:&vector)->&vector 
+    pub fn minus_equals(&mut self, v:&vector)->&vector 
     {
         self.x -= v.x;
         self.y -= v.y;
@@ -81,7 +86,7 @@ impl vector
         return vector::new(self.x *s, self.y *s);
 	}
 
-    pub fn multEquals(&mut self, s:f64)->&vector 
+    pub fn mult_equals(&mut self, s:f64)->&vector 
     {
         self.x *= s;
         self.y *= s;
@@ -93,7 +98,7 @@ impl vector
 		return vector::new(self.x * v.x, self.y * v.y);  
 	}
 
-    pub fn divEquals(&mut self, mut s:f64)->&vector 
+    pub fn div_equals(&mut self, mut s:f64)->&vector 
     {
         if s == 0.0
         { s = 0.0001;}

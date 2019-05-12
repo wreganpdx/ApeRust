@@ -19,8 +19,8 @@ use std::fmt;
 #[derive(Default)]
 pub struct interval
 {
-    min:f64,
-    max:f64,
+    pub min:f64,
+    pub max:f64,
 }
 
 impl interval
@@ -28,5 +28,11 @@ impl interval
 	pub fn new(min: f64, max: f64) -> interval 
     {
         interval { min:min, max:max }
+    }
+}
+
+impl fmt::Debug for interval {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "interval {{ min: {}, max: {} }}", self.min, self.max)
     }
 }

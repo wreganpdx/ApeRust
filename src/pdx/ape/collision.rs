@@ -20,8 +20,8 @@ use crate::vector::vector;
 #[derive(Default)]
 pub struct collision
 {
-    vn:vector,
-    vt:vector,
+    pub vn:vector,
+    pub vt:vector,
 }
 
 impl collision
@@ -29,5 +29,10 @@ impl collision
 	pub fn new(vn:vector, vt:vector) -> collision 
     {
         collision { vn:vn, vt:vt}
+    }
+
+    pub fn clone(&self) -> collision
+    {
+        return collision::new(self.vn.clone(), self.vt.clone());
     }
 }
