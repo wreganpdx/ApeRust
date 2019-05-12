@@ -32,10 +32,7 @@ extern crate graphics;
 extern crate glutin_window;
 extern crate opengl_graphics;
 
-use piston::window::WindowSettings;
-use piston::event_loop::*;
 use piston::input::*;
-use glutin_window::GlutinWindow as Window;
 use opengl_graphics::{ GlGraphics, OpenGL };
 
 #[allow(unused_variables)]
@@ -139,7 +136,7 @@ impl particle_collection
 				self.poly_particles.insert(i, p);
 				continue;
 			}
-			for j in (0..length-1)
+			for j in 0..length-1
 			{
 				let mut p2 = self.poly_particles.remove(j);
 				if !p2.get_collidable() || (p2.get_fixed() && p.get_fixed())
