@@ -53,13 +53,13 @@ pub trait particle
 	fn get_elasticity(&self)-> f64;
 	fn set_elasticity(&mut self, e:f64);
 
-	fn get_curr(&self)-> vector;
+	fn get_curr(&self)-> &vector;
 	fn set_curr(&mut self, c:&vector);
 
 	fn get_position(&self)-> vector;
 	fn set_position(&mut self, c:&vector);
 
-	fn get_prev(&self)-> vector;
+	fn get_prev(&self)-> &vector;
 	fn set_prev(&mut self, p:&vector);
 
 	fn get_px(&self)-> f64;
@@ -177,6 +177,10 @@ pub trait particle
 	fn get_height(&self)->f64;
 
 	fn get_rotation(&self)->f64;
+
+	fn get_vertices(&mut self)->&Vec<vector>;
+
+	fn get_vertices_and_position(&mut self)->(&Vec<vector>, vector);
 
 	//fn resolve_collision(&mut self, mtd:vector, vel:vector, n:vector, d:f64, o:i64, p:&particle);
 

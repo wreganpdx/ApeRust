@@ -164,9 +164,9 @@ impl particle for polygon_particle
         self.elasticity = e;
     }
 
-	fn get_curr(&self)-> vector
+	fn get_curr(&self)-> &vector
     {
-        return self.curr.clone();
+        return &self.curr;
     }
 	fn set_curr(&mut self, c:&vector)
     {
@@ -183,9 +183,9 @@ impl particle for polygon_particle
         self.prev.copy(c);
     }
 
-	fn get_prev(&self)-> vector
+	fn get_prev(&self)-> &vector
     {
-        return self.prev.clone();
+        return &self.prev;
     }
 	fn set_prev(&mut self, p:&vector)
     {
@@ -349,6 +349,11 @@ impl particle for polygon_particle
 			self.axes.push(curr_axis);
 			j=i;
 		}
+	}
+
+	fn get_vertices(&mut self)->&Vec<vector>
+	{
+		return &self.vertices;
 	}
 
 	fn get_projection(&mut self, axis:&vector)->&interval 
@@ -576,7 +581,7 @@ impl particle for polygon_particle
 			self.add_massless_force(ap.massless_force.clone());
 	
 			// integrate
-			self.set_temp(&self.get_curr());
+			self.set_temp(&self.get_position());
 			
 			let mut nv:vector = self.velocity.plus(self.forces.mult_equals(ap.time_step));
 			self.curr.plus_equals(&nv.mult_equals(ap.damping));
@@ -585,7 +590,10 @@ impl particle for polygon_particle
 			// clear the forces
 			self.forces.set_to(0.0,0.0);
     }
-
+	fn get_vertices_and_position(&mut self)->(&Vec<vector>, vector)
+	{
+		return (&self.vertices, self.curr.clone());
+	}
 	fn get_components(&mut self, cn:&vector)->collision
     {
 		let mut vel:vector = self.velocity.clone();
@@ -596,28 +604,30 @@ impl particle for polygon_particle
     }
 	fn resolve_collision(&mut self, mtd:&vector, vel:&vector, n:&vector, d:f64, o:i32)
 	{
-			if !self.fixed
+		if !self.fixed
+		{
+			self.curr.plus_equals(mtd);
+			self.set_velocity(vel);
+		}
+		
+		if self.smashable
+		{
+			let ev:f64 = vel.magnitude();
+			if ev > self.max_exit_velocity
 			{
-				self.curr.plus_equals(mtd);
-				self.set_velocity(vel);
+				//note: These smash events are probably not necessary.
+				//dispatchEvent(new SmashEvent(SmashEvent.COLLISION, ev));
 			}
-			
-			if self.smashable
-			{
-				let ev:f64 = vel.magnitude();
-				if ev > self.max_exit_velocity
-				{
-					//note: These smash events are probably not necessary.
-					//dispatchEvent(new SmashEvent(SmashEvent.COLLISION, ev));
-				}
-			}
+		}
 			
 	}
 	fn resolve_velocities(&mut self, dv:vector, dw:f64, normal:vector)
     {
 		if !self.fixed
 		{
+			println!("Velocity old {:?}, velocity delta {:?}", self.velocity, dv);
 			self.velocity = self.velocity.plus(&dv);
+			println!("Velocity new {:?}, velocity delta {:?}", self.velocity, dv);
 		}
     }
 

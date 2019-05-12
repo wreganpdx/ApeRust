@@ -8,6 +8,7 @@ use ApeRust::vector::vector;
 use ApeRust::APEngine::APEngine;
 use ApeRust::polygon_particle::polygon_particle;
 use std::{thread, time};
+use std::time::{Duration, Instant};
 use ApeRust::particle::particle;
 use ApeRust::particle_collection::particle_collection;
 use ApeRust::APEngine::Paint;
@@ -41,7 +42,7 @@ fn main()
     let mut v5:vector = vector::new(9.0,10.0);
     let mut ap:APEngine = APEngine::new();
 
-    ap.init(0.25);
+    ap.init(0.01);
 
     //boundries
     let mut left: polygon_particle = polygon_particle::new();
@@ -70,35 +71,31 @@ fn main()
     bottom.set_fixed(true);
     left.set_fixed(true);
     right.set_fixed(true);
-        // { x: 400, y: 2.5 } Vector { x: 797.5, y: 405 } 
-         // bottom                       right
-        //{ x: 2.5, y: 405 } Vector { x: 400, y: 2.5 }
-        // left                       bottom
-        //{ x: 797.5, y: 405 } Vector { x: 400, y: 802.5 }
-        //    right                         top
-    //println!("right  width  + x: {} ", (right.get_position().x - (right.get_width()/2.0) ));
-    //println!("top  -width  + x: {}", (top.get_position().x - (top.get_width()/2.0)));
-//
 
 
     //objects
     let mut p: polygon_particle = polygon_particle::new();
     let mut p2: polygon_particle = polygon_particle::new();
 
-    p.create_vertices_from_rect(8.0,5.0);
-    p2.create_vertices_from_rect(8.0,5.0);
+    //p.set_radian(0.2);
+
+    p.create_vertices_from_rect(40.0,5.0);
+    p2.create_vertices_from_rect(40.0,5.0);
+
+    
+  //  p.set_radian(0.2);
 
     p.set_collidable(true);
     p2.set_collidable(true);
 
-    p.set_elasticity(0.5);
-    p2.set_elasticity(0.5);
+    p.set_elasticity(1.0);
+    p2.set_elasticity(1.0);
 
-    p.set_position(&vector::new(420.0,415.0));
-    p2.set_position(&vector::new(450.0,415.0));
+    p.set_position(&vector::new(200.0,415.0));
+    p2.set_position(&vector::new(600.0,415.0));
 
-    p.set_velocity(&vector::new(2.0,0.0));
-    p2.set_velocity(&vector::new(-2.0,0.0));
+    p.set_velocity(&vector::new(1.0,0.0));
+    p2.set_velocity(&vector::new(-1.0,0.000));
 
 
     let mut list:particle_collection = particle_collection::new();
@@ -142,8 +139,8 @@ fn main()
     step = ap.step();
     let mut i:i32 = 0;
     let mut events = Events::new(EventSettings::new());
-
-    for i in 0..100
+    let now = Instant::now();
+    for i in 0..100000
     {
         step = ap.step();
         
@@ -151,7 +148,7 @@ fn main()
         {
             if let Some(r) = e.render_args() 
             {
-                print!("Rendering");
+               // print!("Rendering");
                 ap.paint(&r, &mut gl); //.render(&r);
                 break;
             }
@@ -159,13 +156,18 @@ fn main()
         if !step
         {
            // println!(" p: {:?}", p.get_position());
-            let ten_millis = time::Duration::from_millis(100);
-            thread::sleep(ten_millis);
+            //let ten_millis = time::Duration::from_millis(1);
+            //thread::sleep(ten_millis);
            // print!("Sleeping: {}", i);
         }
         else
         {
             print!("Step: {} ", i);
+        }
+
+        if now.elapsed().as_secs() > 15
+        {
+            break;
         }
     }
 }

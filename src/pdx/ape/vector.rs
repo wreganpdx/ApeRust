@@ -157,6 +157,11 @@ impl vector
         let s = r.sin();
         return vector::new(self.x*c-self.y*s,self.x*s+self.y*c);
 	}
+
+    pub fn swap(&self)-> vector
+    {
+        return vector::new(self.y, self.x);
+    }
 }
 
 impl fmt::Debug for vector {
