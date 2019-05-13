@@ -7,7 +7,7 @@
 
 pub fn resolve_particle_particle(pa:&mut polygon_particle, pb:&mut polygon_particle, normal:&vector, depth:f64)
 {
-    println!("Collision: {:?} {:?} {:?} {:?} ", pa.get_curr(), pb.get_curr(), normal, depth);
+   // println!("Collision: {:?} {:?} {:?} {:?} ", pa.get_curr(), pb.get_curr(), normal, depth);
     let im_pb_inv_mass:f64 = pb.get_inv_mass();
     let im_pa_inv_mass:f64 = pa.get_inv_mass();
     // {
@@ -24,11 +24,11 @@ pub fn resolve_particle_particle(pa:&mut polygon_particle, pb:&mut polygon_parti
     pb.set_curr(&pb.get_samp());
     
     let mtd:vector = normal.mult(depth);       
-    println!("Collision: mtd {:?} ", mtd);    
+    //println!("Collision: mtd {:?} ", mtd);    
     let te:f64 = pa.get_elasticity() + pb.get_elasticity();
-    println!("Collision: te {:?} ", te);    
+   // println!("Collision: te {:?} ", te);    
     let sum_inv_mass:f64 = im_pa_inv_mass + im_pb_inv_mass;
-    println!("Collision: sum_inv_mass {:?} ", sum_inv_mass);    
+   // println!("Collision: sum_inv_mass {:?} ", sum_inv_mass);    
     
     // the total friction in a collision is combined but clamped to [0,1]
     let tf:f64 = 1.0;//clamp(1 - (pa.friction + pb.friction), 0, 1);

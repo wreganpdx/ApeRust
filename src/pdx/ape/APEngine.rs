@@ -45,7 +45,8 @@ pub struct APEngine
 	pub damping:f64,
 	constraint_cycles:i64,
 	constraint_collision_cycles:i64,
-	part_collection:Vec<particle_collection>
+	part_collection:Vec<particle_collection>,
+	id_count:i64,
 }
 
 pub trait Paint
@@ -105,7 +106,13 @@ impl APEngine
 		 * continously to advance the simulation. The faster this method is 
 		 * called, the faster the simulation will run. Usually you would call
 		 * this in your main program loop. 
-		 */			
+		 */		
+
+	pub fn get_new_id(&mut self)->i64
+	{
+		self.id_count = self.id_count + 1;
+		return self.id_count;
+	}	
 	pub fn paint_all(&mut self, args: &RenderArgs, gl:&mut GlGraphics)
 	{
 		for i in 0..self.part_collection.len()
@@ -161,10 +168,23 @@ impl APEngine
 	{
 	//	println!("Check collisions");
 		let values:APValues = self.get_ap_values();
-		for i in 0..self.part_collection.len()
+		let length = self.part_collection.len();
+		for i in 0..length
 		{
-		//	println!("Check LIST");
 			self.part_collection[i].check_collisions(&values);
+		}
+		
+		for i in 0..length
+		{
+			let mut rem = self.part_collection.remove(i);
+			let length2 = self.part_collection.len();
+			for j in 0..length2
+			{
+				let mut rem2 = self.part_collection.remove(j);
+				rem.check_collisions_vs_collection(&mut rem2, &values);
+				self.part_collection.insert(j, rem2);
+			}
+			self.part_collection.insert(i, rem);
 		}
 	}
 	pub fn integrate(&mut self)
@@ -191,6 +211,7 @@ impl APEngine
 		self.constraint_cycles = 0;
 		self.constraint_collision_cycles = 1;
 		println!("Ape Engine Initialized");
+		self.id_count = 0;
 
 	}
 
@@ -207,6 +228,15 @@ impl APEngine
 	pub fn add_particle_collection(&mut self, pc:particle_collection)
 	{
 		self.part_collection.push(pc);
+	}
+
+	pub fn set_massless_force(&mut self, v:vector)
+	{
+		self.massless_force = v;
+	}
+	pub fn set_force(&mut self, v:vector)
+	{
+		self.force = v;
 	}
 }
 

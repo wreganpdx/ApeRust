@@ -20,22 +20,16 @@ extern crate graphics;
 extern crate glutin_window;
 extern crate opengl_graphics;
 
-use piston::window::WindowSettings;
-use piston::event_loop::*;
 use piston::input::*;
-use glutin_window::GlutinWindow as Window;
-use opengl_graphics::{ GlGraphics, OpenGL };
+use opengl_graphics::{ GlGraphics};
 
 
 use crate::vector::vector;
 use crate::interval::interval;
 use crate::collision::collision;
 use crate::particle::particle;
-use crate::particle::shapes;
-use crate::APEngine::APEngine;
 use crate::APEngine::APValues;
 use crate::APEngine::Paint;
-use crate::particle_collection::particle_collection;
 use std::any::Any;
 use std::f64;
 
@@ -83,9 +77,11 @@ pub struct polygon_particle
 
 impl polygon_particle
 {
-    pub fn new()->polygon_particle
+    pub fn new(id:i64)->polygon_particle
     {
-        return polygon_particle::default();
+		let mut p = polygon_particle::default();
+		p.set_id(id);
+        return p;
     }
 
 	pub fn create_vertices_from_rect(&mut self, width:f64, height:f64)
@@ -139,7 +135,14 @@ impl PartialEq for polygon_particle
 
 impl particle for polygon_particle 
 {
-
+	fn set_id(&mut self, i:i64)
+	{
+		self.id = i;
+	}
+	fn get_id(&self)->&i64
+	{
+		return &self.id;
+	}
 	fn as_any(&self) -> &dyn Any 
 	{
         self

@@ -12,6 +12,8 @@ use std::time::{Duration, Instant};
 use ApeRust::particle::particle;
 use ApeRust::particle_collection::particle_collection;
 use ApeRust::APEngine::Paint;
+//use crate object_helper::create_rectangle; 
+mod object_helper;
 
 use piston::window::WindowSettings;
 use piston::event_loop::*;
@@ -45,10 +47,10 @@ fn main()
     ap.init(0.01);
 
     //boundries
-    let mut left: polygon_particle = polygon_particle::new();
-    let mut right: polygon_particle = polygon_particle::new();
-    let mut top: polygon_particle = polygon_particle::new();
-    let mut bottom: polygon_particle = polygon_particle::new();
+    let mut left: polygon_particle = polygon_particle::new(ap.get_new_id());
+    let mut right: polygon_particle = polygon_particle::new(ap.get_new_id());
+    let mut top: polygon_particle = polygon_particle::new(ap.get_new_id());
+    let mut bottom: polygon_particle = polygon_particle::new(ap.get_new_id());
 
     left.create_vertices_from_rect(5.0,800.0);
 
@@ -74,8 +76,8 @@ fn main()
 
 
     //objects
-    let mut p: polygon_particle = polygon_particle::new();
-    let mut p2: polygon_particle = polygon_particle::new();
+    let mut p: polygon_particle = polygon_particle::new(ap.get_new_id());
+    let mut p2: polygon_particle = polygon_particle::new(ap.get_new_id());
 
     //p.set_radian(0.2);
 
@@ -97,6 +99,17 @@ fn main()
     p.set_velocity(&vector::new(1.0,0.0));
     p2.set_velocity(&vector::new(-1.0,0.000));
 
+    let mut p3 = particle_collection::new();
+
+    p3.init_composite(vector::new(400.0, 415.0));
+
+    object_helper::create_rectangle(&mut p3, 
+    (ap.get_new_id(), ap.get_new_id(),
+    ap.get_new_id(), ap.get_new_id(),
+    ap.get_new_id(), ap.get_new_id(),
+    ap.get_new_id(), ap.get_new_id()));
+
+    p3.set_collide_internal(false);
 
     let mut list:particle_collection = particle_collection::new();
 
@@ -110,6 +123,9 @@ fn main()
     list.set_collide_internal(true);
 
     ap.add_particle_collection(list);
+    ap.add_particle_collection(p3);
+
+    ap.set_force(vector::new(0.0,20.0));
     /*
     println!("v = {:?}, v2 = {:?}, v3 = {:?} , v4 = {:?} , v5 = {:?}  ", v, v2, v3, v4, v5);
     v.set_to(4.0, 5.0);
@@ -140,6 +156,7 @@ fn main()
     let mut i:i32 = 0;
     let mut events = Events::new(EventSettings::new());
     let now = Instant::now();
+    let mut exit = false;
     for i in 0..100000
     {
         step = ap.step();
@@ -151,6 +168,11 @@ fn main()
                // print!("Rendering");
                 ap.paint(&r, &mut gl); //.render(&r);
                 break;
+            }
+
+            if let Some(r) = e.close_args()
+            {
+               exit = true;
             }
         }
         if !step
@@ -165,7 +187,8 @@ fn main()
             print!("Step: {} ", i);
         }
 
-        if now.elapsed().as_secs() > 15
+
+        if now.elapsed().as_secs() > 15 || exit
         {
             break;
         }

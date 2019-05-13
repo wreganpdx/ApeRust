@@ -53,6 +53,63 @@ pub fn test_polygon_vs_polygon(ra:& mut polygon_particle, rb:&mut polygon_partic
 	return true;
 }
 
+pub fn test_polygon_vs_polygon2(ra:& mut polygon_particle, rb:&mut polygon_particle, p_size:usize, p2_size:usize)->bool
+{		
+	let mut collision_normal:vector = vector::new(0.0,0.0);
+	let mut collision_depth:f64 = 0.0; 
+	for i in 0..2
+	{
+		//println!("TESTING COLLISION paxes: {} ", i);
+
+		let tuple = ra.get_interval_and_axe(i);
+		let depth_a:f64 = test_intervals(&tuple.1, rb.get_projection(&tuple.0));
+		
+		let tuple2 = rb.get_interval_and_axe(i);
+		let depth_b:f64 = test_intervals(&tuple2.1, ra.get_projection(&tuple2.0));
+
+		let absA:f64 = depth_a.abs();
+		let absB:f64 = depth_b.abs();
+
+		if (absA == 0.0 && absB == 0.0)
+		{
+			return false;
+		}
+
+		if absA > collision_depth || absB > collision_depth 
+		{
+			let altb:bool = absA < absB;
+			if altb 
+			{
+				collision_normal.copy(&tuple.0);
+			}
+			else
+			{
+				collision_normal.copy(&tuple2.0);
+			}
+			if altb
+			{
+				collision_depth = depth_a;
+			}
+			else
+			{
+				collision_depth = depth_b;
+			}
+		}
+	}
+
+	if (collision_depth == 0.0)
+	{
+		return false;
+	}
+	//rotate(&(-f64::consts::PI/2.0)  //one possibility to fix bug is rotate normal, though this seems to pose more problems.
+	//println!("Collision: {:?} {:?}", ra.get_curr(), rb.get_curr());
+	collision_resolver::resolve_particle_particle(ra, rb, &collision_normal, collision_depth);
+	//println!("Collision: {:?} {:?}", ra.get_curr(), rb.get_curr());
+	//println!("COLLISION");
+	return true;
+}
+
+
 pub fn test_rigid_polygon_vs_rigid_polygon(ra:& mut polygon_particle, rb:&mut polygon_particle, p_size:usize, p2_size:usize)->bool
 {	
 	//println!("TESTING COLLISION psize: {}, p2size: {} ", p_size, p2_size);
@@ -279,6 +336,7 @@ fn test_intervals(interval_a:&interval, interval_b:&interval)->f64
 	if interval_b.max < interval_a.min
 	{return 0.0;}
 
+	//println!("interval a : {:?} interval b : {:?}", interval_a, interval_b);
 	let len_a:f64 = interval_b.max - interval_a.min;
 	let len_b:f64 = interval_b.min - interval_a.max;
 
