@@ -58,36 +58,41 @@ pub fn test_polygon_vs_polygon(ra:& mut polygon_particle, rb:&mut polygon_partic
 pub fn test_rect_vs_rect(ra:& mut rectangle_particle, rb:&mut rectangle_particle)->bool
 {		
 	let mut collision_normal:vector = vector::new(0.0,0.0);
-	let mut collision_depth:f64 = 17976931348623157.0; 
+	let mut collision_depth:f64 = 1000000.0; 
 	//println!("{}", collision_depth);
 	for i in 0..2
 	{
 
-		let axisA = &ra.get_axe(i);
-		let depth_a = test_intervals(ra.get_projection(axisA), rb.get_projection(axisA));
+		let axis_a = &ra.get_axe(i);
+		let depth_a = test_intervals(ra.get_projection(axis_a), rb.get_projection(axis_a));
+		let abs_a:f64 = depth_a.abs();
+		if abs_a == 0.0 
+		{
+		//	println!("ret false");
+			return false;
+		}
+		let axis_b = &rb.get_axe(i);
+		let depth_b = test_intervals(ra.get_projection(axis_b), rb.get_projection(axis_b));
 
-		let axisB = &rb.get_axe(i);
-		let depth_b = test_intervals(ra.get_projection(axisB), rb.get_projection(axisB));
-
-		let absA:f64 = depth_a.abs();
-		let absB:f64 = depth_b.abs();
+		
+		let abs_b:f64 = depth_b.abs();
 	//	println!("absA : {} , absB {} ",absA, absB);
-		if absA == 0.0 || absB == 0.0
+		if abs_b == 0.0
 		{
 		//	println!("ret false");
 			return false;
 		}
 
-		if absA < collision_depth || absB < collision_depth 
+		if abs_a < collision_depth || abs_b < collision_depth 
 		{
-			let altb:bool = absA < absB;
+			let altb:bool = abs_a < abs_b;
 			if altb 
 			{
-				collision_normal.copy(axisA);
+				collision_normal.copy(axis_a);
 			}
 			else
 			{
-				collision_normal.copy(axisB);
+				collision_normal.copy(axis_b);
 			}
 			if altb
 			{
@@ -100,7 +105,7 @@ pub fn test_rect_vs_rect(ra:& mut rectangle_particle, rb:&mut rectangle_particle
 		}
 	}
 
-	println!("COLLISON");
+	//println!("COLLISON");
 	//rotate(&(-f64::consts::PI/2.0)  //one possibility to fix bug is rotate normal, though this seems to pose more problems.
 	//println!("Collision: {:?} {:?}", ra.get_curr(), rb.get_curr());
 	collision_resolver::resolve_collision_rect_rect(ra, rb, collision_normal, collision_depth);

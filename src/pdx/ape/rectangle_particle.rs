@@ -315,6 +315,7 @@ impl particle for rectangle_particle
 	{
 		let s = self.radian.sin();
 		let c = self.radian.cos();
+        println!("s: {},c: {}", s, c);
 		self.axes[0] = vector::new(c.clone(), s.clone());
 		self.axes[1] = vector::new(-s, c);
 	}
@@ -565,7 +566,9 @@ impl particle for rectangle_particle
 			self.prev = self.curr.clone();
         
 			self.curr.plus_equals(mtd);
-			self.set_velocity(vel);
+            let mut normalMTD = mtd.clone().normalize();
+            normalMTD.mult_equals(mag);
+			self.set_velocity(&vel);
             println!("vel: {:?}, mtd: {:?}",vel, mtd);
 		}
 		

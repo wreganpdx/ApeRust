@@ -169,37 +169,3 @@ impl fmt::Debug for vector {
         write!(f, "Vector {{ x: {}, y: {} }}", self.x, self.y)
     }
 }
-
-/*
-	import flash.filters.ColorMatrixFilter;
-	import flash.geom.Matrix;
-
-		
-				
-		public function toString():String {
-			return (x + " : " + y);
-		}
-		
-		public function applyMatrix(m:Matrix):Vector {
-			var v:Vector = new Vector();
-			v.x = x * m.a + y * m.c;
-			v.y = x * m.b + y * m.d;
-			return v;			
-		}
-		
-		public function multMatrix(m:Matrix):Vector {
-			var v:Vector = new Vector();
-			v.x = x * m.a + y * m.b;
-			v.y = x * m.c + y * m.d;
-			return v;
-		}
-		
-		public function multEqualsMatrix(m:Matrix):Vector{
-			x = x * m.a + y * m.b;
-			y = x * m.c + y * m.d;
-			return this;
-		}
-
-	}
-}
-*/

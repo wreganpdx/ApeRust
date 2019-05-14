@@ -22,6 +22,9 @@ use piston::event_loop::*;
 use piston::input::*;
 use glutin_window::GlutinWindow as Window;
 use opengl_graphics::{ GlGraphics, OpenGL };
+use std::f64::consts;
+
+use std::f64;
 
 fn main() 
 {
@@ -41,7 +44,7 @@ fn main()
     let mut gl:GlGraphics = GlGraphics::new(opengl);
     let mut ap:APEngine = APEngine::new();
 
-    ap.init(0.01);
+    ap.init(0.001);
 
     //boundries
     let mut left: rectangle_particle = rectangle_particle::new(ap.get_new_id());
@@ -78,16 +81,17 @@ fn main()
 
     let mut p_circle: circle_particle = circle_particle::new(ap.get_new_id());
 
-    //p.set_radian(0.2);
 
     p_circle.init_circle(6.0);
 
     p_circle.set_position(&vector::new(200.0, 600.0));
 
-    p.create_rectangle(40.0,5.0);
-    p2.create_rectangle(40.0,5.0);
+    p.create_rectangle(40.0,40.0);
+    p2.create_rectangle(40.0,15.0);
 
-    //p.set_radian(0.2);
+    //p.set_radian(f64::consts::PI /2.0);
+
+   //// p2.set_radian(f64::consts::PI /1.5);
 
     p.set_collidable(true);
     p2.set_collidable(true);
@@ -117,9 +121,9 @@ fn main()
 
     list.add_rectangle_particle(p);
     list.add_rectangle_particle(p2);
-    list.add_rectangle_particle(left);
-    list.add_rectangle_particle(right);
-   // list.add_rectangle_particle(top);
+    //list.add_rectangle_particle(left);
+    //list.add_rectangle_particle(right);
+    //list.add_rectangle_particle(top);
    // list.add_rectangle_particle(bottom);
 
     list.add_circle_particle(p_circle);
@@ -127,7 +131,7 @@ fn main()
     list.set_collide_internal(true);
 
     ap.add_particle_collection(list);
-   // ap.add_particle_collection(p3);
+    ap.add_particle_collection(p3);
 
    //ap.set_force(vector::new(0.0,20.0));
     /*
