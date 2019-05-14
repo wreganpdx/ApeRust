@@ -7,6 +7,7 @@ extern crate opengl_graphics;
 use ApeRust::vector::vector;
 use ApeRust::APEngine::APEngine;
 use ApeRust::polygon_particle::polygon_particle;
+use ApeRust::rectangle_particle::rectangle_particle;
 use ApeRust::circle_particle::circle_particle;
 use std::{thread, time};
 use std::time::{Duration, Instant};
@@ -38,26 +39,21 @@ fn main()
         .unwrap();
 
     let mut gl:GlGraphics = GlGraphics::new(opengl);
-    let mut v:vector = vector::new(2.0,4.0);
-    let mut v2:vector = vector::new(3.0,4.0);
-    let v3:vector = vector::new(5.0,6.0);
-    let mut v4:vector = vector::new(7.0,8.0);
-    let mut v5:vector = vector::new(9.0,10.0);
     let mut ap:APEngine = APEngine::new();
 
     ap.init(0.01);
 
     //boundries
-    let mut left: polygon_particle = polygon_particle::new(ap.get_new_id());
-    let mut right: polygon_particle = polygon_particle::new(ap.get_new_id());
-    let mut top: polygon_particle = polygon_particle::new(ap.get_new_id());
-    let mut bottom: polygon_particle = polygon_particle::new(ap.get_new_id());
+    let mut left: rectangle_particle = rectangle_particle::new(ap.get_new_id());
+    let mut right: rectangle_particle = rectangle_particle::new(ap.get_new_id());
+    let mut top: rectangle_particle = rectangle_particle::new(ap.get_new_id());
+    let mut bottom: rectangle_particle = rectangle_particle::new(ap.get_new_id());
 
-    left.create_vertices_from_rect(5.0,800.0);
+    left.create_rectangle(5.0,800.0);
 
-    right.create_vertices_from_rect(5.0,800.0);
-    top.create_vertices_from_rect(790.0,5.0);
-    bottom.create_vertices_from_rect(800.0,5.0);
+    right.create_rectangle(5.0,800.0);
+    top.create_rectangle(790.0,5.0);
+    bottom.create_rectangle(800.0,5.0);
 
     left.set_position(&vector::new(5.0, 400.0));
 
@@ -77,8 +73,8 @@ fn main()
 
 
     //objects
-    let mut p: polygon_particle = polygon_particle::new(ap.get_new_id());
-    let mut p2: polygon_particle = polygon_particle::new(ap.get_new_id());
+    let mut p: rectangle_particle = rectangle_particle::new(ap.get_new_id());
+    let mut p2: rectangle_particle = rectangle_particle::new(ap.get_new_id());
 
     let mut p_circle: circle_particle = circle_particle::new(ap.get_new_id());
 
@@ -88,11 +84,10 @@ fn main()
 
     p_circle.set_position(&vector::new(200.0, 600.0));
 
-    p.create_vertices_from_rect(40.0,5.0);
-    p2.create_vertices_from_rect(40.0,5.0);
+    p.create_rectangle(40.0,5.0);
+    p2.create_rectangle(40.0,5.0);
 
-    
-  //  p.set_radian(0.2);
+    //p.set_radian(0.2);
 
     p.set_collidable(true);
     p2.set_collidable(true);
@@ -120,21 +115,21 @@ fn main()
 
     let mut list:particle_collection = particle_collection::new();
 
-    list.add_poly_particle(p);
-    list.add_poly_particle(p2);
-    list.add_poly_particle(left);
-    list.add_poly_particle(right);
-    list.add_poly_particle(top);
-    list.add_poly_particle(bottom);
+    list.add_rectangle_particle(p);
+    list.add_rectangle_particle(p2);
+    list.add_rectangle_particle(left);
+    list.add_rectangle_particle(right);
+   // list.add_rectangle_particle(top);
+   // list.add_rectangle_particle(bottom);
 
     list.add_circle_particle(p_circle);
 
     list.set_collide_internal(true);
 
     ap.add_particle_collection(list);
-    ap.add_particle_collection(p3);
+   // ap.add_particle_collection(p3);
 
-    ap.set_force(vector::new(0.0,20.0));
+   //ap.set_force(vector::new(0.0,20.0));
     /*
     println!("v = {:?}, v2 = {:?}, v3 = {:?} , v4 = {:?} , v5 = {:?}  ", v, v2, v3, v4, v5);
     v.set_to(4.0, 5.0);

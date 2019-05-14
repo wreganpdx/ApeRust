@@ -37,14 +37,12 @@ pub trait particle
 	fn set_id(&mut self, i:i64);
 	fn get_id(&self)->&i64;
 	fn get_axes_len(&mut self)->usize;
-	fn get_interval_and_axe(&mut self, i:usize)->(vector, interval);
 
 	fn as_any(&self) -> &dyn Any;
 	
 	fn get_axes(&mut self)->&Vec<vector>;
 	fn set_axes(&mut self);
 
-	fn orient_vertices(&mut self, r:f64);
 
 	fn get_projection(&mut self, axis:&vector)->&interval;
 
@@ -178,10 +176,6 @@ pub trait particle
 	fn get_height(&self)->f64;
 
 	fn get_rotation(&self)->f64;
-
-	fn get_vertices(&mut self)->&Vec<vector>;
-
-	fn get_vertices_and_position(&mut self)->(&Vec<vector>, vector);
 
 	//fn resolve_collision(&mut self, mtd:vector, vel:vector, n:vector, d:f64, o:i64, p:&particle);
 

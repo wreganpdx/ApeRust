@@ -14,3 +14,4 @@ pub mod circle_particle;
 pub mod collision_detector;
 pub mod collision_resolver;
 pub mod poly_poly_constraint;
+pub mod rectangle_particle;

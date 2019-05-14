@@ -1,9 +1,11 @@
 use crate::particle::particle;
 use crate::polygon_particle::polygon_particle;
+use crate::rectangle_particle::rectangle_particle;
 use crate::interval::interval;
 use crate::vector::vector;
 use crate::collision_resolver;
 use std::any::Any;
+use num_traits::float::FloatCore;
 use std::f64;
 
 #[allow(unused_variables)]
@@ -11,7 +13,7 @@ pub fn test_polygon_vs_polygon(ra:& mut polygon_particle, rb:&mut polygon_partic
 {	
 	//println!("TESTING COLLISION psize: {}, p2size: {} ", p_size, p2_size);
 	let mut collision_normal:vector = vector::new(0.0,0.0);
-	let mut collision_depth:f64 = 100000000.0;//should be float max... 
+	let mut collision_depth:f64 = num_traits::float::Float::max_value();//should be float max... 
 	for i in 0..p_size
 	{
 		//println!("TESTING COLLISION paxes: {} ", i);
@@ -53,38 +55,39 @@ pub fn test_polygon_vs_polygon(ra:& mut polygon_particle, rb:&mut polygon_partic
 	return true;
 }
 
-pub fn test_polygon_vs_polygon2(ra:& mut polygon_particle, rb:&mut polygon_particle, p_size:usize, p2_size:usize)->bool
+pub fn test_rect_vs_rect(ra:& mut rectangle_particle, rb:&mut rectangle_particle)->bool
 {		
 	let mut collision_normal:vector = vector::new(0.0,0.0);
-	let mut collision_depth:f64 = 0.0; 
+	let mut collision_depth:f64 = 17976931348623157.0; 
+	//println!("{}", collision_depth);
 	for i in 0..2
 	{
-		//println!("TESTING COLLISION paxes: {} ", i);
 
-		let tuple = ra.get_interval_and_axe(i);
-		let depth_a:f64 = test_intervals(&tuple.1, rb.get_projection(&tuple.0));
-		
-		let tuple2 = rb.get_interval_and_axe(i);
-		let depth_b:f64 = test_intervals(&tuple2.1, ra.get_projection(&tuple2.0));
+		let axisA = &ra.get_axe(i);
+		let depth_a = test_intervals(ra.get_projection(axisA), rb.get_projection(axisA));
+
+		let axisB = &rb.get_axe(i);
+		let depth_b = test_intervals(ra.get_projection(axisB), rb.get_projection(axisB));
 
 		let absA:f64 = depth_a.abs();
 		let absB:f64 = depth_b.abs();
-
-		if (absA == 0.0 && absB == 0.0)
+	//	println!("absA : {} , absB {} ",absA, absB);
+		if absA == 0.0 || absB == 0.0
 		{
+		//	println!("ret false");
 			return false;
 		}
 
-		if absA > collision_depth || absB > collision_depth 
+		if absA < collision_depth || absB < collision_depth 
 		{
 			let altb:bool = absA < absB;
 			if altb 
 			{
-				collision_normal.copy(&tuple.0);
+				collision_normal.copy(axisA);
 			}
 			else
 			{
-				collision_normal.copy(&tuple2.0);
+				collision_normal.copy(axisB);
 			}
 			if altb
 			{
@@ -97,13 +100,10 @@ pub fn test_polygon_vs_polygon2(ra:& mut polygon_particle, rb:&mut polygon_parti
 		}
 	}
 
-	if (collision_depth == 0.0)
-	{
-		return false;
-	}
+	println!("COLLISON");
 	//rotate(&(-f64::consts::PI/2.0)  //one possibility to fix bug is rotate normal, though this seems to pose more problems.
 	//println!("Collision: {:?} {:?}", ra.get_curr(), rb.get_curr());
-	collision_resolver::resolve_particle_particle(ra, rb, &collision_normal, collision_depth);
+	collision_resolver::resolve_collision_rect_rect(ra, rb, collision_normal, collision_depth);
 	//println!("Collision: {:?} {:?}", ra.get_curr(), rb.get_curr());
 	//println!("COLLISION");
 	return true;
@@ -114,7 +114,7 @@ pub fn test_rigid_polygon_vs_rigid_polygon(ra:& mut polygon_particle, rb:&mut po
 {	
 	//println!("TESTING COLLISION psize: {}, p2size: {} ", p_size, p2_size);
 	let mut collision_normal:vector = vector::new(0.0,0.0);
-	let mut collision_depth:f64 = 100000000.0;//should be float max... 
+	let mut collision_depth:f64 = num_traits::float::Float::max_value();//should be float max... 
 	let offset:vector = ra.get_curr().minus(&rb.get_curr());
 	for i in 0..p_size
 	{

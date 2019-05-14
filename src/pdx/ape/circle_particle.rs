@@ -96,6 +96,54 @@ impl circle_particle
 		self.set_friction(0.5);
 		self.inv_mass = self.mass/1.0;
 	}
+
+		fn get_interval_and_axe(&mut self, i:usize)->(vector, interval)
+	{
+		//println!("made it here: {:?}", self.axes );
+		let vec:vector = self.axes[i].clone();
+		//println!("made it here: {:?}", self.axes );
+		let c:f64 =  self.get_curr().dot(&vec);
+		//println!("made it here: {:?}", self.axes );
+		let mut rad:f64 = self.vertices[0].dot(&vec);
+		//println!("made it here:");
+		let mut neg_rad:f64 = rad;
+		let mut pos_rad:f64 = rad;
+		
+		for i in 0..self.num_vertices
+		{
+			rad = self.vertices[i].dot(&vec);
+			if rad < neg_rad {
+				neg_rad = rad;
+			}else if rad > pos_rad {
+				pos_rad = rad;
+			}
+		}
+		let interv:interval = interval::new(c + neg_rad,c + pos_rad );
+		return (vec, interv);
+		//self.interval.min = c + negRad;
+		//self.interval.max = c + posRad;
+	}
+
+		fn orient_vertices(&mut self, r: f64)
+	{
+		let n = self.original_vertices.len();
+		self.vertices = Vec::new();
+		for i in 0..n
+		{
+			self.vertices.push(self.original_vertices[i].rotate(&r));
+		}
+	}
+
+
+	fn get_vertices(&mut self)->&Vec<vector>
+	{
+		return &self.vertices;
+	}
+
+		fn get_vertices_and_position(&mut self)->(&Vec<vector>, vector)
+	{
+		return (&self.vertices, self.curr.clone());
+	}
 }
 
 impl Paint for circle_particle
@@ -109,7 +157,8 @@ impl Paint for circle_particle
 		gl.draw(args.viewport(), |c, gl| 
 		{
             let transform = c.transform.trans(self.get_curr_x(), self.get_curr_y()).rot_rad(self.get_radian().clone()).trans(-self.get_width()/2.0, -self.get_height()/2.0);
-            rectangle(RED, rect, transform, gl);
+            //rectangle(RED, rect, transform, gl);
+			circle_arc(RED, self.get_width()/2.0, 0.0,f64::consts::PI  * 2.0 - 0.0001, rect, transform, gl);
         });
 	}
 }
@@ -123,6 +172,10 @@ impl PartialEq for circle_particle
 
 impl particle for circle_particle 
 {
+	fn set_axes(&mut self)
+	{
+		
+	}
 	fn set_id(&mut self, i:i64)
 	{
 		self.id = i;
@@ -281,32 +334,7 @@ impl particle for circle_particle
 	}
 	*/
 
-	fn get_interval_and_axe(&mut self, i:usize)->(vector, interval)
-	{
-		//println!("made it here: {:?}", self.axes );
-		let vec:vector = self.axes[i].clone();
-		//println!("made it here: {:?}", self.axes );
-		let c:f64 =  self.get_curr().dot(&vec);
-		//println!("made it here: {:?}", self.axes );
-		let mut rad:f64 = self.vertices[0].dot(&vec);
-		//println!("made it here:");
-		let mut neg_rad:f64 = rad;
-		let mut pos_rad:f64 = rad;
-		
-		for i in 0..self.num_vertices
-		{
-			rad = self.vertices[i].dot(&vec);
-			if rad < neg_rad {
-				neg_rad = rad;
-			}else if rad > pos_rad {
-				pos_rad = rad;
-			}
-		}
-		let interv:interval = interval::new(c + neg_rad,c + pos_rad );
-		return (vec, interv);
-		//self.interval.min = c + negRad;
-		//self.interval.max = c + posRad;
-	}
+
 
 	fn get_axes_len(&mut self)->usize
 	{
@@ -317,24 +345,7 @@ impl particle for circle_particle
 			return &self.axes;
 	}
 	
-	fn orient_vertices(&mut self, r: f64)
-	{
-		let n = self.original_vertices.len();
-		self.vertices = Vec::new();
-		for i in 0..n
-		{
-			self.vertices.push(self.original_vertices[i].rotate(&r));
-		}
-	}
-	fn set_axes(&mut self)
-	{
-		
-	}
 
-	fn get_vertices(&mut self)->&Vec<vector>
-	{
-		return &self.vertices;
-	}
 
 	fn get_projection(&mut self, axis:&vector)->&interval 
 	{
@@ -570,10 +581,7 @@ impl particle for circle_particle
 			// clear the forces
 			self.forces.set_to(0.0,0.0);
     }
-	fn get_vertices_and_position(&mut self)->(&Vec<vector>, vector)
-	{
-		return (&self.vertices, self.curr.clone());
-	}
+
 	fn get_components(&mut self, cn:&vector)->collision
     {
 		let mut vel:vector = self.velocity.clone();

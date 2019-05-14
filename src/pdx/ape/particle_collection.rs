@@ -20,6 +20,7 @@ use crate::collision::collision;
 use crate::particle::particle;
 use crate::polygon_particle::polygon_particle;
 use crate::circle_particle::circle_particle;
+use crate::rectangle_particle::rectangle_particle;
 use crate::poly_poly_constraint::poly_poly_constraint;
 use crate::APEngine::APEngine;
 use crate::APEngine::APValues;
@@ -43,6 +44,7 @@ pub struct particle_collection
 	pub collide_internal:bool,
     poly_particles:Vec<polygon_particle>,
 	circle_particles:Vec<circle_particle>,
+	rectangle_particles:Vec<rectangle_particle>,
 	poly_poly_constraints:Vec<poly_poly_constraint>,
 	is_composite:bool,
 	center:vector, 
@@ -59,6 +61,11 @@ impl Paint for particle_collection
 		}
 
 		for poly in self.circle_particles.iter_mut()
+		{
+			poly.paint(args, gl);
+		}
+
+		for poly in self.rectangle_particles.iter_mut()
 		{
 			poly.paint(args, gl);
 		}
@@ -138,9 +145,23 @@ impl particle_collection
 		self.circle_particles.push(p);
 	}
 
+	fn get_rectangle_particles(&self)->&Vec<rectangle_particle>
+	{
+		return &self.rectangle_particles;
+	}
+
+	pub fn add_rectangle_particle(&mut self, p:rectangle_particle)
+	{
+		self.rectangle_particles.push(p);
+	}
+
 	pub fn integrate(&mut self, ap:&APValues) 
 	{
 		for poly in self.poly_particles.iter_mut()
+		{
+			poly.update(ap);	
+		}
+		for poly in self.rectangle_particles.iter_mut()
 		{
 			poly.update(ap);	
 		}
@@ -203,8 +224,42 @@ impl particle_collection
 		{
 			//println!("Check collisions Internal");
 			self.check_internal_collisions(ap);
+			self.check_rect_rect_internal_collisions(ap);
 		} 
 	}
+	pub fn check_rect_rect_internal_collisions(&mut self, ap:&APValues)
+	{
+		
+		let length:usize = self.rectangle_particles.len();
+		
+		for i in 0..length
+		{
+			//println!("Check LIST - internal - {}", i);
+			let mut p = self.rectangle_particles.remove(i);
+			if !p.get_collidable()
+			{
+				//println!("Check LIST -no collision 1");
+				self.rectangle_particles.insert(i, p);
+				continue;
+			}
+			for j in 0..length-1
+			{
+				let mut p2 = self.rectangle_particles.remove(j);
+				if !p2.get_collidable() || (p2.get_fixed() && p.get_fixed())
+				{
+					//println!("Check LIST -no collision 2");
+					self.rectangle_particles.insert(j, p2);
+					continue;
+				}
+				//println!("Check COLL LIST - internal - ");
+				collision_detector::test_rect_vs_rect(&mut p,&mut p2);
+				self.rectangle_particles.insert(j, p2);
+			}
+			self.rectangle_particles.insert(i, p);
+		}
+	}
+
+	
 	pub fn check_internal_collisions(&mut self, ap:&APValues)
 	{
 		
@@ -235,8 +290,8 @@ impl particle_collection
 				let p_size = p.get_axes_len();
 				let p2_size = p.get_axes_len();
 				//collision_detector::test_polygon_vs_polygon(&mut p,&mut p2, p_size, p2_size);
-				collision_detector::test_rigid_polygon_vs_rigid_polygon(&mut p,&mut p2, p_size, p2_size);
-				//collision_detector::test_polygon_vs_polygon2(&mut p,&mut p2, p_size, p2_size);
+				//collision_detector::test_rigid_polygon_vs_rigid_polygon(&mut p,&mut p2, p_size, p2_size);
+				collision_detector::test_polygon_vs_polygon(&mut p,&mut p2, p_size, p2_size);
 				self.poly_particles.insert(j, p2);
 			}
 			self.poly_particles.insert(i, p);
@@ -273,8 +328,8 @@ impl particle_collection
 				let p_size = p.get_axes_len();
 				let p2_size = p.get_axes_len();
 				//collision_detector::test_polygon_vs_polygon(&mut p,&mut p2, p_size, p2_size);
-				collision_detector::test_rigid_polygon_vs_rigid_polygon(&mut p,&mut p2, p_size, p2_size);
-				//collision_detector::test_polygon_vs_polygon2(&mut p,&mut p2, p_size, p2_size);
+				//collision_detector::test_rigid_polygon_vs_rigid_polygon(&mut p,&mut p2, p_size, p2_size);
+				collision_detector::test_polygon_vs_polygon(&mut p,&mut p2, p_size, p2_size);
 				col.poly_particles.insert(j, p2);
 			}
 			self.poly_particles.insert(i, p);

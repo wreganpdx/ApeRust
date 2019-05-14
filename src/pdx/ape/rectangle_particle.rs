@@ -32,22 +32,19 @@ use crate::APEngine::APValues;
 use crate::APEngine::Paint;
 use std::any::Any;
 use std::f64;
-use std::num::FpCategory::Infinite;
 use num_traits;
 use std::num::FpCategory;
 use num_traits::float::FloatCore;
 
 #[allow(unused_variables)]
 #[derive(Default)]
-pub struct polygon_particle 
+pub struct rectangle_particle 
 {
 	pub id:i64,
     radian:f64,
     density:f64,
-    original_vertices:Vec<vector>,
-    vertices:Vec<vector>,
-    num_vertices:usize,
     axes:Vec<vector>,
+	extents:Vec<f64>,
     curr:vector,
     prev:vector,
     temp:vector,
@@ -79,32 +76,26 @@ pub struct polygon_particle
 	height:f64
 }
 
-impl polygon_particle
+impl rectangle_particle
 {
-    pub fn new(id:i64)->polygon_particle
+    pub fn new(id:i64)->rectangle_particle
     {
-		let mut p = polygon_particle::default();
+		let mut p = rectangle_particle::default();
 		p.set_id(id);
         return p;
     }
 
-	pub fn create_vertices_from_rect(&mut self, width:f64, height:f64)
+	pub fn create_rectangle(&mut self, width:f64, height:f64)
 	{
 		self.width = width;
 		self.height = height;
-		self.vertices = Vec::new();
-		self.original_vertices = Vec::new();
-		
-		self.original_vertices.push(vector::new(width/2.0, height/2.0));
-		self.original_vertices.push(vector::new(-width/2.0, height/2.0));
-		self.original_vertices.push(vector::new(-width/2.0, -height/2.0));
-		self.original_vertices.push(vector::new(width/2.0, -height/2.0));
-		
-		self.num_vertices = self.original_vertices.len();
 
 		self.axes = Vec::new();
 		self.axes.push(vector::new(0.0,0.0));
 		self.axes.push(vector::new(0.0,0.0));
+
+		self.extents.push(width/2.0);
+		self.extents.push(height/2.0);
 		println!("rect init");
 		self.set_radian(0.0);
 		println!("rect init complete");
@@ -113,56 +104,13 @@ impl polygon_particle
 		self.inv_mass = self.mass/1.0;
 	}
 
-	
-	pub fn get_interval_and_axe(&mut self, i:usize)->(vector, interval)
+	pub fn get_axe(&mut self, i:usize)->vector
 	{
-		//println!("made it here: {:?}", self.axes );
-		let vec:vector = self.axes[i].clone();
-		//println!("made it here: {:?}", self.axes );
-		let c:f64 =  self.get_curr().dot(&vec);
-		//println!("made it here: {:?}", self.axes );
-		let mut rad:f64 = self.vertices[0].dot(&vec);
-		//println!("made it here:");
-		let mut neg_rad:f64 = rad;
-		let mut pos_rad:f64 = rad;
-		
-		for i in 0..self.num_vertices
-		{
-			rad = self.vertices[i].dot(&vec);
-			if rad < neg_rad {
-				neg_rad = rad;
-			}else if rad > pos_rad {
-				pos_rad = rad;
-			}
-		}
-		let interv:interval = interval::new(c + neg_rad,c + pos_rad );
-		return (vec, interv);
-		//self.interval.min = c + negRad;
-		//self.interval.max = c + posRad;
-	}
-
-	pub fn orient_vertices(&mut self, r: f64)
-	{
-		let n = self.original_vertices.len();
-		self.vertices = Vec::new();
-		for i in 0..n
-		{
-			self.vertices.push(self.original_vertices[i].rotate(&r));
-		}
-	}
-
-	pub fn get_vertices_and_position(&mut self)->(&Vec<vector>, vector)
-	{
-		return (&self.vertices, self.curr.clone());
-	}
-
-	pub fn get_vertices(&mut self)->&Vec<vector>
-	{
-		return &self.vertices;
+		return self.axes[0].clone();
 	}
 }
 
-impl Paint for polygon_particle
+impl Paint for rectangle_particle
 {
 	fn paint(&mut self, args: &RenderArgs, gl:&mut GlGraphics)
 	{
@@ -178,14 +126,14 @@ impl Paint for polygon_particle
 	}
 }
 
-impl PartialEq for polygon_particle 
+impl PartialEq for rectangle_particle 
 {
-    fn eq(&self, other: &polygon_particle) -> bool {
+    fn eq(&self, other: &rectangle_particle) -> bool {
         self.id == other.id
     }
 }
 
-impl particle for polygon_particle 
+impl particle for rectangle_particle 
 {
 	fn set_id(&mut self, i:i64)
 	{
@@ -203,7 +151,7 @@ impl particle for polygon_particle
     fn get_mass(&self)-> f64
     {
 		if self.fixed {
-			return num_traits::float::FloatCore::infinity();
+			return 17976931348623157.0;
 		}
 		else
 		{
@@ -352,6 +300,7 @@ impl particle for polygon_particle
 	*/
 
 
+
 	fn get_axes_len(&mut self)->usize
 	{
 		return self.axes.len();
@@ -364,44 +313,27 @@ impl particle for polygon_particle
 	
 	fn set_axes(&mut self)
 	{
-		self.axes = Vec::new();
-		//println!("self.vertices.len() {} ", self.vertices.len() );
-		let mut j:usize = self.num_vertices - 1;
-		for i in 0..self.num_vertices
-		{
-			let e0:vector = self.vertices[j].clone();
-			let e1:vector = self.vertices[i].clone();
-			let e:vector = e1.minus(&e0);
-			let curr_axis:vector = (vector::new(-e.y, e.x)).normalize();
-			self.axes.push(curr_axis);
-			j=i;
-		}
+		let s = self.radian.sin();
+		let c = self.radian.cos();
+		self.axes[0] = vector::new(c.clone(), s.clone());
+		self.axes[1] = vector::new(-s, c);
 	}
 
 
 
 	fn get_projection(&mut self, axis:&vector)->&interval 
 	{
-		let c:f64 = self.curr.dot(axis);
-		
-		let mut rad:f64 = self.vertices[0].dot(axis);
-		let mut neg_rad:f64 = rad;
-		let mut pos_rad:f64 = rad;
-		
-		for i in 0..self.num_vertices
-		{
-			rad = self.vertices[i].dot(axis);
-			if rad < neg_rad {
-				neg_rad = rad;
-			}else if rad > pos_rad {
-				pos_rad = rad;
-			}
-		}
-		let i:interval = interval::new(c + neg_rad,c + pos_rad );
-		self.set_interval(i);
-		//self.interval.min = c + negRad;
-		//self.interval.max = c + posRad;
-		
+		let rad = &self.extents[0] * axis.dot(&self.axes[0]).abs() + &self.extents[1] * axis.dot(&self.axes[1]).abs();
+        let mut projected = self.get_position();
+        if !self.fixed
+        {
+            projected.plus_equals(&self.curr.minus(&self.prev));
+        }
+		//let next = self.curr.plus(&self.curr.minus(&self.prev));
+		let c = projected.dot(axis);
+		//c.plus_equals(self.curr.minus(&self.prev));
+		self.interval.min = c - rad;
+		self.interval.max = c + rad;
 		return &self.interval;
 	}
 
@@ -627,9 +559,14 @@ impl particle for polygon_particle
 	{
 		if !self.fixed
 		{
+			let mag = vel.magnitude();
+			let newVel = self.curr.clone().minus(&self.prev).mult(mag);
+			
 			self.prev = self.curr.clone();
+        
 			self.curr.plus_equals(mtd);
-			self.set_velocity(&self.curr.minus(&self.prev));
+			self.set_velocity(vel);
+            println!("vel: {:?}, mtd: {:?}",vel, mtd);
 		}
 		
 		if self.smashable
@@ -677,9 +614,6 @@ impl particle for polygon_particle
     {
 		let _r = r % ((f64::consts::PI)*2.0);
 		self.radian = _r;
-		println!("orienting_vertices");
-		self.orient_vertices(_r);
-		println!("setting axes_vertices");
 		self.set_axes();
     }
 
@@ -708,243 +642,3 @@ impl particle for polygon_particle
 		return (180.0/f64::consts::PI) * self.get_radian();
 	}
 }
-/*
-package org.cove.ape {
-	
-	import flash.display.Graphics;
-	import flash.geom.Matrix;
-	
-	/**
-	 * An n-sided polygon shaped particle. 
-	 */ 
-	public class PolygonParticle extends AbstractParticle {
-
-		
-		public function PolygonParticle(x:Number, 
-				y:Number,
-				width:Number, 
-				height:Number,
-				numVertices:int,
-				rotation:Number = 0,
-				fixedPosition:Boolean = false,
-				mass:Number = 1, 
-				elasticity:Number = 0.15,
-				friction:Number = 0.1) {
-				
-				super(x, y, fixedPosition, mass, elasticity, friction);
-				
-				_numVertices = numVertices;
-				createVertices(width, height);
-				radian = rotation;
-				
-				//this.density = density;
-		}
-		
-		internal function createVertices(width:Number, height:Number):void{
-			_vertices = new Array();
-			_originalVertices = new Array();
-			
-			var a:Number = Math.PI/numVertices;
-			var da:Number = MathUtil.TWO_PI/numVertices;
-			
-			for(var i:int = 0; i < numVertices; i++){
-				a+= da;
-				_originalVertices.push(new Vector(Math.cos(a) * width, Math.sin(a) * height));
-			}			
-		}
-		
-		
-		public override function get radian():Number {
-			return _radian;
-		}
-		
-		/**
-		 * @private
-		 */		
-		public function set radian(t:Number):void {
-			t = t % (MathUtil.TWO_PI);
-			_radian = t;
-			orientVertices(t);
-			setAxes();
-		}
-		
-		public function get angle():Number {
-			return radian * MathUtil.ONE_EIGHTY_OVER_PI;
-		}
-
-		/**
-		 * @private
-		 */		
-		public function set angle(a:Number):void {
-			radian = a * MathUtil.PI_OVER_ONE_EIGHTY;
-		}
-		
-		/**
-		 * Sets up the visual representation of this PolygonParticle. This method is called 
-		 * automatically when an instance of this PolygonParticle's parent Group is added to 
-		 * the APEngine, when  this PolygonParticle's Composite is added to a Group, or the 
-		 * PolygonParticle is added to a Composite or Group.
-		 */				
-		public override function init():void {
-			cleanup();
-			if (displayObject != null) {
-				initDisplay();
-			} else {
-			
-				sprite.graphics.clear();
-				sprite.graphics.lineStyle(lineThickness, lineColor, lineAlpha);
-				sprite.graphics.beginFill(fillColor, fillAlpha);
-				sprite.graphics.moveTo(_originalVertices[0].x, _originalVertices[0].y);
-				for(var i:int = 1; i < _originalVertices.length; i++){
-					sprite.graphics.lineTo(_originalVertices[i].x, _originalVertices[i].y);
-				}
-				sprite.graphics.lineTo(_originalVertices[0].x, _originalVertices[0].y);
-				sprite.graphics.endFill();
-			}
-			paint();
-		}
-		
-		public override function paint():void {
-			sprite.x = curr.x;
-			sprite.y = curr.y;
-			sprite.rotation = angle;
-		}
-		
-		public function clearSprite():void{
-			sprite.parent.removeChild(sprite);
-		}
-		
-		internal function get vertices():Array{
-			return _vertices;
-		}
-		
-		internal function get numVertices():int{
-			return _numVertices;
-		}
-		
-		internal function set density(d:Number):void{
-			_density = d;
-			mass = calculateMass();
-		}
-		
-		internal function get density():Number{
-			return _density;
-		}
-		
-		internal function calculateMass():Number{
-			if(numVertices < 2){
-				return 5 * density;
-			}
-			
-			var m:Number = 0;
-			var j:int = numVertices - 1;
-			for (var i:int = 0; i < numVertices; i++){
-				var P0:Vector = vertices[j];
-				var P1:Vector = vertices[i];
-				m += Math.abs(P0.cross(P1));
-				j = i;
-			}
-			if(numVertices <= 2){
-				m = 10;
-			}
-			m *= density * .5;
-			return m;
-		}
-		
-		internal function orientVertices(r:Number){
-			for(var i:int = 0; i < _originalVertices.length; i++){
-				_vertices[i] = _originalVertices[i].rotate(r);
-			}
-		}
-		
-		/**
-		 * @private
-		 */	
-		internal function getProjection(axis:Vector):Interval {
-			
-			var c:Number = curr.dot(axis);
-			
-			var rad:Number = _vertices[0].dot(axis);
-			var negRad:Number = rad;
-			var posRad:Number = rad;
-			
-			for (var i:int = 1; i < _vertices.length; i++){
-				rad = _vertices[i].dot(axis);
-				if(rad < negRad){
-					negRad = rad;
-				}else if(rad > posRad){
-					posRad = rad;
-				}
-			}
-			
-			interval.min = c + negRad;
-			interval.max = c + posRad;
-			
-			return interval;
-		}
-		
-		internal function getAxes():Array{
-			return _axes;
-		}
-		
-		internal function setAxes():void{
-			_axes = new Array();
-			var j:int = _numVertices - 1;
-			for(var i:int = 0; i < _numVertices; i++){
-				var e0:Vector = _vertices[j];
-				var e1:Vector = _vertices[i];
-				var e:Vector = e1.minus(e0);
-				var currAxis:Vector = (new Vector(-e.y, e.x)).normalize();
-				_axes.push(currAxis);
-				j=i;
-			}
-		}
-		
-		internal function getClosestVertex(v:Vector):Vector{
-			var d:Vector = v.minus(curr);
-			var maxDist:Number = 0;
-			var index:int = -1;
-			
-			for(var i:int = 0; i<_vertices.length; i++){
-				var dist:Number = d.dot(_vertices[i]);
-				if(dist > maxDist){
-					maxDist = dist;
-					index = i;
-				}
-			}
-			return _vertices[index].plus(curr);
-		}
-		
-		public override function leftMostXValue():Number{
-			if(!isNaN(lmx) && fixedPosition) return lmx;
-			
-			var vx:Number = _vertices[0].x;
-			lmx = vx;
-			for(var i:int = 1; i < _vertices.length; i++){
-				vx = _vertices[i].x;
-				if( vx < lmx){
-					lmx = vx;
-				}
-			}
-			lmx += curr.x;
-			return lmx;
-		}
-		
-		public override function rightMostXValue():Number{
-			if(!isNaN(rmx) && fixedPosition) return rmx;
-			
-			var vx:Number = _vertices[0].x;
-			rmx = vx;
-			for(var i:int = 1; i < _vertices.length; i++){
-				vx = _vertices[i].x;
-				if( vx > rmx){
-					rmx = vx;
-				}
-			}
-			rmx += curr.x;
-			return rmx;
-		}
-	}
-}
-
-*/

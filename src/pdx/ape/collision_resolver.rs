@@ -1,5 +1,6 @@
  
  use crate::polygon_particle::polygon_particle;
+  use crate::rectangle_particle::rectangle_particle;
  use crate::vector::vector;
  use crate::collision::collision;
  use crate::particle::particle;
@@ -135,7 +136,50 @@ pub fn resolveOverlap(c0:&vector, c1:&vector, normal:&vector, depthTime:f64, pa:
     }
         //trace(" "+pb.velocity.magnitude());
 }
-			
+pub fn resolve_collision_rect_rect( pa:&mut rectangle_particle, pb:&mut rectangle_particle, normal:vector, depthTime:f64,)
+{	
+    //pre-computations
+    let mtd = normal.mult(depthTime);
+    let te = pa.get_elasticity() + pb.get_elasticity();
+    let mut tf = 1.0- pa.get_friction() + pb.get_friction();
+    if tf > 1.0
+    {
+        tf = 1.0;
+    }
+    if tf < 0.0
+    {
+        tf = 0.0;
+    }
+    let ma = pa.get_mass();
+    let mb = pa.get_mass();
+    let tm = ma + mb;
+
+    let mut ca = pa.get_components(&normal);
+    let mut cb = pb.get_components(&normal);
+
+    let mut vn_a = cb.vn.mult((te + 1.0) * mb);
+    vn_a.plus_equals(&ca.vn.mult(ma - te * mb));
+    vn_a.div_equals(tm);
+
+    let mut vn_b = ca.vn.mult((te + 1.0) * ma);
+    vn_a.plus_equals(&cb.vn.mult(mb - te * ma));
+    vn_a.div_equals(tm);
+
+    ca.vt.mult_equals(tf);
+    cb.vt.mult_equals(tf);
+ 
+    let mtd_a = mtd.mult(mb/tm);
+    let mtd_b = mtd.mult(-ma/tm);
+
+    if !pa.get_fixed()
+    {
+        pa.resolve_collision(&mtd_a, &vn_a.plus(&ca.vt), &normal, depthTime, -1)
+    }
+    if !pb.get_fixed()
+    {
+        pb.resolve_collision(&mtd_b, &vn_b.plus(&cb.vt), &normal, depthTime, 1)
+    }
+}			
 pub fn resolveCollision(normal:vector, depthTime:f64, c0:&vector, c1:&vector, pa:&mut polygon_particle, pb:&mut polygon_particle, va:&vector, ava:f64, vb:&vector, avb:f64)
 {	
     //pre-computations

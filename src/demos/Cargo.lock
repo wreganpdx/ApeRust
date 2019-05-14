@@ -3,6 +3,7 @@ name = "ApeRust"
 version = "1.3.0"
 dependencies = [
  "lazy_static 1.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num-traits 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "piston 0.42.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "piston2d-graphics 0.30.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "piston2d-opengl_graphics 0.59.0 (registry+https://github.com/rust-lang/crates.io-index)",
