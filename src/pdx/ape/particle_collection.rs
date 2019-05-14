@@ -57,6 +57,11 @@ impl Paint for particle_collection
 		{
 			poly.paint(args, gl);
 		}
+
+		for poly in self.circle_particles.iter_mut()
+		{
+			poly.paint(args, gl);
+		}
 	}
 }
 
@@ -110,6 +115,8 @@ impl particle_collection
 	{
 		self.poly_particles.push(p);
 	}
+
+
 
 	fn get_poly_poly_constraint(&self)->&Vec<poly_poly_constraint>
 	{

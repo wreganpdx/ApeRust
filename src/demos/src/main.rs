@@ -7,6 +7,7 @@ extern crate opengl_graphics;
 use ApeRust::vector::vector;
 use ApeRust::APEngine::APEngine;
 use ApeRust::polygon_particle::polygon_particle;
+use ApeRust::circle_particle::circle_particle;
 use std::{thread, time};
 use std::time::{Duration, Instant};
 use ApeRust::particle::particle;
@@ -79,7 +80,13 @@ fn main()
     let mut p: polygon_particle = polygon_particle::new(ap.get_new_id());
     let mut p2: polygon_particle = polygon_particle::new(ap.get_new_id());
 
+    let mut p_circle: circle_particle = circle_particle::new(ap.get_new_id());
+
     //p.set_radian(0.2);
+
+    p_circle.init_circle(6.0);
+
+    p_circle.set_position(&vector::new(200.0, 600.0));
 
     p.create_vertices_from_rect(40.0,5.0);
     p2.create_vertices_from_rect(40.0,5.0);
@@ -119,6 +126,8 @@ fn main()
     list.add_poly_particle(right);
     list.add_poly_particle(top);
     list.add_poly_particle(bottom);
+
+    list.add_circle_particle(p_circle);
 
     list.set_collide_internal(true);
 
