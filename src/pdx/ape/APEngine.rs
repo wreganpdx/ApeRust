@@ -68,7 +68,7 @@ impl Paint for APEngine
 	fn paint(&mut self, args: &RenderArgs, gl:&mut GlGraphics)
 	{
 		use graphics::*;
-		const GREEN: [f32; 4] = [0.0, 1.0, 0.0, 1.0];
+		const GREEN: [f32; 4] = [0.6, 0.6, 0.6, 1.0];
 		gl.draw(args.viewport(), |c, gl| {
             // Clear the screen.
             clear(GREEN, gl);
@@ -135,7 +135,7 @@ impl APEngine
 		{
 			//print!(" *Delta: {} * ", self.delta);
 			//print!(" *Stepping Elapsed: {} * ", elapsed);
-			println!("--");
+			//println!("--");
 			self.time_step = elapsed;
 			self.last_step = cur;
 		}

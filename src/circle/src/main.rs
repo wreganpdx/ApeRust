@@ -46,22 +46,26 @@ fn main()
 
     ap.init(0.001);
 
-
+    let mut p = rectangle_particle::new(ap.get_new_id());
 
     let mut p_circle: circle_particle = circle_particle::new(ap.get_new_id());
     let mut p_circle2: circle_particle = circle_particle::new(ap.get_new_id());
-
 
     p_circle.init_circle(25.0);
     p_circle2.init_circle(25.0);
 
     p_circle.set_position(&vector::new(200.0, 400.0));
     p_circle2.set_position(&vector::new(600.0, 400.0));
+    p.set_position(&vector::new(200.0, 500.0));
+
+    p.create_rectangle(50.0,50.0);
+
 
     p_circle.set_collidable(true);
     p_circle2.set_collidable(true);
-
-
+    p_circle.set_elasticity(0.7);
+    p_circle2.set_elasticity(0.7);
+    
 
     p_circle.set_velocity(&vector::new(1.0,0.0));
     p_circle2.set_velocity(&vector::new(-1.0,0.0));
@@ -70,7 +74,7 @@ fn main()
 
     list.add_circle_particle(p_circle);
     list.add_circle_particle(p_circle2);
-
+    list.add_rectangle_particle(p);
     list.set_collide_internal(true);
 
     ap.add_particle_collection(list);
@@ -90,8 +94,7 @@ fn main()
         {
             if let Some(r) = e.render_args() 
             {
-               // print!("Rendering");
-                ap.paint(&r, &mut gl); //.render(&r);
+                ap.paint(&r, &mut gl); 
                 break;
             }
 
@@ -99,17 +102,6 @@ fn main()
             {
                exit = true;
             }
-        }
-        if !step
-        {
-           // println!(" p: {:?}", p.get_position());
-            //let ten_millis = time::Duration::from_millis(1);
-            //thread::sleep(ten_millis);
-           // print!("Sleeping: {}", i);
-        }
-        else
-        {
-            print!("Step: {} ", i);
         }
 
 

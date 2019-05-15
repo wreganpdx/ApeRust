@@ -117,6 +117,8 @@ pub fn test_rect_vs_rect(ra:& mut rectangle_particle, rb:&mut rectangle_particle
 
 pub fn test_circ_vs_circ(ra:& mut circle_particle, rb:&mut circle_particle)->bool
 {		
+	ra.set_samp(ra.get_position());
+	rb.set_samp(rb.get_position());
 	let depth_a = test_intervals(ra.get_interval_x(), rb.get_interval_x());
 	if depth_a == 0.0
 	{
@@ -128,7 +130,9 @@ pub fn test_circ_vs_circ(ra:& mut circle_particle, rb:&mut circle_particle)->boo
 		return false;
 	}
 	let mut collision_normal:vector = ra.get_position().minus(&rb.get_position());
+	println!("collision_normal {:?}", collision_normal);
 	let mag = collision_normal.clone().magnitude();
+	println!("collision_normal {:?}", collision_normal);
 	let mut collision_depth:f64 = ra.get_radius() + rb.get_radius() - mag;
 
 	if collision_depth > 0.0

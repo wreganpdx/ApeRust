@@ -25,6 +25,15 @@ pub struct vector
 
 impl vector
 {
+
+    pub fn get_x(&mut self)-> &f64
+    {
+        return &self.x;
+    }
+    pub fn get_y(&mut self)-> &f64
+    {
+        return &self.y;
+    }
 	pub fn new(x: f64, y: f64) -> vector 
     {
         vector { x: x, y: y }
@@ -32,7 +41,7 @@ impl vector
 
     pub fn clone(&self) -> vector 
     {
-        return vector::new(self.x, self.y);
+        return vector::new(self.x.clone(), self.y.clone());
     }
 
     pub fn set_to(&mut self, px: f64, py: f64)

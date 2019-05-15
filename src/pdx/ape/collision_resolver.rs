@@ -105,8 +105,8 @@ pub fn resolve_circle_circle(pa:&mut circle_particle, pb:&mut circle_particle, n
     let plus_a:&mut vector = &mut mult_a.plus(mult_a_2);
     let mut vn_a:vector = plus_a.div_equals(sum_inv_mass).clone();
 
-    ca.vt.mult_equals(te);
-    cb.vt.mult_equals(te);
+    ca.vt.mult_equals(tf);
+    cb.vt.mult_equals(tf);
     
 
     let mtd_a:vector = mtd.mult( im_pa_inv_mass / sum_inv_mass);     
