@@ -97,52 +97,23 @@ impl circle_particle
 		self.inv_mass = self.mass/1.0;
 	}
 
-		fn get_interval_and_axe(&mut self, i:usize)->(vector, interval)
+	pub fn get_interval_x(&mut self)->&interval
 	{
-		//println!("made it here: {:?}", self.axes );
-		let vec:vector = self.axes[i].clone();
-		//println!("made it here: {:?}", self.axes );
-		let c:f64 =  self.get_curr().dot(&vec);
-		//println!("made it here: {:?}", self.axes );
-		let mut rad:f64 = self.vertices[0].dot(&vec);
-		//println!("made it here:");
-		let mut neg_rad:f64 = rad;
-		let mut pos_rad:f64 = rad;
-		
-		for i in 0..self.num_vertices
-		{
-			rad = self.vertices[i].dot(&vec);
-			if rad < neg_rad {
-				neg_rad = rad;
-			}else if rad > pos_rad {
-				pos_rad = rad;
-			}
-		}
-		let interv:interval = interval::new(c + neg_rad,c + pos_rad );
-		return (vec, interv);
-		//self.interval.min = c + negRad;
-		//self.interval.max = c + posRad;
+		self.interval.min = self.curr.x - self.radius;
+		self.interval.max = self.curr.x + self.radius;
+		return &self.interval;
 	}
 
-		fn orient_vertices(&mut self, r: f64)
+	pub fn get_interval_y(&mut self)->&interval
 	{
-		let n = self.original_vertices.len();
-		self.vertices = Vec::new();
-		for i in 0..n
-		{
-			self.vertices.push(self.original_vertices[i].rotate(&r));
-		}
+		self.interval.min = self.curr.y - self.radius;
+		self.interval.max = self.curr.y + self.radius;
+		return &self.interval;
 	}
 
-
-	fn get_vertices(&mut self)->&Vec<vector>
+	pub fn get_radius(& mut self)->&f64
 	{
-		return &self.vertices;
-	}
-
-		fn get_vertices_and_position(&mut self)->(&Vec<vector>, vector)
-	{
-		return (&self.vertices, self.curr.clone());
+		return &self.radius;
 	}
 }
 
@@ -156,9 +127,9 @@ impl Paint for circle_particle
 
 		gl.draw(args.viewport(), |c, gl| 
 		{
-            let transform = c.transform.trans(self.get_curr_x(), self.get_curr_y()).rot_rad(self.get_radian().clone()).trans(-self.get_width()/2.0, -self.get_height()/2.0);
-            //rectangle(RED, rect, transform, gl);
-			circle_arc(BLUE, self.get_width()/2.0, 0.0,f64::consts::PI  * 2.0 - 0.0001, rect, transform, gl);
+            let transform = c.transform.trans(self.get_curr_x(), self.get_curr_y()).rot_rad(self.get_radian().clone());
+            //rectangle(BLUE, rect, transform, gl);
+			circle_arc(BLUE, self.get_width()/2.0, 0.0,f64::consts::PI  * (2.0 - 0.0001), rect, transform, gl);
         });
 	}
 }
@@ -575,7 +546,7 @@ impl particle for circle_particle
 			self.set_temp(&self.get_position());
 			
 			let mut nv:vector = self.velocity.plus(self.forces.mult_equals(ap.time_step));
-			self.curr.plus_equals(&nv.mult_equals(ap.damping));
+			self.curr.plus_equals(&nv);
 			self.set_prev(&self.get_temp());
 
 			// clear the forces
@@ -643,10 +614,6 @@ impl particle for circle_particle
     {
 		let _r = r % ((f64::consts::PI)*2.0);
 		self.radian = _r;
-		println!("orienting_vertices");
-		self.orient_vertices(_r);
-		println!("setting axes_vertices");
-		self.set_axes();
     }
 
 	fn get_left_most_x_value(&self)->f64

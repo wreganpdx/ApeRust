@@ -165,12 +165,10 @@ impl particle_collection
 		{
 			poly.update(ap);	
 		}
-/*
-		for circ in self.circle_particles 
+		for circ in self.circle_particles.iter_mut()
 		{
-			circ.update(ap.delta, ap);	
+			circ.update(ap);	
 		}
-		*/
 	}
 	pub fn satisfy_constraints(&mut self, ap:&APValues)
 	{
@@ -225,6 +223,7 @@ impl particle_collection
 			//println!("Check collisions Internal");
 			self.check_internal_collisions(ap);
 			self.check_rect_rect_internal_collisions(ap);
+			self.check_circ_circ_internal_collisions(ap);
 		} 
 	}
 	pub fn check_rect_rect_internal_collisions(&mut self, ap:&APValues)
@@ -256,6 +255,38 @@ impl particle_collection
 				self.rectangle_particles.insert(j, p2);
 			}
 			self.rectangle_particles.insert(i, p);
+		}
+	}
+
+	pub fn check_circ_circ_internal_collisions(&mut self, ap:&APValues)
+	{
+		
+		let length:usize = self.circle_particles.len();
+		
+		for i in 0..length
+		{
+			//println!("Check LIST - internal - {}", i);
+			let mut p = self.circle_particles.remove(i);
+			if !p.get_collidable()
+			{
+				//println!("Check LIST -no collision 1");
+				self.circle_particles.insert(i, p);
+				continue;
+			}
+			for j in 0..length-1
+			{
+				let mut p2 = self.circle_particles.remove(j);
+				if !p2.get_collidable() || (p2.get_fixed() && p.get_fixed())
+				{
+					//println!("Check LIST -no collision 2");
+					self.circle_particles.insert(j, p2);
+					continue;
+				}
+				//println!("Check COLL LIST - internal - ");
+				collision_detector::test_circ_vs_circ(&mut p,&mut p2);
+				self.circle_particles.insert(j, p2);
+			}
+			self.circle_particles.insert(i, p);
 		}
 	}
 

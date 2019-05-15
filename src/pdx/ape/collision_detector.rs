@@ -1,6 +1,7 @@
 use crate::particle::particle;
 use crate::polygon_particle::polygon_particle;
 use crate::rectangle_particle::rectangle_particle;
+use crate::circle_particle::circle_particle;
 use crate::interval::interval;
 use crate::vector::vector;
 use crate::collision_resolver;
@@ -111,6 +112,30 @@ pub fn test_rect_vs_rect(ra:& mut rectangle_particle, rb:&mut rectangle_particle
 	collision_resolver::resolve_collision_rect_rect(ra, rb, collision_normal, collision_depth);
 	//println!("Collision: {:?} {:?}", ra.get_curr(), rb.get_curr());
 	//println!("COLLISION");
+	return true;
+}
+
+pub fn test_circ_vs_circ(ra:& mut circle_particle, rb:&mut circle_particle)->bool
+{		
+	let depth_a = test_intervals(ra.get_interval_x(), rb.get_interval_x());
+	if depth_a == 0.0
+	{
+		return false;
+	}
+	let depth_b = test_intervals(ra.get_interval_y(), rb.get_interval_y());
+	if depth_b == 0.0
+	{
+		return false;
+	}
+	let mut collision_normal:vector = ra.get_position().minus(&rb.get_position());
+	let mag = collision_normal.clone().magnitude();
+	let mut collision_depth:f64 = ra.get_radius() + rb.get_radius() - mag;
+
+	if collision_depth > 0.0
+	{
+		collision_normal.div_equals(mag);
+		collision_resolver::resolve_circle_circle(ra, rb, &collision_normal, collision_depth);
+	}
 	return true;
 }
 

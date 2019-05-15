@@ -82,7 +82,7 @@ fn main()
     let mut p_circle: circle_particle = circle_particle::new(ap.get_new_id());
 
 
-    p_circle.init_circle(6.0);
+    p_circle.init_circle(25.0);
 
     p_circle.set_position(&vector::new(200.0, 600.0));
 
