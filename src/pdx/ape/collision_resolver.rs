@@ -44,12 +44,12 @@ pub fn resolve_particle_particle(pa:&mut polygon_particle, pb:&mut polygon_parti
     let mult_b:&mut vector = &mut ca.vn.mult((te + 1.0) * im_pb_inv_mass);
     let mult_b_2:&mut vector = &mut cb.vn.mult(im_pa_inv_mass - te * im_pb_inv_mass);
     let plus_b:&mut vector = &mut mult_b.plus(mult_b_2);
-    let mut vn_b:vector = plus_b.div_equals(sum_inv_mass).clone();
+    let mut vn_b:vector = plus_b.divided_by(sum_inv_mass);
 
     let mult_a:&mut vector = &mut cb.vn.mult((te + 1.0) * im_pa_inv_mass);
     let mult_a_2:&mut vector = &mut ca.vn.mult(im_pb_inv_mass - te * im_pa_inv_mass);
     let plus_a:&mut vector = &mut mult_a.plus(mult_a_2);
-    let mut vn_a:vector = plus_a.div_equals(sum_inv_mass).clone();
+    let mut vn_a:vector = plus_a.divided_by(sum_inv_mass);
     // apply friction to the tangental component
     ca.vt.mult_equals(tf);
     cb.vt.mult_equals(tf);
@@ -98,12 +98,12 @@ pub fn resolve_circle_circle(pa:&mut circle_particle, pb:&mut circle_particle, n
     let mult_b:&mut vector = &mut ca.vn.mult((te + 1.0) * im_pb_inv_mass);
     let mult_b_2:&mut vector = &mut cb.vn.mult(im_pa_inv_mass - te * im_pb_inv_mass);
     let plus_b:&mut vector = &mut mult_b.plus(mult_b_2);
-    let mut vn_b:vector = plus_b.div_equals(sum_inv_mass).clone();
+    let mut vn_b:vector = plus_b.divided_by(sum_inv_mass);
 
     let mult_a:&mut vector = &mut cb.vn.mult((te + 1.0) * im_pa_inv_mass);
     let mult_a_2:&mut vector = &mut ca.vn.mult(im_pb_inv_mass - te * im_pa_inv_mass);
     let plus_a:&mut vector = &mut mult_a.plus(mult_a_2);
-    let mut vn_a:vector = plus_a.div_equals(sum_inv_mass).clone();
+    let mut vn_a:vector = plus_a.divided_by(sum_inv_mass);
 
     ca.vt.mult_equals(tf);
     cb.vt.mult_equals(tf);

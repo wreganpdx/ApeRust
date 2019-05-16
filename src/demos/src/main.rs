@@ -89,9 +89,9 @@ fn main()
     p.create_rectangle(40.0,40.0);
     p2.create_rectangle(40.0,15.0);
 
-    //p.set_radian(f64::consts::PI /2.0);
+    p.set_radian(f64::consts::PI /2.0);
 
-   //// p2.set_radian(f64::consts::PI /1.5);
+    p2.set_radian(f64::consts::PI /2.0);
 
     p.set_collidable(true);
     p2.set_collidable(true);
@@ -131,7 +131,7 @@ fn main()
     list.set_collide_internal(true);
 
     ap.add_particle_collection(list);
-    ap.add_particle_collection(p3);
+   // ap.add_particle_collection(p3);
 
    //ap.set_force(vector::new(0.0,20.0));
     /*

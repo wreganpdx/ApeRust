@@ -73,7 +73,8 @@ pub struct rectangle_particle
     fixed:bool,
     collidable:bool,
 	width:f64,
-	height:f64
+	height:f64,
+    created:bool
 }
 
 impl rectangle_particle
@@ -87,6 +88,11 @@ impl rectangle_particle
 
 	pub fn create_rectangle(&mut self, width:f64, height:f64)
 	{
+        if self.created
+        {
+            println!("Already created rectangle!!");
+            return;
+        }
 		self.width = width;
 		self.height = height;
 
@@ -102,11 +108,12 @@ impl rectangle_particle
 		self.mass = 1.0;
 		self.set_friction(0.5);
 		self.inv_mass = self.mass/1.0;
+        self.samp = vector::new(0.0,0.0);
 	}
 
 	pub fn get_axe(&mut self, i:usize)->vector
 	{
-		return self.axes[0].clone();
+		return self.axes[i].clone();
 	}
 }
 
@@ -166,7 +173,7 @@ impl particle for rectangle_particle
 
 	fn get_elasticity(&self)-> f64
     {
-        return self.elasticity;
+        return self.elasticity.clone();
     }
 	fn set_elasticity(&mut self, e:f64)
     {
@@ -313,25 +320,28 @@ impl particle for rectangle_particle
 	
 	fn set_axes(&mut self)
 	{
+        println!("RADIAN {}", self.radian);
 		let s = self.radian.sin();
 		let c = self.radian.cos();
         println!("s: {},c: {}", s, c);
-		self.axes[0] = vector::new(c.clone(), s.clone());
-		self.axes[1] = vector::new(-s, c);
+		self.axes[0].set_to(c.clone(), s.clone());
+		self.axes[1].set_to(-s, c);
+        println!("{:?}, {:?}", self.axes[0], self.axes[1]);
 	}
 
 
 
 	fn get_projection(&mut self, axis:&vector)->&interval 
 	{
-		let rad = &self.extents[0] * axis.dot(&self.axes[0]).abs() + &self.extents[1] * axis.dot(&self.axes[1]).abs();
+		let rad = self.extents[0].clone() * axis.dot(&self.axes[0]).abs() + self.extents[1].clone() * axis.dot(&self.axes[1]).abs();
         let mut projected = self.get_position();
         if !self.fixed
         {
             projected.plus_equals(&self.curr.minus(&self.prev));
         }
 		//let next = self.curr.plus(&self.curr.minus(&self.prev));
-		let c = projected.dot(axis);
+		//let c2 = projected.dot(axis);
+        let c = self.samp.dot(axis);
 		//c.plus_equals(self.curr.minus(&self.prev));
 		self.interval.min = c - rad;
 		self.interval.max = c + rad;
@@ -377,7 +387,7 @@ impl particle for rectangle_particle
 
 	fn get_collidable(&self)-> bool
     {
-        return self.collidable;
+        return self.collidable.clone();
     }
 	fn set_collidable(&mut self, c:bool)
     {
@@ -540,8 +550,8 @@ impl particle for rectangle_particle
 			// integrate
 			self.set_temp(&self.get_position());
 			
-			let mut nv:vector = self.velocity.plus(self.forces.mult_equals(ap.time_step));
-			self.curr.plus_equals(&nv.mult_equals(ap.damping));
+			let mut nv:vector = self.velocity.plus(&self.forces.mult(ap.time_step));
+			self.curr.plus_equals(&nv.mult(ap.damping));
 			self.set_prev(&self.get_temp());
 
 			// clear the forces
@@ -560,6 +570,9 @@ impl particle for rectangle_particle
 	{
 		if !self.fixed
 		{
+			self.curr.plus_equals(mtd);
+			self.set_velocity(vel);
+            /*
 			let mag = vel.magnitude();
 			let newVel = self.curr.clone().minus(&self.prev).mult(mag);
 			
@@ -570,6 +583,7 @@ impl particle for rectangle_particle
             normalMTD.mult_equals(mag);
 			self.set_velocity(&vel);
             println!("vel: {:?}, mtd: {:?}",vel, mtd);
+            */
 		}
 		
 		if self.smashable
@@ -642,6 +656,7 @@ impl particle for rectangle_particle
 
 	fn get_rotation(&self)->f64
 	{
+        println!("getting rotation");
 		return (180.0/f64::consts::PI) * self.get_radian();
 	}
 }

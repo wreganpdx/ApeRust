@@ -34,7 +34,7 @@ fn main()
     
     let mut window: Window = WindowSettings::new(
             "testcd.",
-            [850, 850]
+            [1000, 1000]
         )
         .opengl(opengl)
         .exit_on_esc(true)

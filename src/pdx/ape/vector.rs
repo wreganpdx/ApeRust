@@ -14,7 +14,7 @@ Final Project
  * For more information, see  https://github.com/arctwelve/ape-js-port/tree/master/org/cove/ape
  */
 use std::fmt;
-
+use std::f64;
 #[allow(unused_variables)]
 #[derive(Default)]
 pub struct vector
@@ -26,13 +26,13 @@ pub struct vector
 impl vector
 {
 
-    pub fn get_x(&mut self)-> &f64
+    pub fn get_x(&mut self)-> f64
     {
-        return &self.x;
+        return self.x.clone();
     }
-    pub fn get_y(&mut self)-> &f64
+    pub fn get_y(&mut self)-> f64
     {
-        return &self.y;
+        return self.y.clone();
     }
 	pub fn new(x: f64, y: f64) -> vector 
     {
@@ -71,11 +71,10 @@ impl vector
 	}
 
     		
-	pub fn plus_equals(&mut self, v:&vector)->&vector 
+	pub fn plus_equals(&mut self, v:&vector)
     {
         self.x += v.x;
         self.y += v.y;
-        return self as &vector;
 	}
 
     pub fn minus(&self, v:&vector) ->vector 
@@ -83,11 +82,10 @@ impl vector
 		return vector::new(self.x - v.x, self.y - v.y);  
 	}
 
-    pub fn minus_equals(&mut self, v:&vector)->&vector 
+    pub fn minus_equals(&mut self, v:&vector)
     {
         self.x -= v.x;
         self.y -= v.y;
-        return self as &vector;
 	}
 
     pub fn mult(& self, s:f64)->vector 
@@ -95,11 +93,10 @@ impl vector
         return vector::new(self.x *s, self.y *s);
 	}
 
-    pub fn mult_equals(&mut self, s:f64)->&vector 
+    pub fn mult_equals(&mut self, s:f64)
     {
         self.x *= s;
         self.y *= s;
-        return self as &vector;
 	}
 
     pub fn times(&self, v:&vector) ->vector 
@@ -107,13 +104,19 @@ impl vector
 		return vector::new(self.x * v.x, self.y * v.y);  
 	}
 
-    pub fn div_equals(&mut self, mut s:f64)->&vector 
+    pub fn div_equals(&mut self, mut s:f64)
     {
         if s == 0.0
         { s = 0.0001;}
         self.x /= s;
         self.y /= s;
-        return self as &vector;
+	}
+
+    pub fn divided_by(&self, mut s:f64) ->vector 
+    {
+        if s == 0.0
+        { s = 0.0001;}
+		return vector::new(self.x / s, self.y /s);  
 	}
 
     pub fn magnitude(&self)->f64 
@@ -141,11 +144,16 @@ impl vector
 		return b;
 	}
 
+    pub fn length(&mut self)->f64 
+    {
+        return f64::sqrt(self.x * self.x + self.y * self.y);
+    }
+
     pub fn distance(&self, v:&vector)->f64 
     {
         let delta:vector = self.minus(&v);
         let mut mag:f64 = delta.magnitude();
-        if (mag == 0.0)
+        if mag == 0.0
         {
             mag = 0.0001;
         }
@@ -169,7 +177,12 @@ impl vector
 
     pub fn swap(&self)-> vector
     {
-        return vector::new(self.y, self.x);
+        return vector::new(self.y.clone(), self.x.clone());
+    }
+
+    pub fn swap_with_neg_y(&self)-> vector
+    {
+        return vector::new(-self.y.clone(), self.x.clone());
     }
 }
 

@@ -77,10 +77,15 @@ pub struct circle_particle
 	is_wheel:bool,
 	rim:rim_particle,
 	traction:f64,
+	norm_slip:vector,
 }
 
 impl circle_particle
 {
+	pub fn init_wheel(&mut self)
+	{
+		self.is_wheel = true;
+	}
     pub fn new(id:i64)->circle_particle
     {
 		let mut p = circle_particle::default();
@@ -121,46 +126,20 @@ impl circle_particle
 
 	pub fn resolve_wheel(&mut self, mtd:&vector, vel:&vector, n:&vector, d:f64, o:i32)
 	{
-		/*
-		let mut tan = vector::new(-self.rim.get_curr_y(), self.rim.get_curr_x());
+		
+		let mut tan = self.rim.get_curr().swap_with_neg_y();
 		tan.normalize();
 		let wheel_surf_vel = tan.mult(self.rim.get_speed());
-
-		let combined_vel = self.get_velocity().plus(wheel_surf_vel);
+		
+		let combined_vel = self.get_velocity().plus(&wheel_surf_vel);
 		let cp = combined_vel.cross(n);
 		tan.mult_equals(cp);
-	//	self.rim.set_prev(self.rim.get_position().minus(tan));
-		let slip_speed = self.traction * self.rim.get_speed();
-		*/
-		/*
-		private void resolve(Vector2 n)
-        {
-
-            tan= new Vector2(-rp.Curr.Y, rp.Curr.X);
-
-            tan.Normalize();
-
-            // velocity of the wheel's surface 
-            Vector2 wheelSurfaceVelocity = tan* rp.getSpeed();
-
-            // the velocity of the wheel's surface relative to the ground
-            Vector2 combinedVelocity = getVelocity() + wheelSurfaceVelocity;
-
-            float cp = cross(combinedVelocity, n);
-			public float cross(Vector2 v1, Vector2 v2) {
-			return v1.X * v2.Y - v1.Y * v2.X;
-		}
-            // set the wheel's spinspeed to track the ground
-            tan*= cp;
-            rp.Prev = rp.Curr - tan;
-            // some of the wheel's torque is removed and converted into linear displacement
-            float slipSpeed = _traction * rp.getSpeed();
-            normSlip= new Vector2(slipSpeed * n.Y, slipSpeed * n.X);
-            velocityIsDirty = true;
-            //SceneObject.Position += normSlip;
-            rp.setSpeed(rp.getSpeed() * 1-_traction);
-        }
-		*/
+		let prev = &self.rim.get_curr().minus(&tan);
+	 	self.rim.set_prev(prev);
+		let slip_speed = (1.0-self.traction) * self.rim.get_speed();
+		self.norm_slip.set_to(slip_speed * n.y , slip_speed * n.x);
+		self.curr.plus_equals(&self.norm_slip);
+		self.rim.damp_speed(self.traction);
 	}
 }
 
@@ -172,16 +151,27 @@ impl Paint for circle_particle
 		const BLUE:   [f32; 4] = [0.2, 0.2, 0.8, 1.0];
 		const OFFBLUE:   [f32; 4] = [0.1, 0.1, 0.5, 1.0];
 		let rect = rectangle::rectangle_by_corners(0.0, 0.0, 1.0, 1.0);
-
-		gl.draw(args.viewport(), |c, gl| 
+		if self.is_wheel
 		{
-            let transform = c.transform.trans(self.get_curr_x(), self.get_curr_y()).rot_rad(self.get_radian().clone());
-            //rectangle(BLUE, rect, transform, gl);
-			circle_arc(BLUE, self.get_radius().clone(), 0.0,f64::consts::PI  /2.0, rect, transform, gl);
-			circle_arc(OFFBLUE, self.get_radius().clone(), f64::consts::PI  /2.0,f64::consts::PI , rect, transform, gl);
-			circle_arc(BLUE, self.get_radius().clone(),f64::consts::PI, f64::consts::PI  * 1.5, rect, transform, gl);
-			circle_arc(OFFBLUE, self.get_radius().clone(), f64::consts::PI  * 1.5,f64::consts::PI  * 2.0, rect, transform, gl);
-        });
+			gl.draw(args.viewport(), |c, gl| 
+			{
+				let transform = c.transform.trans(self.get_curr_x(), self.get_curr_y()).rot_rad(self.get_radian().clone());
+				//rectangle(BLUE, rect, transform, gl);
+				circle_arc(BLUE, self.get_radius().clone(), 0.0,f64::consts::PI  /2.0, rect, transform, gl);
+				circle_arc(OFFBLUE, self.get_radius().clone(), f64::consts::PI  /2.0,f64::consts::PI , rect, transform, gl);
+				circle_arc(BLUE, self.get_radius().clone(),f64::consts::PI, f64::consts::PI  * 1.5, rect, transform, gl);
+				circle_arc(OFFBLUE, self.get_radius().clone(), f64::consts::PI  * 1.5,f64::consts::PI  * 2.0, rect, transform, gl);
+			});
+		}
+		else
+		{
+			gl.draw(args.viewport(), |c, gl| 
+			{
+				let transform = c.transform.trans(self.get_curr_x(), self.get_curr_y()).rot_rad(self.get_radian().clone());
+				//rectangle(BLUE, rect, transform, gl);
+				circle_arc(BLUE, self.get_radius().clone(), 0.0,f64::consts::PI  * 1.99, rect, transform, gl);
+			});
+		}
 	}
 }
 
@@ -577,7 +567,7 @@ impl particle for circle_particle
 			// integrate
 			self.set_temp(&self.get_position());
 			
-			let mut nv:vector = self.velocity.plus(self.forces.mult_equals(ap.time_step));
+			let mut nv:vector = self.velocity.plus(&self.forces.mult(ap.time_step));
 			self.curr.plus_equals(&nv);
 			self.set_prev(&self.get_temp());
 

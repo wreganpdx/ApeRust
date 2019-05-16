@@ -607,8 +607,8 @@ impl particle for polygon_particle
 			// integrate
 			self.set_temp(&self.get_position());
 			
-			let mut nv:vector = self.velocity.plus(self.forces.mult_equals(ap.time_step));
-			self.curr.plus_equals(&nv.mult_equals(ap.damping));
+			let mut nv:vector = self.velocity.plus(&self.forces.mult(ap.time_step));
+			self.curr.plus_equals(&nv.mult(ap.damping));
 			self.set_prev(&self.get_temp());
 
 			// clear the forces

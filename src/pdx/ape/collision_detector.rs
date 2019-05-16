@@ -57,7 +57,9 @@ pub fn test_polygon_vs_polygon(ra:& mut polygon_particle, rb:&mut polygon_partic
 }
 
 pub fn test_rect_vs_rect(ra:& mut rectangle_particle, rb:&mut rectangle_particle)->bool
-{		
+{	
+	ra.set_samp(ra.get_position());
+	rb.set_samp(rb.get_position());
 	let mut collision_normal:vector = vector::new(0.0,0.0);
 	let mut collision_depth:f64 = 1000000.0; 
 	//println!("{}", collision_depth);

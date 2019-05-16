@@ -73,6 +73,9 @@ impl Paint for APEngine
             // Clear the screen.
             clear(GREEN, gl);
         });
+
+		//let rect = rectangle::rectangle_by_corners(0.0, 0.0, args.width/2.0, args.height/2.0);
+
 		self.paint_all(args, gl);
 	}
 }

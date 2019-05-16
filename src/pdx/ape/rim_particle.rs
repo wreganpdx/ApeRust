@@ -16,9 +16,22 @@ pub struct rim_particle
 
 impl rim_particle
 {
-    pub fn get_speed(&mut self)->&f64
+    pub fn set_prev(&mut self, vec:&vector)
     {
-        return &self.speed;
+        self.prev = vec.clone();
+    }
+    pub fn get_curr(&mut self)->vector
+    {
+        return self.curr.clone();
+    }
+    pub fn get_speed(&mut self)->f64
+    {
+        return self.speed.clone();
+    }
+
+    pub fn damp_speed(&mut self, d:f64)
+    {
+        self.speed = self.speed * d;
     }
 
     pub fn init(&mut self, r:f64, mt:f64)
@@ -43,8 +56,24 @@ impl rim_particle
     pub fn update(&mut self, dt:&f64, ap:&APValues)
     {
        // self.sp = f64::MAX(-self.max_torque, f64::MIN(self.max_torque, self.sp + self.av));
-        let dx = self.curr.get_x();
-        let dy = self.curr.get_y();
-        //let len = f64::
+        let mut dx = -self.curr.get_y();
+        let mut dy = self.curr.get_x();
+        let len = f64::sqrt(dx * dx + dy * dy);
+        dx = dx/len;
+        dy = dy/len;
+
+        self.curr.plus_equals(&vector::new(self.sp*dx, self.sp*dy));
+
+        let ox = self.prev.get_x();
+        let oy = self.prev.get_y();
+        self.prev.x = self.curr.get_x().clone();
+        self.prev.y = self.curr.get_y().clone();
+        let px = self.prev.get_x();
+        let py = self.prev.get_y();
+        self.curr.plus_equals(&vector::new(ap.damping * (px - ox), ap.damping * (py-oy)));
+        let clen:f64 = self.curr.length();
+        let diff = (clen - self.wr) / clen;
+        self.curr.minus_equals(&self.curr.mult(diff));
+
     }
 }
