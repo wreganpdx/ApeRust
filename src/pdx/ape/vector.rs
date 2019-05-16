@@ -144,6 +144,16 @@ impl vector
 		return b;
 	}
 
+    pub fn mag_or_one(&self)->f64 
+    {
+        let mag = self.magnitude();
+        if (mag < 1.0)
+        {
+            return 1.0
+        }
+        return mag;
+	}
+
     pub fn length(&mut self)->f64 
     {
         return f64::sqrt(self.x * self.x + self.y * self.y);

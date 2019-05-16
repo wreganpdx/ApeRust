@@ -478,7 +478,7 @@ impl particle for rectangle_particle
 
 	fn get_velocity(&self)-> vector
     {   
-        return self.curr.minus(&self.prev);
+        return self.velocity.clone();
     }
 	fn set_velocity(&mut self, i:&vector)
     {
@@ -577,7 +577,8 @@ impl particle for rectangle_particle
 		if !self.fixed
 		{
 			self.curr.plus_equals(mtd);
-            let mag = self.velocity.magnitude();
+            println!("{:?}", self.velocity);
+            let mag = self.velocity.mag_or_one();
             let newVel = mtd.clone().normalize().mult(mag).mult(self.elasticity);
 			self.velocity.copy(&newVel);
             /*

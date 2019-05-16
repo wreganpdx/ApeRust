@@ -84,7 +84,7 @@ pub fn test_rect_vs_rect(ra:& mut rectangle_particle, rb:&mut rectangle_particle
 			return false;
 		}
 
-		if abs_a < collision_depth || abs_b < collision_depth 
+		if abs_a < collision_depth.abs() || abs_b < collision_depth.abs() 
 		{
 			let altb:bool = abs_a < abs_b;
 			if altb 
@@ -197,9 +197,9 @@ pub fn test_circ_vs_circ(ra:& mut circle_particle, rb:&mut circle_particle)->boo
 		return false;
 	}
 	let mut collision_normal:vector = ra.get_position().minus(&rb.get_position());
-	println!("collision_normal {:?}", collision_normal);
+	//println!("collision_normal {:?}", collision_normal);
 	let mag = collision_normal.clone().magnitude();
-	println!("collision_normal {:?}", collision_normal);
+	//println!("collision_normal {:?}", collision_normal);
 	let mut collision_depth:f64 = ra.get_radius() + rb.get_radius() - mag;
 
 	if collision_depth > 0.0

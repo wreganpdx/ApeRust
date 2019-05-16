@@ -107,10 +107,10 @@ fn main()
     wheel.set_elasticity(0.9);
 
     circ.set_position(&vector::new(600.0,415.0));
-    rect.set_position(&vector::new(200.0,415.0));
+    rect.set_position(&vector::new(225.0,415.0));
     wheel.set_position(&vector::new(400.0,215.0));
 
-    rect.set_velocity(&vector::new(-2.0,0.0));
+    rect.set_velocity(&vector::new(-2.0,-200.0));
     circ.set_velocity(&vector::new(10.0,-4.000));
     wheel.set_velocity(&vector::new(-10.0,-4.0));
 
@@ -142,7 +142,7 @@ fn main()
     ap.add_particle_collection(list);
    // ap.add_particle_collection(p3);
 
-    ap.set_force(vector::new(0.0,200.0));
+    //ap.set_force(vector::new(0.0,200.0));
     
     let mut step:bool = false;
     step = ap.step();
