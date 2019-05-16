@@ -151,6 +151,8 @@ fn main()
     let mut nowRender = Instant::now();
     let mut exit = false;
     let mut steps = 0;
+    let mut EngineSteps = 0;
+    let mut FramesRendered = 0;
     while (true)
     {
         step = ap.step();
@@ -163,6 +165,7 @@ fn main()
                 // print!("Rendering");
                     ap.paint(&r, &mut gl); //.render(&r);
                     nowRender = Instant::now();
+                    FramesRendered += 1;
                     break;
                 }
 
@@ -181,7 +184,7 @@ fn main()
         }
         else
         {
-           // print!("Step: {} ", i);
+           EngineSteps += 1;
         }
 
         
@@ -193,5 +196,5 @@ fn main()
         }
         steps = steps + 1;
     }
-    println!("Engine steps: {}", steps);
+    println!("Engine steps: {}, Frames Rendered: {}, Total Steps: {}, Seconds: {}", EngineSteps, FramesRendered, steps, now.elapsed().as_secs());
 }
