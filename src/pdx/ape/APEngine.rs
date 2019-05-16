@@ -201,7 +201,7 @@ impl APEngine
 		//self.groups = new Array();	
 		self.force = vector::new(0.0,0.0);
 		self.massless_force = vector::new(0.0,0.0);
-		self.damping = 1.0;
+		self.damping = 1.0-(delta*10.0);
 		self.constraint_cycles = 0;
 		self.constraint_collision_cycles = 1;
 		println!("Ape Engine Initialized");

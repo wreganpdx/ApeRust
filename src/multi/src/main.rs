@@ -44,7 +44,7 @@ fn main()
     let mut gl:GlGraphics = GlGraphics::new(opengl);
     let mut ap:APEngine = APEngine::new();
 
-    ap.init(0.01);
+    ap.init(0.001);
 
     //boundries
     let mut left: rectangle_particle = rectangle_particle::new(ap.get_new_id());
@@ -76,8 +76,8 @@ fn main()
 
 
     //objects
-    let mut p: rectangle_particle = rectangle_particle::new(ap.get_new_id());
-    let mut p2: circle_particle = circle_particle::new(ap.get_new_id());
+    let mut rect: rectangle_particle = rectangle_particle::new(ap.get_new_id());
+    let mut circ: circle_particle = circle_particle::new(ap.get_new_id());
 
     let mut p_circle: circle_particle = circle_particle::new(ap.get_new_id());
 
@@ -90,27 +90,28 @@ fn main()
 
     p_circle.set_position(&vector::new(200.0, 600.0));
 
-    p.create_rectangle(40.0,40.0);
-    p2.init_circle(20.0);
+    rect.create_rectangle(40.0,40.0);
+    circ.init_circle(20.0);
 
     //p.set_radian(f64::consts::PI /2.0);
 
    // p2.set_radian(f64::consts::PI /2.0);
 
-    p.set_collidable(true);
-    p2.set_collidable(true);
+    rect.set_collidable(true);
+    circ.set_collidable(true);
     wheel.set_collidable(true);
+    p_circle.set_collidable(true);
 
-    p.set_elasticity(1.0);
-    p2.set_elasticity(1.0);
+    rect.set_elasticity(0.9);
+    circ.set_elasticity(0.9);
     wheel.set_elasticity(0.9);
 
-    p2.set_position(&vector::new(200.0,415.0));
-    p.set_position(&vector::new(300.0,415.0));
+    circ.set_position(&vector::new(600.0,415.0));
+    rect.set_position(&vector::new(200.0,415.0));
     wheel.set_position(&vector::new(400.0,215.0));
 
-    p.set_velocity(&vector::new(-5.4,-4.0));
-    p2.set_velocity(&vector::new(10.0,-4.000));
+    rect.set_velocity(&vector::new(-2.0,0.0));
+    circ.set_velocity(&vector::new(10.0,-4.000));
     wheel.set_velocity(&vector::new(-10.0,-4.0));
 
     let mut p3 = particle_collection::new();
@@ -127,21 +128,22 @@ fn main()
 
     let mut list:particle_collection = particle_collection::new();
 
-    list.add_rectangle_particle(p);
-    list.add_circle_particle(p2);
+    list.add_rectangle_particle(rect);
+    list.add_circle_particle(circ);
     list.add_rectangle_particle(left);
     list.add_rectangle_particle(right);
     list.add_rectangle_particle(top);
     list.add_rectangle_particle(bottom);
     list.add_circle_particle(wheel);
-    //list.add_circle_particle(p_circle);
+    list.add_circle_particle(p_circle);
 
     list.set_collide_internal(true);
 
     ap.add_particle_collection(list);
    // ap.add_particle_collection(p3);
 
-    ap.set_force(vector::new(0.0,20.0));
+    ap.set_force(vector::new(0.0,200.0));
+    
     let mut step:bool = false;
     step = ap.step();
     step = ap.step();
@@ -162,8 +164,7 @@ fn main()
             {
                 if let Some(r) = e.render_args() 
                 {
-                // print!("Rendering");
-                    ap.paint(&r, &mut gl); //.render(&r);
+                    ap.paint(&r, &mut gl); 
                     nowRender = Instant::now();
                     FramesRendered += 1;
                     break;
@@ -175,19 +176,10 @@ fn main()
                 }
             }
         }
-        if !step
-        {
-           // println!(" p: {:?}", p.get_position());
-            //let ten_millis = time::Duration::from_millis(1);
-            //thread::sleep(ten_millis);
-           // print!("Sleeping: {}", i);
-        }
-        else
+        if step
         {
            EngineSteps += 1;
         }
-
-        
 
         if now.elapsed().as_secs() > 60 || exit
         {

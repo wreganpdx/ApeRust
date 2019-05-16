@@ -572,6 +572,7 @@ impl particle for circle_particle
 			// integrate
 			self.set_temp(&self.get_position());
 			//println!("velocity {:?}", self.velocity);
+			self.velocity.mult_equals(ap.damping);
 			self.velocity.plus_equals(&self.forces.mult(ap.time_step));
 			//let mut nv:vector = self.velocity.plus(&self.forces.mult(ap.time_step));
 			//println!("velocity {:?}, adding: {:?}", self.velocity,self.velocity.mult(ap.time_step));
@@ -603,7 +604,11 @@ impl particle for circle_particle
 		if !self.fixed
 		{
 			self.curr.plus_equals(mtd);
-			self.velocity.plus_equals(vel);
+            let mag = self.velocity.magnitude();
+            let newVel = mtd.clone().normalize().mult(mag).mult(self.elasticity);
+			self.velocity.copy(&newVel);
+			//self.curr.plus_equals(mtd);
+			//self.velocity.plus_equals(vel);
 		}
 		
 		if self.smashable

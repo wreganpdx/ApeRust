@@ -547,6 +547,7 @@ impl particle for rectangle_particle
                 return;
             }
 			
+            self.velocity.mult_equals(ap.damping);
 			
 			// global forces
 			self.add_force(ap.force.clone());
@@ -576,7 +577,9 @@ impl particle for rectangle_particle
 		if !self.fixed
 		{
 			self.curr.plus_equals(mtd);
-			self.velocity.plus_equals(vel);
+            let mag = self.velocity.magnitude();
+            let newVel = mtd.clone().normalize().mult(mag).mult(self.elasticity);
+			self.velocity.copy(&newVel);
             /*
 			let mag = vel.magnitude();
 			let newVel = self.curr.clone().minus(&self.prev).mult(mag);
