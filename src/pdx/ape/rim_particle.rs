@@ -16,6 +16,11 @@ pub struct rim_particle
 
 impl rim_particle
 {
+    pub fn new()->rim_particle
+    {
+		let mut p = rim_particle::default();
+        return p;
+    }
     pub fn set_prev(&mut self, vec:&vector)
     {
         self.prev = vec.clone();
@@ -23,6 +28,15 @@ impl rim_particle
     pub fn get_curr(&mut self)->vector
     {
         return self.curr.clone();
+    }
+
+    pub fn get_curr_x(&mut self)->f64
+    {
+        return self.curr.x.clone();
+    }
+    pub fn get_curr_y(&mut self)->f64
+    {
+        return self.curr.y.clone();
     }
     pub fn get_speed(&mut self)->f64
     {
@@ -53,7 +67,7 @@ impl rim_particle
         self.av = s;
     }
 
-    pub fn update(&mut self, dt:&f64, ap:&APValues)
+    pub fn update(&mut self,ap:&APValues)
     {
        // self.sp = f64::MAX(-self.max_torque, f64::MIN(self.max_torque, self.sp + self.av));
         let mut dx = -self.curr.get_y();

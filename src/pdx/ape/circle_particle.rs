@@ -84,6 +84,8 @@ impl circle_particle
 {
 	pub fn init_wheel(&mut self)
 	{
+		self.rim = rim_particle::new();
+		self.rim.init(self.radius, 5.0);
 		self.is_wheel = true;
 	}
     pub fn new(id:i64)->circle_particle
@@ -103,6 +105,7 @@ impl circle_particle
 		self.set_friction(0.5);
 		self.inv_mass = self.mass/1.0;
 		self.radius = radius;
+
 	}
 
 	pub fn get_interval_x(&mut self)->&interval
@@ -361,7 +364,9 @@ impl particle for circle_particle
 
 	fn get_projection(&mut self, axis:&vector)->&interval 
 	{
-		
+		let c:f64 = self.samp.dot(axis);
+		self.interval.min = c -  self.radius;
+		self.interval.max = c + self.radius;
 		return &self.interval;
 	}
 
@@ -566,13 +571,23 @@ impl particle for circle_particle
 	
 			// integrate
 			self.set_temp(&self.get_position());
+			//println!("velocity {:?}", self.velocity);
+			self.velocity.plus_equals(&self.forces.mult(ap.time_step));
+			//let mut nv:vector = self.velocity.plus(&self.forces.mult(ap.time_step));
+			//println!("velocity {:?}, adding: {:?}", self.velocity,self.velocity.mult(ap.time_step));
+			self.curr.plus_equals(&self.velocity.mult(ap.time_step));
 			
-			let mut nv:vector = self.velocity.plus(&self.forces.mult(ap.time_step));
-			self.curr.plus_equals(&nv);
+			
 			self.set_prev(&self.get_temp());
 
 			// clear the forces
 			self.forces.set_to(0.0,0.0);
+
+			if self.is_wheel
+			{
+				self.rim.update(ap);
+				self.radian = f64::atan2(self.rim.get_curr_x(), self.rim.get_curr_y()) + f64::consts::PI//Math.atan2(orientation.y, orientation.x) + Math.PI;
+			}
     }
 
 	fn get_components(&mut self, cn:&vector)->collision
@@ -588,7 +603,7 @@ impl particle for circle_particle
 		if !self.fixed
 		{
 			self.curr.plus_equals(mtd);
-			self.set_velocity(vel);
+			self.velocity.plus_equals(vel);
 		}
 		
 		if self.smashable
@@ -599,6 +614,11 @@ impl particle for circle_particle
 				//note: These smash events are probably not necessary.
 				//dispatchEvent(new SmashEvent(SmashEvent.COLLISION, ev));
 			}
+		}
+
+		if self.is_wheel
+		{
+			self.resolve_wheel(mtd, vel, n, d, o);
 		}
 			
 	}

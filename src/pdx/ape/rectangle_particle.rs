@@ -86,6 +86,11 @@ impl rectangle_particle
         return p;
     }
 
+    pub fn get_extent(&mut self, i:usize)->f64
+    {
+        return self.extents[i].clone();
+    }
+
 	pub fn create_rectangle(&mut self, width:f64, height:f64)
 	{
         if self.created
@@ -550,8 +555,8 @@ impl particle for rectangle_particle
 			// integrate
 			self.set_temp(&self.get_position());
 			
-			let mut nv:vector = self.velocity.plus(&self.forces.mult(ap.time_step));
-			self.curr.plus_equals(&nv.mult(ap.damping));
+			self.velocity.plus_equals(&self.forces.mult(ap.time_step));
+			self.curr.plus_equals(&self.velocity.mult(ap.time_step));
 			self.set_prev(&self.get_temp());
 
 			// clear the forces
@@ -571,7 +576,7 @@ impl particle for rectangle_particle
 		if !self.fixed
 		{
 			self.curr.plus_equals(mtd);
-			self.set_velocity(vel);
+			self.velocity.plus_equals(vel);
             /*
 			let mag = vel.magnitude();
 			let newVel = self.curr.clone().minus(&self.prev).mult(mag);
@@ -601,9 +606,7 @@ impl particle for rectangle_particle
     {
 		if !self.fixed
 		{
-			println!("Velocity old {:?}, velocity delta {:?}", self.velocity, dv);
 			self.velocity = self.velocity.plus(&dv);
-			println!("Velocity new {:?}, velocity delta {:?}", self.velocity, dv);
 		}
     }
 

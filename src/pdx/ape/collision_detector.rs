@@ -76,8 +76,6 @@ pub fn test_rect_vs_rect(ra:& mut rectangle_particle, rb:&mut rectangle_particle
 		}
 		let axis_b = &rb.get_axe(i);
 		let depth_b = test_intervals(ra.get_projection(axis_b), rb.get_projection(axis_b));
-
-		
 		let abs_b:f64 = depth_b.abs();
 	//	println!("absA : {} , absB {} ",absA, absB);
 		if abs_b == 0.0
@@ -115,6 +113,73 @@ pub fn test_rect_vs_rect(ra:& mut rectangle_particle, rb:&mut rectangle_particle
 	//println!("Collision: {:?} {:?}", ra.get_curr(), rb.get_curr());
 	//println!("COLLISION");
 	return true;
+}
+
+pub fn test_circ_vs_rect(circle:& mut circle_particle, rect:&mut rectangle_particle)->bool
+{	
+	circle.set_samp(circle.get_position());
+	rect.set_samp(rect.get_position());
+	let mut collision_normal:vector = vector::new(0.0,0.0);
+	let mut collision_depth:f64 = 1000000.0; 
+	let mut depths = Vec::new();
+	//println!("{}", collision_depth);
+	for i in 0..2
+	{
+		let axis_b = &rect.get_axe(i);
+		let depth_b = test_intervals(circle.get_projection(axis_b), rect.get_projection(axis_b));
+		let abs_b:f64 = depth_b.abs();
+		if abs_b == 0.0
+		{
+			return false;
+		}
+
+		if abs_b < collision_depth.abs() 
+		{
+			collision_normal.copy(axis_b);
+			collision_depth = depth_b;
+		}
+		depths.push(depth_b);
+	}
+
+	let r = circle.get_radius().clone();
+	if depths[0].abs() < r && depths[1].abs() < r
+	{
+		let vert = closestVertexOnOBB(circle.get_samp(), rect);
+		collision_normal.copy(&vert.minus(&circle.get_samp()));
+		let mag = collision_normal.magnitude();
+		collision_depth = r - mag;
+		if collision_depth > 0.0
+		{
+			collision_normal.div_equals(mag);
+
+		}
+		else
+		{
+			return false;
+		}
+	}
+	collision_resolver::resolve_collision_rect_circ(circle, rect, collision_normal, collision_depth);
+	return true;
+}
+
+pub fn closestVertexOnOBB(p:vector, r:&mut rectangle_particle)-> vector
+{
+	
+	let d:vector = p.minus(&r.get_samp());
+	let mut q:vector = r.get_samp().clone();
+
+	for i in 0..2
+	{
+		let mut dist:f64 = d.dot(&r.get_axe(i));
+
+		if dist >= 0.0
+		{ dist = r.get_extent(i);}
+		else if dist < 0.0 {dist = -r.get_extent(i);}
+
+		q.plus_equals(&r.get_axe(i).mult(dist));
+	}
+	return q;
+
 }
 
 pub fn test_circ_vs_circ(ra:& mut circle_particle, rb:&mut circle_particle)->bool
@@ -376,7 +441,7 @@ fn test_intervals(interval_a:&interval, interval_b:&interval)->f64
 	let len_a:f64 = interval_b.max - interval_a.min;
 	let len_b:f64 = interval_b.min - interval_a.max;
 
-	if len_a.abs() > len_b.abs()
+	if len_a.abs() < len_b.abs()
 	{
 		return len_a;
 	}

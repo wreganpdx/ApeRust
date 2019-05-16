@@ -27,7 +27,7 @@ pub fn resolve_particle_particle(pa:&mut polygon_particle, pb:&mut polygon_parti
     
     let mtd:vector = normal.mult(depth);       
     //println!("Collision: mtd {:?} ", mtd);    
-    let te:f64 = pa.get_elasticity() + pb.get_elasticity();
+    let te:f64 = ( pa.get_elasticity() + pb.get_elasticity() ) * 0.5;
    // println!("Collision: te {:?} ", te);    
     let sum_inv_mass:f64 = im_pa_inv_mass + im_pb_inv_mass;
    // println!("Collision: sum_inv_mass {:?} ", sum_inv_mass);    
@@ -77,7 +77,7 @@ pub fn resolve_circle_circle(pa:&mut circle_particle, pb:&mut circle_particle, n
     
     let mtd:vector = normal.mult(depth);       
 
-    let te:f64 = pa.get_elasticity() + pb.get_elasticity();
+    let te:f64 = ( pa.get_elasticity() + pb.get_elasticity() ) * 0.5;
 
     let mut tf:f64  = 1.0 - (pa.get_friction() + pb.get_friction());
     if tf > 1.0
@@ -94,6 +94,123 @@ pub fn resolve_circle_circle(pa:&mut circle_particle, pb:&mut circle_particle, n
     
     let mut ca:collision = pa.get_components(normal);
     let mut cb:collision = pb.get_components(normal);
+    
+    let mult_b:&mut vector = &mut ca.vn.mult((te + 1.0) * im_pb_inv_mass);
+    let mult_b_2:&mut vector = &mut cb.vn.mult(im_pa_inv_mass - te * im_pb_inv_mass);
+    let plus_b:&mut vector = &mut mult_b.plus(mult_b_2);
+    let mut vn_b:vector = plus_b.divided_by(sum_inv_mass);
+
+    let mult_a:&mut vector = &mut cb.vn.mult((te + 1.0) * im_pa_inv_mass);
+    let mult_a_2:&mut vector = &mut ca.vn.mult(im_pb_inv_mass - te * im_pa_inv_mass);
+    let plus_a:&mut vector = &mut mult_a.plus(mult_a_2);
+    let mut vn_a:vector = plus_a.divided_by(sum_inv_mass);
+
+    ca.vt.mult_equals(tf);
+    cb.vt.mult_equals(tf);
+    
+
+    let mtd_a:vector = mtd.mult( im_pa_inv_mass / sum_inv_mass);     
+    let mtd_b:vector = mtd.mult(-im_pb_inv_mass / sum_inv_mass);
+    
+
+    vn_a.plus_equals(&ca.vt);
+    vn_b.plus_equals(&cb.vt);
+    
+    
+    pa.resolve_collision(&mtd_a, &vn_a, &normal, depth, 1);
+    pb.resolve_collision(&mtd_b, &vn_b, &normal, depth,  -1);
+}
+
+pub fn resolve_collision_rect_rect(pa:&mut rectangle_particle, pb:&mut rectangle_particle, normal:vector, depth:f64)
+{
+    println!("Depth {}", depth);
+    let im_pb_inv_mass:f64 = pb.get_inv_mass();
+    let im_pa_inv_mass:f64 = pa.get_inv_mass();
+    
+    pa.set_curr(&pa.get_samp());
+    pb.set_curr(&pb.get_samp());
+    
+    let mtd:vector = normal.mult(depth);       
+
+    let te:f64 = ( pa.get_elasticity() + pb.get_elasticity() ) * 0.5;
+
+    let mut tf:f64  = 1.0 - (pa.get_friction() + pb.get_friction());
+    if tf > 1.0
+    {
+        tf = 1.0;
+    }
+    if tf < 0.0
+    {
+        tf = 0.0;
+    }
+
+    let sum_inv_mass:f64 = im_pa_inv_mass + im_pb_inv_mass;
+    
+    
+    let mut ca:collision = pa.get_components(&normal);
+    let mut cb:collision = pb.get_components(&normal);
+    
+    let mult_b:&mut vector = &mut ca.vn.mult((te + 1.0) * im_pb_inv_mass);
+    let mult_b_2:&mut vector = &mut cb.vn.mult(im_pa_inv_mass - te * im_pb_inv_mass);
+    let plus_b:&mut vector = &mut mult_b.plus(mult_b_2);
+    let mut vn_b:vector = plus_b.divided_by(sum_inv_mass);
+
+    let mult_a:&mut vector = &mut cb.vn.mult((te + 1.0) * im_pa_inv_mass);
+    let mult_a_2:&mut vector = &mut ca.vn.mult(im_pb_inv_mass - te * im_pa_inv_mass);
+    let plus_a:&mut vector = &mut mult_a.plus(mult_a_2);
+    let mut vn_a:vector = plus_a.divided_by(sum_inv_mass);
+
+    ca.vt.mult_equals(tf);
+    cb.vt.mult_equals(tf);
+    
+
+    let mtd_a:vector = mtd.mult( im_pa_inv_mass / sum_inv_mass);     
+    let mtd_b:vector = mtd.mult(-im_pb_inv_mass / sum_inv_mass);
+    
+
+    vn_a.plus_equals(&ca.vt);
+    vn_b.plus_equals(&cb.vt);
+    
+    
+    pa.resolve_collision(&mtd_a, &vn_a, &normal, depth, 1);
+    pb.resolve_collision(&mtd_b, &vn_b, &normal, depth,  -1);
+}
+
+pub fn resolve_collision_rect_circ(pa:&mut circle_particle, pb:&mut rectangle_particle, normal:vector, depth:f64)
+{
+    println!("Depth {}", depth);
+    let im_pb_inv_mass:f64 = pb.get_inv_mass();
+    let im_pa_inv_mass:f64 = pa.get_inv_mass();
+    
+    pa.set_curr(&pa.get_samp());
+    pb.set_curr(&pb.get_samp());
+    
+    let mtd:vector = normal.mult(depth);       
+
+    let mut te:f64 = ( pa.get_elasticity() + pb.get_elasticity() ) * 0.5;
+    if te > 1.0
+    {
+        te = 1.0;
+    }
+    if te < 0.0
+    {
+        te = 0.0;
+    }
+    let mut tf:f64  = 1.0 - (pa.get_friction() + pb.get_friction());
+    if tf > 1.0
+    {
+        tf = 1.0;
+    }
+    if tf < 0.0
+    {
+        tf = 0.0;
+    }
+
+    let sum_inv_mass:f64 = im_pa_inv_mass + im_pb_inv_mass;
+    
+    
+    let mut ca:collision = pa.get_components(&normal);
+    let mut cb:collision = pb.get_components(&normal);
     
     let mult_b:&mut vector = &mut ca.vn.mult((te + 1.0) * im_pb_inv_mass);
     let mult_b_2:&mut vector = &mut cb.vn.mult(im_pa_inv_mass - te * im_pb_inv_mass);
@@ -191,11 +308,11 @@ pub fn resolveOverlap(c0:&vector, c1:&vector, normal:&vector, depthTime:f64, pa:
     }
         //trace(" "+pb.velocity.magnitude());
 }
-pub fn resolve_collision_rect_rect( pa:&mut rectangle_particle, pb:&mut rectangle_particle, normal:vector, depthTime:f64,)
+pub fn resolve_collision_rect_rect2( pa:&mut rectangle_particle, pb:&mut rectangle_particle, normal:vector, depthTime:f64,)
 {	
     //pre-computations
     let mtd = normal.mult(depthTime);
-    let te = pa.get_elasticity() + pb.get_elasticity();
+    let te = ( pa.get_elasticity() + pb.get_elasticity() ) * 0.5;
     let mut tf = 1.0- pa.get_friction() + pb.get_friction();
     if tf > 1.0
     {
@@ -206,7 +323,7 @@ pub fn resolve_collision_rect_rect( pa:&mut rectangle_particle, pb:&mut rectangl
         tf = 0.0;
     }
     let ma = pa.get_mass();
-    let mb = pa.get_mass();
+    let mb = pb.get_mass();
     let tm = ma + mb;
 
     let mut ca = pa.get_components(&normal);

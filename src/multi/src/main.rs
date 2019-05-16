@@ -34,7 +34,7 @@ fn main()
     
     let mut window: Window = WindowSettings::new(
             "testcd.",
-            [850, 850]
+            [1000, 1000]
         )
         .opengl(opengl)
         .exit_on_esc(true)
@@ -44,7 +44,7 @@ fn main()
     let mut gl:GlGraphics = GlGraphics::new(opengl);
     let mut ap:APEngine = APEngine::new();
 
-    ap.init(0.001);
+    ap.init(0.01);
 
     //boundries
     let mut left: rectangle_particle = rectangle_particle::new(ap.get_new_id());
@@ -77,17 +77,21 @@ fn main()
 
     //objects
     let mut p: rectangle_particle = rectangle_particle::new(ap.get_new_id());
-    let mut p2: rectangle_particle = rectangle_particle::new(ap.get_new_id());
+    let mut p2: circle_particle = circle_particle::new(ap.get_new_id());
 
     let mut p_circle: circle_particle = circle_particle::new(ap.get_new_id());
 
+    let mut wheel: circle_particle = circle_particle::new(ap.get_new_id());
 
+    
     p_circle.init_circle(25.0);
+    wheel.init_circle(25.0);
+    wheel.init_wheel();
 
     p_circle.set_position(&vector::new(200.0, 600.0));
 
     p.create_rectangle(40.0,40.0);
-    p2.create_rectangle(40.0,15.0);
+    p2.init_circle(20.0);
 
     //p.set_radian(f64::consts::PI /2.0);
 
@@ -95,15 +99,19 @@ fn main()
 
     p.set_collidable(true);
     p2.set_collidable(true);
+    wheel.set_collidable(true);
 
     p.set_elasticity(1.0);
     p2.set_elasticity(1.0);
+    wheel.set_elasticity(0.9);
 
-    p.set_position(&vector::new(200.0,415.0));
-    p2.set_position(&vector::new(600.0,415.0));
+    p2.set_position(&vector::new(200.0,415.0));
+    p.set_position(&vector::new(300.0,415.0));
+    wheel.set_position(&vector::new(400.0,215.0));
 
-    p.set_velocity(&vector::new(1.0,0.0));
-    p2.set_velocity(&vector::new(-1.0,0.000));
+    p.set_velocity(&vector::new(-5.4,-4.0));
+    p2.set_velocity(&vector::new(10.0,-4.000));
+    wheel.set_velocity(&vector::new(-10.0,-4.0));
 
     let mut p3 = particle_collection::new();
 
@@ -120,67 +128,48 @@ fn main()
     let mut list:particle_collection = particle_collection::new();
 
     list.add_rectangle_particle(p);
-    list.add_rectangle_particle(p2);
-    //list.add_rectangle_particle(left);
-    //list.add_rectangle_particle(right);
-    //list.add_rectangle_particle(top);
-   // list.add_rectangle_particle(bottom);
-
-    list.add_circle_particle(p_circle);
+    list.add_circle_particle(p2);
+    list.add_rectangle_particle(left);
+    list.add_rectangle_particle(right);
+    list.add_rectangle_particle(top);
+    list.add_rectangle_particle(bottom);
+    list.add_circle_particle(wheel);
+    //list.add_circle_particle(p_circle);
 
     list.set_collide_internal(true);
 
     ap.add_particle_collection(list);
    // ap.add_particle_collection(p3);
 
-   //ap.set_force(vector::new(0.0,20.0));
-    /*
-    println!("v = {:?}, v2 = {:?}, v3 = {:?} , v4 = {:?} , v5 = {:?}  ", v, v2, v3, v4, v5);
-    v.set_to(4.0, 5.0);
-    println!("v set to 4, 5 = {:?} ", v);
-    v2.copy(&v);
-    println!("v2 copy v = {:?}", v2);
-    v2.plus_equals(&v);
-    println!("v2 plus Equals v {:?}", v2);
-    v2.minus_equals(&v);
-    println!("v2 minus Equals v {:?}", v2);
-    v4 = v4.mult(5.0);
-    println!("v4 = v4 mult 5.0 {:?}", v4);
-    v5 = v4.times(&v4);
-    println!("v5 = v4 times v4 {:?}", v5);
-    v5.div_equals(3.0);
-    println!("v5 divEquals 3.0 {:?}", v5);
-    let c = v5.magnitude();
-    println!("c equals magnitude of v5 {}", c);
-    let t = v2.distance(&v3);
-    println!("t distance v2, v3 {}", t);
-    v5 = v5.normalize();
-    v5 = v5.rotate(&0.52);
-    println!("Hello, World! {:?}, {:?}, {}, {}, {:?}, {:?}, {:?}, {:?}", c, t, v2.cross(&v), v2.dot(&v), v2.plus(&v), v2.minus(&v), v3, v5);
-*/
+    ap.set_force(vector::new(0.0,20.0));
     let mut step:bool = false;
     step = ap.step();
     step = ap.step();
     let mut i:i32 = 0;
     let mut events = Events::new(EventSettings::new());
     let now = Instant::now();
+    let mut nowRender = Instant::now();
     let mut exit = false;
-    for i in 0..100000
+    let mut steps = 0;
+    while (true)
     {
         step = ap.step();
-        
-        while let Some(e) = events.next(&mut window) 
+        if nowRender.elapsed().as_millis() * 3 > 100
         {
-            if let Some(r) = e.render_args() 
+            while let Some(e) = events.next(&mut window) 
             {
-               // print!("Rendering");
-                ap.paint(&r, &mut gl); //.render(&r);
-                break;
-            }
+                if let Some(r) = e.render_args() 
+                {
+                // print!("Rendering");
+                    ap.paint(&r, &mut gl); //.render(&r);
+                    nowRender = Instant::now();
+                    break;
+                }
 
-            if let Some(r) = e.close_args()
-            {
-               exit = true;
+                if let Some(r) = e.close_args()
+                {
+                    exit = true;
+                }
             }
         }
         if !step
@@ -195,10 +184,14 @@ fn main()
            // print!("Step: {} ", i);
         }
 
+        
 
-        if now.elapsed().as_secs() > 15 || exit
+        if now.elapsed().as_secs() > 60 || exit
         {
+            
             break;
         }
+        steps = steps + 1;
     }
+    println!("Engine steps: {}", steps);
 }
