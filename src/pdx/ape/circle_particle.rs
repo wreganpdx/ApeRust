@@ -603,10 +603,19 @@ impl particle for circle_particle
 	{
 		if !self.fixed
 		{
+
+			self.curr.plus_equals(mtd);
+           // println!("{:?}", self.velocity);
+            let mag = self.velocity.mag_or_one();
+            let newVel = mtd.clone().normalize().mult(mag).mult(0.5);
+            self.velocity.mult_equals(0.5);
+			self.velocity.plus_equals(&newVel);
+			/*
 			self.curr.plus_equals(mtd);
             let mag = self.velocity.magnitude();
             let newVel = mtd.clone().normalize().mult(mag).mult(self.elasticity);
 			self.velocity.copy(&newVel);
+			*/
 			//self.curr.plus_equals(mtd);
 			//self.velocity.plus_equals(vel);
 		}

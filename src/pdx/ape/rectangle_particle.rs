@@ -577,11 +577,16 @@ impl particle for rectangle_particle
 		if !self.fixed
 		{
 			self.curr.plus_equals(mtd);
-            println!("{:?}", self.velocity);
+            //println!("{:?}", self.velocity);
             let mag = self.velocity.mag_or_one();
-            let newVel = mtd.clone().normalize().mult(mag).mult(self.elasticity);
-			self.velocity.copy(&newVel);
+            let newVel = mtd.clone().normalize().mult(mag).mult(0.5);
+            self.velocity.mult_equals(0.5);
+			self.velocity.plus_equals(&newVel);
             /*
+            self.velocity.normalize();
+            self.velocity.plus_equals(&new_vel);
+            self.velocity.div_equals(2.0);
+            self.velocity.mult_equals(mag * self.elasticity);
 			let mag = vel.magnitude();
 			let newVel = self.curr.clone().minus(&self.prev).mult(mag);
 			

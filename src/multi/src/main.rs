@@ -142,7 +142,7 @@ fn main()
     ap.add_particle_collection(list);
    // ap.add_particle_collection(p3);
 
-    //ap.set_force(vector::new(0.0,200.0));
+    ap.set_force(vector::new(0.0,200.0));
     
     let mut step:bool = false;
     step = ap.step();
