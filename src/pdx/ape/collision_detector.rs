@@ -4,6 +4,7 @@ use crate::rectangle_particle::rectangle_particle;
 use crate::circle_particle::circle_particle;
 use crate::interval::interval;
 use crate::vector::vector;
+use crate::APEngine::APValues;
 use crate::collision_resolver;
 use std::any::Any;
 use num_traits::float::FloatCore;
@@ -447,4 +448,72 @@ fn test_intervals(interval_a:&interval, interval_b:&interval)->f64
 	}
 	return len_b;
 	//return (Math.abs(lenA) < Math.abs(lenB)) ? lenA : lenB;
+}
+
+pub fn check_rectangle_vs_rects(p:&mut rectangle_particle, col:&mut Vec<rectangle_particle>, ap:&APValues)
+{
+	let length2:usize = col.len();
+
+	for j in 0..length2
+	{
+		let mut p2 = col.remove(j);
+		if !p2.get_collidable() || (p2.get_fixed() && p.get_fixed())
+		{
+			col.insert(j, p2);
+			continue;
+		}
+		test_rect_vs_rect(p,&mut p2);
+		col.insert(j, p2);
+	}
+}
+
+pub fn check_rectangle_vs_circs(p:&mut rectangle_particle, col:&mut Vec<circle_particle>, ap:&APValues)
+{
+	let length2:usize = col.len();
+
+	for j in 0..length2
+	{
+		let mut p2 = col.remove(j);
+		if !p2.get_collidable() || (p2.get_fixed() && p.get_fixed())
+		{
+			col.insert(j, p2);
+			continue;
+		}
+		test_circ_vs_rect(&mut p2,p);
+		col.insert(j, p2);
+	}
+}
+
+pub fn check_circ_vs_circ(p:&mut circle_particle, col:&mut Vec<circle_particle>, ap:&APValues)
+{
+	let length2:usize = col.len();
+
+	for j in 0..length2
+	{
+		let mut p2 = col.remove(j);
+		if !p2.get_collidable() || (p2.get_fixed() && p.get_fixed())
+		{
+			col.insert(j, p2);
+			continue;
+		}
+		test_circ_vs_circ(&mut p2,p);
+		col.insert(j, p2);
+	}
+}
+
+pub fn check_circ_vs_rects(p:&mut circle_particle, col:&mut Vec<rectangle_particle>, ap:&APValues)
+{
+	let length2:usize = col.len();
+
+	for j in 0..length2
+	{
+		let mut p2 = col.remove(j);
+		if !p2.get_collidable() || (p2.get_fixed() && p.get_fixed())
+		{
+			col.insert(j, p2);
+			continue;
+		}
+		test_circ_vs_rect(p, &mut p2);
+		col.insert(j, p2);
+	}
 }

@@ -34,6 +34,9 @@ pub enum shapes
 #[allow(unused_variables)]
 pub trait particle 
 {
+
+	fn set_primary_color(&mut self, c:[f32;4]);
+	fn set_secondary_color(&mut self, c:[f32;4]);
 	fn set_id(&mut self, i:i64);
 	fn get_id(&self)->&i64;
 	fn get_axes_len(&mut self)->usize;

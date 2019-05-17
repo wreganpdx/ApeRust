@@ -15,14 +15,11 @@ Final Project
  */
 
 use crate::vector::vector;
-use crate::interval::interval;
-use crate::collision::collision;
 use crate::particle::particle;
 use crate::polygon_particle::polygon_particle;
 use crate::circle_particle::circle_particle;
 use crate::rectangle_particle::rectangle_particle;
 use crate::poly_poly_constraint::poly_poly_constraint;
-use crate::APEngine::APEngine;
 use crate::APEngine::APValues;
 use crate::collision_detector;
 use crate::APEngine::Paint;
@@ -48,7 +45,8 @@ pub struct particle_collection
 	poly_poly_constraints:Vec<poly_poly_constraint>,
 	is_composite:bool,
 	center:vector, 
-	delta:vector
+	delta:vector,
+	id:i64,
 }
 
 impl Paint for particle_collection
@@ -69,6 +67,11 @@ impl Paint for particle_collection
 		{
 			poly.paint(args, gl);
 		}
+
+		for poly in self.poly_poly_constraints.iter_mut()
+		{
+			poly.paint(args, gl);
+		}
 	}
 }
 
@@ -78,9 +81,27 @@ pub fn getRelativeAngle(delta:&mut vector, center:&mut vector, p:&mut vector) ->
 	return delta.y.atan2(delta.x.clone());
 } 
 
+
 #[allow(dead_code)]
 impl particle_collection
 {
+	pub fn get_circle_by_id(&mut self, i:&i64)->Option<&mut circle_particle>
+	{
+		for p in self.circle_particles.iter_mut()
+		{
+			if p.id == *i
+			{
+				return Option::from(p);
+			}
+		}
+		return Option::None;
+	}
+
+	pub fn check_collisions_vs_collection(&mut self, rem2:&mut particle_collection, ap:&APValues)
+	{
+		self.check_rectangles_vs_collection(rem2, ap);
+		self.check_circs_vs_collection(rem2, ap);
+	}
 	pub fn init_composite(&mut self, v:vector)
 	{
 		self.center = v;
@@ -90,6 +111,15 @@ impl particle_collection
 	{
 		return &self.center;
 	}
+
+	pub fn set_speed(&mut self, s:f64)
+	{
+		for p in self.circle_particles.iter_mut()
+		{
+			p.set_speed(s);
+		}
+	}
+
 	pub fn rotate_by_radian(&mut self, angleRadians:f64, center:vector) 
 	{
 		for p in self.poly_particles.iter_mut()
@@ -108,9 +138,11 @@ impl particle_collection
 	{
 		self.collide_internal = c;
 	}
-	pub fn new() -> particle_collection 
+	pub fn new(i:i64) -> particle_collection 
     {
-        particle_collection::default()
+        let mut p = particle_collection::default();
+		p.id = i;
+		return p;
     }
 
 	fn get_poly_particles(&self)->&Vec<polygon_particle>
@@ -173,58 +205,120 @@ impl particle_collection
 	pub fn satisfy_constraints(&mut self, ap:&APValues)
 	{
 		let length:usize = self.poly_poly_constraints.len();
-		//println!("Check LIST - internal - ");
 		for i in 0..length
 		{
 			let mut c = self.poly_poly_constraints.remove(i);
-			self.satisfy_constraint(&mut c, ap);
+			if c.rect_circ
+			{
+				self.satisfy_constraint_circ_rect(&mut c, ap);
+			}
+			else if c.rect_rect
+			{
+				self.satisfy_constraint_rect_rect(&mut c, ap);
+			}
+			else if c.circ_circ
+			{
+				self.satisfy_constraint_circ_circ(&mut c, ap);
+			}
+			
 			self.poly_poly_constraints.insert(i, c);
 		}
 	}	
-	pub fn satisfy_constraint(&mut self,constraint: &mut poly_poly_constraint, ap:&APValues)
+	pub fn satisfy_constraint_rect_rect(&mut self,constraint: &mut poly_poly_constraint, ap:&APValues)
 	{
 		let tuple = constraint.get_particles();
 		let mut length:usize = self.poly_particles.len();
-		//println!("Check LIST - internal - ");
 		let mut i:usize = 0;
 		let mut p1 = loop
 		{
-			if self.poly_particles[i].get_id() == &tuple.0
+			if self.rectangle_particles[i].get_id() == &tuple.0
 			{
-				//let &mut p:&mut polygon_particle = &mut self.poly_particles.remove(i);
-				break self.poly_particles.remove(i);
+				break self.rectangle_particles.remove(i);
 			}
 			i+= 1;
 		};
-		length = self.poly_particles.len();
+		length = self.rectangle_particles.len();
 		i = 0;
 		let mut p2 = loop
 		{
-			if self.poly_particles[i].get_id() == &tuple.1
+			if self.rectangle_particles[i].get_id() == &tuple.1
 			{
-				//let &mut p:&mut polygon_particle = &mut self.poly_particles.remove(i);
-				break self.poly_particles.remove(i);
+				break self.rectangle_particles.remove(i);
 			}
 			i+= 1;
 		};
-		//contraint.resolve(&mut p1, &mut p2);
 		if constraint.is_spring()
 		{
-			constraint.resolve_spring(&mut p1, &mut p2);
+			constraint.resolve_spring_rect_rect(&mut p1, &mut p2);
 		}
-		self.poly_particles.push(p1);
-		self.poly_particles.push(p2);
+		self.rectangle_particles.push(p1);
+		self.rectangle_particles.push(p2);
+	}	
+	pub fn satisfy_constraint_circ_rect(&mut self,constraint: &mut poly_poly_constraint, ap:&APValues)
+	{
+		let tuple = constraint.get_particles();
+		let mut length:usize = self.circle_particles.len();
+		let mut i:usize = 0;
+		let mut p1 = loop
+		{
+			if self.circle_particles[i].get_id() == &tuple.0 || self.circle_particles[i].get_id() == &tuple.0
+			{
+				break self.circle_particles.remove(i);
+			}
+			i+= 1;
+		};
+		length = self.rectangle_particles.len();
+		i = 0;
+		let mut p2 = loop
+		{
+			if self.rectangle_particles[i].get_id() == &tuple.1 || self.rectangle_particles[i].get_id() == &tuple.0
+			{
+				break self.rectangle_particles.remove(i);
+			}
+			i+= 1;
+		};
+		if constraint.is_spring()
+		{
+			constraint.resolve_spring_circ_rect(&mut p1, &mut p2);
+		}
+		self.circle_particles.push(p1);
+		self.rectangle_particles.push(p2);
+	}	
+	pub fn satisfy_constraint_circ_circ(&mut self,constraint: &mut poly_poly_constraint, ap:&APValues)
+	{
+		let tuple = constraint.get_particles();
+		let mut length:usize = self.circle_particles.len();
+		let mut i:usize = 0;
+		let mut p1 = loop
+		{
+			if self.circle_particles[i].get_id() == &tuple.0
+			{
+				break self.circle_particles.remove(i);
+			}
+			i+= 1;
+		};
+		length = self.circle_particles.len();
+		i = 0;
+		let mut p2 = loop
+		{
+			if self.circle_particles[i].get_id() == &tuple.1
+			{
+				break self.circle_particles.remove(i);
+			}
+			i+= 1;
+		};
+		if constraint.is_spring()
+		{
+			constraint.resolve_spring_circ_circ(&mut p1, &mut p2);
+		}
+		self.circle_particles.push(p1);
+		self.circle_particles.push(p2);
 	}	
 	pub fn check_collisions(&mut self, ap:&APValues)
 	{
-		//println!("Check collisions ?");
 		if self.collide_internal
 		{
-			//println!("Check collisions Internal");
 			self.check_internal_collisions(ap);
-			self.check_rect_rect_internal_collisions(ap);
-			self.check_circ_circ_internal_collisions(ap);
-			self.check_rect_circ_internal_collisions(ap);
 		} 
 	}
 	pub fn check_rect_rect_internal_collisions(&mut self, ap:&APValues)
@@ -234,27 +328,14 @@ impl particle_collection
 		
 		for i in 0..length
 		{
-			//println!("Check LIST - internal - {}", i);
 			let mut p = self.rectangle_particles.remove(i);
 			if !p.get_collidable()
 			{
-				//println!("Check LIST -no collision 1");
 				self.rectangle_particles.insert(i, p);
 				continue;
 			}
-			for j in 0..length-1
-			{
-				let mut p2 = self.rectangle_particles.remove(j);
-				if !p2.get_collidable() || (p2.get_fixed() && p.get_fixed())
-				{
-					//println!("Check LIST -no collision 2");
-					self.rectangle_particles.insert(j, p2);
-					continue;
-				}
-				//println!("Check COLL LIST - internal - ");
-				collision_detector::test_rect_vs_rect(&mut p,&mut p2);
-				self.rectangle_particles.insert(j, p2);
-			}
+			let vec = &mut self.rectangle_particles;
+			collision_detector::check_rectangle_vs_rects(&mut p, vec, ap);
 			self.rectangle_particles.insert(i, p);
 		}
 	}
@@ -262,34 +343,19 @@ impl particle_collection
 	pub fn check_rect_circ_internal_collisions(&mut self, ap:&APValues)
 	{
 		
-		let length:usize = self.circle_particles.len();
+		let length:usize = self.rectangle_particles.len();
 		
 		for i in 0..length
 		{
-			//println!("Check LIST - internal - {}", i);
-			let mut p = self.circle_particles.remove(i);
+			let mut p = self.rectangle_particles.remove(i);
 			if !p.get_collidable()
 			{
-				//println!("Check LIST -no collision 1");
-				self.circle_particles.insert(i, p);
+				self.rectangle_particles.insert(i, p);
 				continue;
 			}
-			let length2:usize = self.rectangle_particles.len();
-			for j in 0..length2
-			{
-				//println!("Check J LISTs");
-				let mut p2 = self.rectangle_particles.remove(j);
-				if !p2.get_collidable() || (p2.get_fixed() && p.get_fixed())
-				{
-					//println!("Check LIST -no collision 2");
-					self.rectangle_particles.insert(j, p2);
-					continue;
-				}
-				//println!("Check COLL LIST - internal - ");
-				collision_detector::test_circ_vs_rect(&mut p,&mut p2);
-				self.rectangle_particles.insert(j, p2);
-			}
-			self.circle_particles.insert(i, p);
+			let vec = &mut self.circle_particles;
+			collision_detector::check_rectangle_vs_circs(&mut p, vec, ap);
+			self.rectangle_particles.insert(i, p);
 		}
 	}
 
@@ -300,27 +366,14 @@ impl particle_collection
 		
 		for i in 0..length
 		{
-			//println!("Check LIST - internal - {}", i);
 			let mut p = self.circle_particles.remove(i);
 			if !p.get_collidable()
 			{
-				//println!("Check LIST -no collision 1");
 				self.circle_particles.insert(i, p);
 				continue;
 			}
-			for j in 0..length-1
-			{
-				let mut p2 = self.circle_particles.remove(j);
-				if !p2.get_collidable() || (p2.get_fixed() && p.get_fixed())
-				{
-					//println!("Check LIST -no collision 2");
-					self.circle_particles.insert(j, p2);
-					continue;
-				}
-				//println!("Check COLL LIST - internal - ");
-				collision_detector::test_circ_vs_circ(&mut p,&mut p2);
-				self.circle_particles.insert(j, p2);
-			}
+			let vec = &mut self.circle_particles;
+			collision_detector::check_circ_vs_circ(&mut p, vec, ap);
 			self.circle_particles.insert(i, p);
 		}
 	}
@@ -328,106 +381,45 @@ impl particle_collection
 	
 	pub fn check_internal_collisions(&mut self, ap:&APValues)
 	{
-		
-		let length:usize = self.poly_particles.len();
-		//println!("Check LIST - internal - ");
-		for i in 0..length
-		{
-			//println!("Check LIST - internal - {}", i);
-			let mut p = self.poly_particles.remove(i);
-			if !p.get_collidable()
-			{
-				//println!("Check LIST -no collision 1");
-				self.poly_particles.insert(i, p);
-				continue;
-			}
-			for j in 0..length-1
-			{
-				let mut p2 = self.poly_particles.remove(j);
-				if !p2.get_collidable() || (p2.get_fixed() && p.get_fixed())
-				{
-					//println!("Check LIST -no collision 2");
-					self.poly_particles.insert(j, p2);
-					continue;
-				}
-				
-				p.set_samp(p.get_position());
-				p2.set_samp(p2.get_position());
-				let p_size = p.get_axes_len();
-				let p2_size = p.get_axes_len();
-				//collision_detector::test_polygon_vs_polygon(&mut p,&mut p2, p_size, p2_size);
-				//collision_detector::test_rigid_polygon_vs_rigid_polygon(&mut p,&mut p2, p_size, p2_size);
-				collision_detector::test_polygon_vs_polygon(&mut p,&mut p2, p_size, p2_size);
-				self.poly_particles.insert(j, p2);
-			}
-			self.poly_particles.insert(i, p);
-		}
+		self.check_rect_rect_internal_collisions(ap);
+		self.check_circ_circ_internal_collisions(ap);
+		self.check_rect_circ_internal_collisions(ap);
 	}
-
-	pub fn check_collisions_vs_collection(&mut self, col:&mut particle_collection, ap:&APValues)
+	pub fn check_rectangles_vs_collection(&mut self, col:&mut particle_collection, ap:&APValues)
 	{
-		let length:usize = self.poly_particles.len();
-		let length2:usize = col.poly_particles.len();
-		//println!("Check LIST - internal - ");
+		let length:usize = self.rectangle_particles.len();
 		for i in 0..length
 		{
-			//println!("Check LIST - internal - {}", i);
-			let mut p = self.poly_particles.remove(i);
+			let mut p = self.rectangle_particles.remove(i);
 			if !p.get_collidable()
 			{
-				//println!("Check LIST -no collision 1");
-				self.poly_particles.insert(i, p);
+				self.rectangle_particles.insert(i, p);
 				continue;
 			}
-			for j in 0..length2
-			{
-				let mut p2 = col.poly_particles.remove(j);
-				if !p2.get_collidable() || (p2.get_fixed() && p.get_fixed())
-				{
-					//println!("Check LIST -no collision 2");
-					col.poly_particles.insert(j, p2);
-					continue;
-				}
-				
-				p.set_samp(p.get_position());
-				p2.set_samp(p2.get_position());
-				let p_size = p.get_axes_len();
-				let p2_size = p.get_axes_len();
-				//collision_detector::test_polygon_vs_polygon(&mut p,&mut p2, p_size, p2_size);
-				//collision_detector::test_rigid_polygon_vs_rigid_polygon(&mut p,&mut p2, p_size, p2_size);
-				collision_detector::test_polygon_vs_polygon(&mut p,&mut p2, p_size, p2_size);
-				col.poly_particles.insert(j, p2);
-			}
-			self.poly_particles.insert(i, p);
-		}
 
-			/*
-			internal function checkInternalCollisions():void {
-		 
-			// every particle in this AbstractCollection
-			//var plen:int = _particles.length;
-			for (var j:int = 0; j < _particles.length; j++) {
-				
-				var pa:AbstractParticle = _particles[j];
-				if (pa == null || ! pa.collidable) continue;
-				
-				// ...vs every other particle in this AbstractCollection
-				for (var i:int = j + 1; i < _particles.length; i++) {
-					var pb:AbstractParticle = _particles[i];
-					if (pb.collidable) CollisionDetector.test(pa, pb);
-				}
-				
-				// ...vs every other constraint in this AbstractCollection
-				//var clen:int = _constraints.length;
-				for (var n:int = 0; n < _constraints.length; n++) {
-					if(_constraints[n] is SpringConstraint){
-						var c:SpringConstraint = _constraints[n];
-						if (c.collidable && ! c.isConnectedTo(pa)) {
-							c.scp.updatePosition();
-							CollisionDetector.test(pa, c.scp);
-						}
-					}
-				}
-			}*/
+			collision_detector::check_rectangle_vs_rects(&mut p, &mut col.rectangle_particles, ap);
+			collision_detector::check_rectangle_vs_circs(&mut p, &mut col.circle_particles, ap);
+			self.rectangle_particles.insert(i, p);
+		}
 	}
+
+	pub fn check_circs_vs_collection(&mut self, col:&mut particle_collection, ap:&APValues)
+	{
+		let length:usize = self.circle_particles.len();
+		for i in 0..length
+		{
+			let mut p = self.circle_particles.remove(i);
+			if !p.get_collidable()
+			{
+				self.circle_particles.insert(i, p);
+				continue;
+			}
+
+			collision_detector::check_circ_vs_circ(&mut p, &mut col.circle_particles, ap);
+			collision_detector::check_circ_vs_rects(&mut p, &mut col.rectangle_particles, ap);
+			self.circle_particles.insert(i, p);
+		}
+	}
+	
+
 }

@@ -104,6 +104,12 @@ impl vector
 		return vector::new(self.x * v.x, self.y * v.y);  
 	}
 
+    pub fn times_equals(&mut self, v:&vector)
+    {
+		self.x = self.x * v.x;
+        self.y = self.y * v.y;  
+	}
+
     pub fn div_equals(&mut self, mut s:f64)
     {
         if s == 0.0
@@ -177,6 +183,16 @@ impl vector
             m = 0.0001;
         }
         return self.mult(1.0/m);
+	}
+
+    pub fn normalize_self(&mut self) 
+    {
+        let mut m:f64 = self.magnitude();
+        if m == 0.0
+        {
+            m = 0.0001;
+        }
+        self.mult_equals(1.0/m);
 	}
 	pub fn rotate(&self, r:&f64) ->vector 
     {

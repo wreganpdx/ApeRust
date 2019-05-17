@@ -74,7 +74,9 @@ pub struct rectangle_particle
     collidable:bool,
 	width:f64,
 	height:f64,
-    created:bool
+    created:bool,
+    primary_color:[f32; 4],
+    secondary_color:[f32; 4]
 }
 
 impl rectangle_particle
@@ -576,12 +578,22 @@ impl particle for rectangle_particle
 	{
 		if !self.fixed
 		{
+            self.curr.plus_equals(mtd);
+            self.velocity.copy(vel);
+            /*
 			self.curr.plus_equals(mtd);
             //println!("{:?}", self.velocity);
             let mag = self.velocity.mag_or_one();
-            let newVel = mtd.clone().normalize().mult(mag).mult(0.5);
-            self.velocity.mult_equals(0.5);
-			self.velocity.plus_equals(&newVel);
+            let mut newVel = mtd.clone().normalize().mult(mag);
+            self.velocity.times_equals(&newVel);
+            newVel.normalize_self();
+            self.velocity.normalize_self();
+            self.velocity.plus_equals(&newVel);
+            self.velocity.normalize_self();
+            self.velocity.mult_equals(mag);
+           // self.velocity.mult_equals(0.33);
+			//self.velocity.plus_equals(&newVel);
+            */
             /*
             self.velocity.normalize();
             self.velocity.plus_equals(&new_vel);
@@ -671,4 +683,13 @@ impl particle for rectangle_particle
         println!("getting rotation");
 		return (180.0/f64::consts::PI) * self.get_radian();
 	}
+
+    fn set_primary_color(&mut self, c:[f32;4])
+    {
+        self.primary_color = c;
+    }
+	fn set_secondary_color(&mut self, c:[f32;4])
+    {
+        self.secondary_color = c;
+    }
 }

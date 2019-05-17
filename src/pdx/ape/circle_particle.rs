@@ -78,14 +78,19 @@ pub struct circle_particle
 	rim:rim_particle,
 	traction:f64,
 	norm_slip:vector,
+    primary_color:[f32; 4],
+    secondary_color:[f32; 4]
 }
 
 impl circle_particle
 {
-	pub fn init_wheel(&mut self)
+	pub fn init_wheel(&mut self, mt:f64)
 	{
 		self.rim = rim_particle::new();
-		self.rim.init(self.radius, 5.0);
+		self.rim.init(self.radius, mt);
+		//self.rim.max_torque = mt;
+		self.friction = 0.0;
+		self.traction = 1.0;
 		self.is_wheel = true;
 	}
     pub fn new(id:i64)->circle_particle
@@ -97,6 +102,8 @@ impl circle_particle
 
 	pub fn init_circle(&mut self, radius:f64)
 	{
+        self.primary_color = [0.2, 0.2, 0.8, 1.0];
+		self.secondary_color =  [0.1, 0.1, 0.5, 1.0];
 		self.width = radius*2.0;
 		self.height = radius*2.0;
 
@@ -131,7 +138,7 @@ impl circle_particle
 	{
 		
 		let mut tan = self.rim.get_curr().swap_with_neg_y();
-		tan.normalize();
+		tan.normalize_self();
 		let wheel_surf_vel = tan.mult(self.rim.get_speed());
 		
 		let combined_vel = self.get_velocity().plus(&wheel_surf_vel);
@@ -140,9 +147,16 @@ impl circle_particle
 		let prev = &self.rim.get_curr().minus(&tan);
 	 	self.rim.set_prev(prev);
 		let slip_speed = (1.0-self.traction) * self.rim.get_speed();
+		
 		self.norm_slip.set_to(slip_speed * n.y , slip_speed * n.x);
+		//println!("normslip {:?}", self.norm_slip);
 		self.curr.plus_equals(&self.norm_slip);
 		self.rim.damp_speed(self.traction);
+	}
+
+	pub fn set_speed(&mut self, s:f64)
+	{
+		self.rim.speed = s;
 	}
 }
 
@@ -151,8 +165,7 @@ impl Paint for circle_particle
 	fn paint(&mut self, args: &RenderArgs, gl:&mut GlGraphics)
 	{
 		use graphics::*;
-		const BLUE:   [f32; 4] = [0.2, 0.2, 0.8, 1.0];
-		const OFFBLUE:   [f32; 4] = [0.1, 0.1, 0.5, 1.0];
+
 		let rect = rectangle::rectangle_by_corners(0.0, 0.0, 1.0, 1.0);
 		if self.is_wheel
 		{
@@ -160,10 +173,10 @@ impl Paint for circle_particle
 			{
 				let transform = c.transform.trans(self.get_curr_x(), self.get_curr_y()).rot_rad(self.get_radian().clone());
 				//rectangle(BLUE, rect, transform, gl);
-				circle_arc(BLUE, self.get_radius().clone(), 0.0,f64::consts::PI  /2.0, rect, transform, gl);
-				circle_arc(OFFBLUE, self.get_radius().clone(), f64::consts::PI  /2.0,f64::consts::PI , rect, transform, gl);
-				circle_arc(BLUE, self.get_radius().clone(),f64::consts::PI, f64::consts::PI  * 1.5, rect, transform, gl);
-				circle_arc(OFFBLUE, self.get_radius().clone(), f64::consts::PI  * 1.5,f64::consts::PI  * 2.0, rect, transform, gl);
+				circle_arc(self.primary_color, self.get_radius().clone(), 0.0,f64::consts::PI  /2.0, rect, transform, gl);
+				circle_arc(self.secondary_color, self.get_radius().clone(), f64::consts::PI  /2.0,f64::consts::PI , rect, transform, gl);
+				circle_arc(self.primary_color, self.get_radius().clone(),f64::consts::PI, f64::consts::PI  * 1.5, rect, transform, gl);
+				circle_arc(self.secondary_color, self.get_radius().clone(), f64::consts::PI  * 1.5,f64::consts::PI  * 2.0, rect, transform, gl);
 			});
 		}
 		else
@@ -172,7 +185,7 @@ impl Paint for circle_particle
 			{
 				let transform = c.transform.trans(self.get_curr_x(), self.get_curr_y()).rot_rad(self.get_radian().clone());
 				//rectangle(BLUE, rect, transform, gl);
-				circle_arc(BLUE, self.get_radius().clone(), 0.0,f64::consts::PI  * 1.99, rect, transform, gl);
+				circle_arc(self.primary_color, self.get_radius().clone(), 0.0,f64::consts::PI  * 1.99, rect, transform, gl);
 			});
 		}
 	}
@@ -187,6 +200,14 @@ impl PartialEq for circle_particle
 
 impl particle for circle_particle 
 {
+    fn set_primary_color(&mut self, c:[f32;4])
+    {
+        self.primary_color = c;
+    }
+	fn set_secondary_color(&mut self, c:[f32;4])
+    {
+        self.secondary_color = c;
+    }
 	fn set_axes(&mut self)
 	{
 		
@@ -335,20 +356,6 @@ impl particle for circle_particle
     {
         self.coll = f.clone();
     }
-/*
-	fn get_parent(&self)-> Box<particle_collection>
-	{
-		return &self.collection;
-	}
-
-	This is probably never going to happen because Rust says you can't have an object reference in more than one place.
-
-	fn set_parent(&mut self, pc:&particle_collection)
-	{
-		self.collection = Box::new(pc);
-	}
-	*/
-
 
 
 	fn get_axes_len(&mut self)->usize
@@ -603,13 +610,20 @@ impl particle for circle_particle
 	{
 		if !self.fixed
 		{
-
+			  self.curr.plus_equals(mtd);
+            self.velocity.copy(vel);
+/*
 			self.curr.plus_equals(mtd);
-           // println!("{:?}", self.velocity);
+            //println!("{:?}", self.velocity);
             let mag = self.velocity.mag_or_one();
-            let newVel = mtd.clone().normalize().mult(mag).mult(0.5);
-            self.velocity.mult_equals(0.5);
-			self.velocity.plus_equals(&newVel);
+            let mut newVel = mtd.clone().normalize().mult(mag);
+            self.velocity.times_equals(&newVel);
+            newVel.normalize_self();
+            self.velocity.normalize_self();
+            self.velocity.plus_equals(&newVel);
+            self.velocity.normalize_self();
+            self.velocity.mult_equals(mag);
+			*/
 			/*
 			self.curr.plus_equals(mtd);
             let mag = self.velocity.magnitude();
@@ -697,243 +711,3 @@ impl particle for circle_particle
 		return (180.0/f64::consts::PI) * self.get_radian();
 	}
 }
-/*
-package org.cove.ape {
-	
-	import flash.display.Graphics;
-	import flash.geom.Matrix;
-	
-	/**
-	 * An n-sided polygon shaped particle. 
-	 */ 
-	public class PolygonParticle extends AbstractParticle {
-
-		
-		public function PolygonParticle(x:Number, 
-				y:Number,
-				width:Number, 
-				height:Number,
-				numVertices:int,
-				rotation:Number = 0,
-				fixedPosition:Boolean = false,
-				mass:Number = 1, 
-				elasticity:Number = 0.15,
-				friction:Number = 0.1) {
-				
-				super(x, y, fixedPosition, mass, elasticity, friction);
-				
-				_numVertices = numVertices;
-				createVertices(width, height);
-				radian = rotation;
-				
-				//this.density = density;
-		}
-		
-		internal function createVertices(width:Number, height:Number):void{
-			_vertices = new Array();
-			_originalVertices = new Array();
-			
-			var a:Number = Math.PI/numVertices;
-			var da:Number = MathUtil.TWO_PI/numVertices;
-			
-			for(var i:int = 0; i < numVertices; i++){
-				a+= da;
-				_originalVertices.push(new Vector(Math.cos(a) * width, Math.sin(a) * height));
-			}			
-		}
-		
-		
-		public override function get radian():Number {
-			return _radian;
-		}
-		
-		/**
-		 * @private
-		 */		
-		public function set radian(t:Number):void {
-			t = t % (MathUtil.TWO_PI);
-			_radian = t;
-			orientVertices(t);
-			setAxes();
-		}
-		
-		public function get angle():Number {
-			return radian * MathUtil.ONE_EIGHTY_OVER_PI;
-		}
-
-		/**
-		 * @private
-		 */		
-		public function set angle(a:Number):void {
-			radian = a * MathUtil.PI_OVER_ONE_EIGHTY;
-		}
-		
-		/**
-		 * Sets up the visual representation of this PolygonParticle. This method is called 
-		 * automatically when an instance of this PolygonParticle's parent Group is added to 
-		 * the APEngine, when  this PolygonParticle's Composite is added to a Group, or the 
-		 * PolygonParticle is added to a Composite or Group.
-		 */				
-		public override function init():void {
-			cleanup();
-			if (displayObject != null) {
-				initDisplay();
-			} else {
-			
-				sprite.graphics.clear();
-				sprite.graphics.lineStyle(lineThickness, lineColor, lineAlpha);
-				sprite.graphics.beginFill(fillColor, fillAlpha);
-				sprite.graphics.moveTo(_originalVertices[0].x, _originalVertices[0].y);
-				for(var i:int = 1; i < _originalVertices.length; i++){
-					sprite.graphics.lineTo(_originalVertices[i].x, _originalVertices[i].y);
-				}
-				sprite.graphics.lineTo(_originalVertices[0].x, _originalVertices[0].y);
-				sprite.graphics.endFill();
-			}
-			paint();
-		}
-		
-		public override function paint():void {
-			sprite.x = curr.x;
-			sprite.y = curr.y;
-			sprite.rotation = angle;
-		}
-		
-		public function clearSprite():void{
-			sprite.parent.removeChild(sprite);
-		}
-		
-		internal function get vertices():Array{
-			return _vertices;
-		}
-		
-		internal function get numVertices():int{
-			return _numVertices;
-		}
-		
-		internal function set density(d:Number):void{
-			_density = d;
-			mass = calculateMass();
-		}
-		
-		internal function get density():Number{
-			return _density;
-		}
-		
-		internal function calculateMass():Number{
-			if(numVertices < 2){
-				return 5 * density;
-			}
-			
-			var m:Number = 0;
-			var j:int = numVertices - 1;
-			for (var i:int = 0; i < numVertices; i++){
-				var P0:Vector = vertices[j];
-				var P1:Vector = vertices[i];
-				m += Math.abs(P0.cross(P1));
-				j = i;
-			}
-			if(numVertices <= 2){
-				m = 10;
-			}
-			m *= density * .5;
-			return m;
-		}
-		
-		internal function orientVertices(r:Number){
-			for(var i:int = 0; i < _originalVertices.length; i++){
-				_vertices[i] = _originalVertices[i].rotate(r);
-			}
-		}
-		
-		/**
-		 * @private
-		 */	
-		internal function getProjection(axis:Vector):Interval {
-			
-			var c:Number = curr.dot(axis);
-			
-			var rad:Number = _vertices[0].dot(axis);
-			var negRad:Number = rad;
-			var posRad:Number = rad;
-			
-			for (var i:int = 1; i < _vertices.length; i++){
-				rad = _vertices[i].dot(axis);
-				if(rad < negRad){
-					negRad = rad;
-				}else if(rad > posRad){
-					posRad = rad;
-				}
-			}
-			
-			interval.min = c + negRad;
-			interval.max = c + posRad;
-			
-			return interval;
-		}
-		
-		internal function getAxes():Array{
-			return _axes;
-		}
-		
-		internal function setAxes():void{
-			_axes = new Array();
-			var j:int = _numVertices - 1;
-			for(var i:int = 0; i < _numVertices; i++){
-				var e0:Vector = _vertices[j];
-				var e1:Vector = _vertices[i];
-				var e:Vector = e1.minus(e0);
-				var currAxis:Vector = (new Vector(-e.y, e.x)).normalize();
-				_axes.push(currAxis);
-				j=i;
-			}
-		}
-		
-		internal function getClosestVertex(v:Vector):Vector{
-			var d:Vector = v.minus(curr);
-			var maxDist:Number = 0;
-			var index:int = -1;
-			
-			for(var i:int = 0; i<_vertices.length; i++){
-				var dist:Number = d.dot(_vertices[i]);
-				if(dist > maxDist){
-					maxDist = dist;
-					index = i;
-				}
-			}
-			return _vertices[index].plus(curr);
-		}
-		
-		public override function leftMostXValue():Number{
-			if(!isNaN(lmx) && fixedPosition) return lmx;
-			
-			var vx:Number = _vertices[0].x;
-			lmx = vx;
-			for(var i:int = 1; i < _vertices.length; i++){
-				vx = _vertices[i].x;
-				if( vx < lmx){
-					lmx = vx;
-				}
-			}
-			lmx += curr.x;
-			return lmx;
-		}
-		
-		public override function rightMostXValue():Number{
-			if(!isNaN(rmx) && fixedPosition) return rmx;
-			
-			var vx:Number = _vertices[0].x;
-			rmx = vx;
-			for(var i:int = 1; i < _vertices.length; i++){
-				vx = _vertices[i].x;
-				if( vx > rmx){
-					rmx = vx;
-				}
-			}
-			rmx += curr.x;
-			return rmx;
-		}
-	}
-}
-
-*/

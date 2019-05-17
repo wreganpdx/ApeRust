@@ -123,7 +123,7 @@ pub fn resolve_circle_circle(pa:&mut circle_particle, pb:&mut circle_particle, n
 
 pub fn resolve_collision_rect_rect(pa:&mut rectangle_particle, pb:&mut rectangle_particle, normal:vector, depth:f64)
 {
-    println!("Depth {}", depth);
+    //println!("Depth {}", depth);
     let im_pb_inv_mass:f64 = pb.get_inv_mass();
     let im_pa_inv_mass:f64 = pa.get_inv_mass();
     
@@ -139,6 +139,7 @@ pub fn resolve_collision_rect_rect(pa:&mut rectangle_particle, pb:&mut rectangle
     {
         tf = 1.0;
     }
+    
     if tf < 0.0
     {
         tf = 0.0;

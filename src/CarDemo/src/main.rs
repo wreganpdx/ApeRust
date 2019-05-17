@@ -15,7 +15,9 @@ use ApeRust::particle::particle;
 use ApeRust::particle_collection::particle_collection;
 use ApeRust::APEngine::Paint;
 //use crate object_helper::create_rectangle; 
-mod object_helper;
+mod car_create;
+mod capsule_create;
+mod surfaces_create;
 
 use piston::window::WindowSettings;
 use piston::event_loop::*;
@@ -34,7 +36,7 @@ fn main()
     
     let mut window: Window = WindowSettings::new(
             "testcd.",
-            [1000, 1000]
+            [660, 350]
         )
         .opengl(opengl)
         .exit_on_esc(true)
@@ -44,7 +46,7 @@ fn main()
     let mut gl:GlGraphics = GlGraphics::new(opengl);
     let mut ap:APEngine = APEngine::new();
 
-    ap.init(0.001);
+    ap.init(0.01);
 
     //boundries
     let mut left: rectangle_particle = rectangle_particle::new(ap.get_new_id());
@@ -86,7 +88,7 @@ fn main()
     
     p_circle.init_circle(25.0);
     wheel.init_circle(25.0);
-    wheel.init_wheel();
+    wheel.init_wheel(2.0);
 
     p_circle.set_position(&vector::new(200.0, 600.0));
 
@@ -95,7 +97,7 @@ fn main()
 
     //p.set_radian(f64::consts::PI /2.0);
 
-   // p2.set_radian(f64::consts::PI /2.0);
+    //p2.set_radian(f64::consts::PI /2.0);
 
     rect.set_collidable(true);
     circ.set_collidable(true);
@@ -110,23 +112,12 @@ fn main()
     rect.set_position(&vector::new(225.0,415.0));
     wheel.set_position(&vector::new(400.0,215.0));
 
-    rect.set_velocity(&vector::new(-2.0,70.0));
-    circ.set_velocity(&vector::new(10.0,-4.000));
-    wheel.set_velocity(&vector::new(-100.0,-4.0));
+    rect.set_velocity(&vector::new(20.0,70.0));
+    circ.set_velocity(&vector::new(20.0,-4.000));
+    wheel.set_velocity(&vector::new(-200.0,30.0));
 
-    let mut p3 = particle_collection::new();
 
-    p3.init_composite(vector::new(400.0, 415.0));
-
-    object_helper::create_rectangle(&mut p3, 
-    (ap.get_new_id(), ap.get_new_id(),
-    ap.get_new_id(), ap.get_new_id(),
-    ap.get_new_id(), ap.get_new_id(),
-    ap.get_new_id(), ap.get_new_id()));
-
-    p3.set_collide_internal(false);
-
-    let mut list:particle_collection = particle_collection::new();
+    let mut list:particle_collection = particle_collection::new(ap.get_new_id());
 
     list.add_rectangle_particle(rect);
     list.add_circle_particle(circ);
@@ -139,10 +130,30 @@ fn main()
 
     list.set_collide_internal(true);
 
-    ap.add_particle_collection(list);
-   // ap.add_particle_collection(p3);
+    let mut cap = particle_collection::new(ap.get_new_id());
+    capsule_create::capsule_create(&mut cap, (ap.get_new_id(),ap.get_new_id(),ap.get_new_id()));
 
-    ap.set_force(vector::new(0.0,20.0));
+    let mut surf = particle_collection::new(ap.get_new_id());
+    surfaces_create::surfaces_create(&mut surf, (
+        ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),  
+        ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),  
+        ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),  
+        ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),  
+        ));
+
+    let mut car = particle_collection::new(ap.get_new_id());
+
+    ap.set_force(vector::new(0.0,200.0));
+
+    let mut car = particle_collection::new(ap.get_new_id());
+    let wheel_id_1 = ap.get_new_id();
+    let wheel_id_2 = ap.get_new_id();
+    car_create::car_create(&mut car, (wheel_id_1.clone(), wheel_id_2.clone(), ap.get_new_id()));
+
+    ap.add_particle_collection(car);
+    ap.add_particle_collection(list);
+    ap.add_particle_collection(cap);
+     ap.add_particle_collection(surf);
     
     let mut step:bool = false;
     step = ap.step();
@@ -174,6 +185,26 @@ fn main()
                 {
                     exit = true;
                 }
+               // if let Some(Input::Button::press_args)
+                if let Some(Button::Keyboard(key)) = e.press_args()
+                {
+                    
+                    match key 
+                    {
+                        Key::A => {
+                            println!("A");
+                            speed_up_wheel(wheel_id_1, 0.2, &mut ap);
+                            speed_up_wheel(wheel_id_2, 0.2, &mut ap);
+                            },
+                        Key::D => {
+                            println!("D");
+                            speed_up_wheel(wheel_id_1, -0.2, &mut ap);
+                            speed_up_wheel(wheel_id_2, -0.2, &mut ap);
+                            },
+                        _ => {println!("KEY: {:?}", key);}
+                    }
+                    
+                }
             }
         }
         if step
@@ -189,4 +220,10 @@ fn main()
         steps = steps + 1;
     }
     println!("Engine steps: {}, Frames Rendered: {}, Total Steps: {}, Seconds: {}", EngineSteps, FramesRendered, steps, now.elapsed().as_secs());
+}
+
+pub fn speed_up_wheel(i:i64, s:f64, ap:&mut APEngine)
+{
+    let mut p = &mut ap.get_circle_by_id(i);
+    p.set_speed(s);
 }

@@ -26,7 +26,7 @@ use piston::input::*;
 use glutin_window::GlutinWindow as Window;
 use opengl_graphics::{ GlGraphics, OpenGL };
 
-
+use crate::circle_particle::circle_particle;
 use crate::vector::vector;
 use crate::particle_collection::particle_collection;
 extern crate time;
@@ -102,6 +102,25 @@ impl APEngine
 		 * this in your main program loop. 
 		 */		
 
+	pub fn get_circle_by_id(&mut self, i:i64)->&mut circle_particle
+	{
+		for p in self.part_collection.iter_mut()
+		{
+			let t = p.get_circle_by_id(&i);
+			match t
+			{
+				Some(c) => 
+				{
+					return c;
+				}
+				_=> 
+				{
+					continue;
+				}
+			}
+		}
+		panic!("Couldn't find object!");
+	}
 	pub fn get_new_id(&mut self)->i64
 	{
 		self.id_count = self.id_count + 1;
@@ -154,8 +173,9 @@ impl APEngine
 
 	pub fn satisfy_constraints(&mut self)
 	{
+		let vals = self.get_ap_values();
 		for pc in self.part_collection.iter_mut() {
-			//pc.satisfy_constraints(&self);
+			pc.satisfy_constraints(&vals);
 		}
 	}
 	pub fn check_collisions(&mut self)

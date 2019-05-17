@@ -5,12 +5,11 @@ use std::f64;
 #[derive(Default)]
 pub struct rim_particle
 {
-    speed:f64,
+    pub speed:f64,
     curr:vector,
     prev:vector,
     wr:f64,
     av:f64,
-    sp:f64,
     max_torque:f64,
 }
 
@@ -52,7 +51,7 @@ impl rim_particle
     {
         self.max_torque = mt;
         self.wr = r;
-        self.sp = 0.0;
+        self.speed = 0.0;
         self.av = 0.0;
         self.curr = vector::new(r.clone(), 0.0);
         self.prev = vector::new(0.0,0.0);
@@ -70,13 +69,16 @@ impl rim_particle
     pub fn update(&mut self,ap:&APValues)
     {
        // self.sp = f64::MAX(-self.max_torque, f64::MIN(self.max_torque, self.sp + self.av));
+
+        self.speed = f64::max(-self.max_torque, f64::min(self.max_torque, self.speed + self.av));
+
         let mut dx = -self.curr.get_y();
         let mut dy = self.curr.get_x();
         let len = f64::sqrt(dx * dx + dy * dy);
         dx = dx/len;
         dy = dy/len;
 
-        self.curr.plus_equals(&vector::new(self.sp*dx, self.sp*dy));
+        self.curr.plus_equals(&vector::new(self.speed*dx, self.speed*dy));
 
         let ox = self.prev.get_x();
         let oy = self.prev.get_y();
@@ -88,6 +90,5 @@ impl rim_particle
         let clen:f64 = self.curr.length();
         let diff = (clen - self.wr) / clen;
         self.curr.minus_equals(&self.curr.mult(diff));
-
     }
 }

@@ -44,7 +44,7 @@ fn main()
     let mut gl:GlGraphics = GlGraphics::new(opengl);
     let mut ap:APEngine = APEngine::new();
 
-    ap.init(0.001);
+    ap.init(0.01);
 
     //boundries
     let mut left: rectangle_particle = rectangle_particle::new(ap.get_new_id());
@@ -86,7 +86,7 @@ fn main()
     
     p_circle.init_circle(25.0);
     wheel.init_circle(25.0);
-    wheel.init_wheel();
+    wheel.init_wheel(2.0);
 
     p_circle.set_position(&vector::new(200.0, 600.0));
 
@@ -95,7 +95,7 @@ fn main()
 
     //p.set_radian(f64::consts::PI /2.0);
 
-   // p2.set_radian(f64::consts::PI /2.0);
+    //p2.set_radian(f64::consts::PI /2.0);
 
     rect.set_collidable(true);
     circ.set_collidable(true);
@@ -110,9 +110,9 @@ fn main()
     rect.set_position(&vector::new(225.0,415.0));
     wheel.set_position(&vector::new(400.0,215.0));
 
-    rect.set_velocity(&vector::new(-2.0,70.0));
-    circ.set_velocity(&vector::new(10.0,-4.000));
-    wheel.set_velocity(&vector::new(-100.0,-4.0));
+    rect.set_velocity(&vector::new(20.0,70.0));
+    circ.set_velocity(&vector::new(20.0,-4.000));
+    wheel.set_velocity(&vector::new(-200.0,30.0));
 
     let mut p3 = particle_collection::new();
 
@@ -139,10 +139,24 @@ fn main()
 
     list.set_collide_internal(true);
 
-    ap.add_particle_collection(list);
-   // ap.add_particle_collection(p3);
+
 
     ap.set_force(vector::new(0.0,20.0));
+
+    for i in 0..10
+    {
+        let mut w = circle_particle::new(ap.get_new_id());
+        w.init_circle(25.0);
+        w.init_wheel(2.0);
+        w.set_elasticity(0.4);
+        w.set_collidable(true);
+        w.set_position(&vector::new((i as f64) * -60.0 + 600.0,215.0 + (i as f64) * -30.0));
+        w.set_velocity(&vector::new(-200.0,30.0));
+        list.add_circle_particle(w);
+    }
+
+    ap.add_particle_collection(list);
+    ap.add_particle_collection(p3);
     
     let mut step:bool = false;
     step = ap.step();
