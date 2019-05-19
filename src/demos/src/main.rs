@@ -102,10 +102,10 @@ fn main()
     p.set_position(&vector::new(200.0,415.0));
     p2.set_position(&vector::new(600.0,415.0));
 
-    p.set_velocity(&vector::new(1.0,0.0));
-    p2.set_velocity(&vector::new(-1.0,0.000));
+    p.set_velocity(&vector::new(100.0,0.0));
+    p2.set_velocity(&vector::new(-100.0,0.000));
 
-    let mut p3 = particle_collection::new();
+    let mut p3 = particle_collection::new(ap.get_new_id());
 
     p3.init_composite(vector::new(400.0, 415.0));
 
@@ -117,14 +117,14 @@ fn main()
 
     p3.set_collide_internal(false);
 
-    let mut list:particle_collection = particle_collection::new();
+    let mut list:particle_collection = particle_collection::new(ap.get_new_id());
 
     list.add_rectangle_particle(p);
     list.add_rectangle_particle(p2);
-    //list.add_rectangle_particle(left);
-    //list.add_rectangle_particle(right);
-    //list.add_rectangle_particle(top);
-   // list.add_rectangle_particle(bottom);
+    list.add_rectangle_particle(left);
+    list.add_rectangle_particle(right);
+    list.add_rectangle_particle(top);
+    list.add_rectangle_particle(bottom);
 
     list.add_circle_particle(p_circle);
 

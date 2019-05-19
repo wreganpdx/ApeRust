@@ -67,10 +67,10 @@ fn main()
     p_circle2.set_elasticity(0.7);
     
 
-    p_circle.set_velocity(&vector::new(1.0,0.0));
-    p_circle2.set_velocity(&vector::new(-1.0,0.0));
+    p_circle.set_velocity(&vector::new(100.0,0.0));
+    p_circle2.set_velocity(&vector::new(-100.0,0.0));
 
-    let mut list:particle_collection = particle_collection::new();
+    let mut list:particle_collection = particle_collection::new(ap.get_new_id());
 
     list.add_circle_particle(p_circle);
     list.add_circle_particle(p_circle2);
