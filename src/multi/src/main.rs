@@ -86,7 +86,7 @@ fn main()
     
     p_circle.init_circle(25.0);
     wheel.init_circle(25.0);
-    wheel.init_wheel();
+    wheel.init_wheel(2.0);
 
     p_circle.set_position(&vector::new(200.0, 600.0));
 
@@ -114,7 +114,7 @@ fn main()
     circ.set_velocity(&vector::new(10.0,-4.000));
     wheel.set_velocity(&vector::new(-100.0,-4.0));
 
-    let mut p3 = particle_collection::new();
+    let mut p3 = particle_collection::new(ap.get_new_id());
 
     p3.init_composite(vector::new(400.0, 415.0));
 
@@ -126,7 +126,7 @@ fn main()
 
     p3.set_collide_internal(false);
 
-    let mut list:particle_collection = particle_collection::new();
+    let mut list:particle_collection = particle_collection::new(ap.get_new_id());
 
     list.add_rectangle_particle(rect);
     list.add_circle_particle(circ);
