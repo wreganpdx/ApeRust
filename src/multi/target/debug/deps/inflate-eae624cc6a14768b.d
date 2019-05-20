@@ -1,0 +1,11 @@
+C:\Users\Tyler Pelham\Documents\rust projects\ApeRust\src\multi\target\debug\deps\inflate-eae624cc6a14768b.rmeta: C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\inflate-0.4.5\src\lib.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\inflate-0.4.5\src\checksum.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\inflate-0.4.5\src\writer.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\inflate-0.4.5\src\utils.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\inflate-0.4.5\src\reader.rs
+
+C:\Users\Tyler Pelham\Documents\rust projects\ApeRust\src\multi\target\debug\deps\libinflate-eae624cc6a14768b.rlib: C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\inflate-0.4.5\src\lib.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\inflate-0.4.5\src\checksum.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\inflate-0.4.5\src\writer.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\inflate-0.4.5\src\utils.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\inflate-0.4.5\src\reader.rs
+
+C:\Users\Tyler Pelham\Documents\rust projects\ApeRust\src\multi\target\debug\deps\inflate-eae624cc6a14768b.d: C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\inflate-0.4.5\src\lib.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\inflate-0.4.5\src\checksum.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\inflate-0.4.5\src\writer.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\inflate-0.4.5\src\utils.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\inflate-0.4.5\src\reader.rs
+
+C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\inflate-0.4.5\src\lib.rs:
+C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\inflate-0.4.5\src\checksum.rs:
+C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\inflate-0.4.5\src\writer.rs:
+C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\inflate-0.4.5\src\utils.rs:
+C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\inflate-0.4.5\src\reader.rs:

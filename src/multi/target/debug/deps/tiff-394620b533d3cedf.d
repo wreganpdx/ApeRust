@@ -1,0 +1,11 @@
+C:\Users\Tyler Pelham\Documents\rust projects\ApeRust\src\multi\target\debug\deps\tiff-394620b533d3cedf.rmeta: C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\tiff-0.2.2\src\lib.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\tiff-0.2.2\src\decoder\mod.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\tiff-0.2.2\src\decoder\ifd.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\tiff-0.2.2\src\decoder\stream.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\tiff-0.2.2\src\error.rs
+
+C:\Users\Tyler Pelham\Documents\rust projects\ApeRust\src\multi\target\debug\deps\libtiff-394620b533d3cedf.rlib: C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\tiff-0.2.2\src\lib.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\tiff-0.2.2\src\decoder\mod.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\tiff-0.2.2\src\decoder\ifd.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\tiff-0.2.2\src\decoder\stream.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\tiff-0.2.2\src\error.rs
+
+C:\Users\Tyler Pelham\Documents\rust projects\ApeRust\src\multi\target\debug\deps\tiff-394620b533d3cedf.d: C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\tiff-0.2.2\src\lib.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\tiff-0.2.2\src\decoder\mod.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\tiff-0.2.2\src\decoder\ifd.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\tiff-0.2.2\src\decoder\stream.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\tiff-0.2.2\src\error.rs
+
+C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\tiff-0.2.2\src\lib.rs:
+C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\tiff-0.2.2\src\decoder\mod.rs:
+C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\tiff-0.2.2\src\decoder\ifd.rs:
+C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\tiff-0.2.2\src\decoder\stream.rs:
+C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\tiff-0.2.2\src\error.rs:

@@ -1,0 +1,10 @@
+C:\Users\Tyler Pelham\Documents\rust projects\ApeRust\src\multi\target\debug\deps\proc_macro2-7558bf2e27d3d9f5.rmeta: C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\proc-macro2-0.4.30\src\lib.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\proc-macro2-0.4.30\src\strnom.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\proc-macro2-0.4.30\src\fallback.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\proc-macro2-0.4.30\src\wrapper.rs
+
+C:\Users\Tyler Pelham\Documents\rust projects\ApeRust\src\multi\target\debug\deps\libproc_macro2-7558bf2e27d3d9f5.rlib: C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\proc-macro2-0.4.30\src\lib.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\proc-macro2-0.4.30\src\strnom.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\proc-macro2-0.4.30\src\fallback.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\proc-macro2-0.4.30\src\wrapper.rs
+
+C:\Users\Tyler Pelham\Documents\rust projects\ApeRust\src\multi\target\debug\deps\proc_macro2-7558bf2e27d3d9f5.d: C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\proc-macro2-0.4.30\src\lib.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\proc-macro2-0.4.30\src\strnom.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\proc-macro2-0.4.30\src\fallback.rs C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\proc-macro2-0.4.30\src\wrapper.rs
+
+C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\proc-macro2-0.4.30\src\lib.rs:
+C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\proc-macro2-0.4.30\src\strnom.rs:
+C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\proc-macro2-0.4.30\src\fallback.rs:
+C:\Users\Tyler\ Pelham\.cargo\registry\src\github.com-1ecc6299db9ec823\proc-macro2-0.4.30\src\wrapper.rs:

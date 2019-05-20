@@ -181,7 +181,7 @@ fn main()
            EngineSteps += 1;
         }
 
-        if now.elapsed().as_secs() > 60 || exit
+        if now.elapsed().as_secs() > 30 || exit
         {
             
             break;
