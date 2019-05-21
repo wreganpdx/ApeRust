@@ -89,6 +89,9 @@ fn main()
     left_bar.set_radian(PI *0.69999);
     right_bar.set_radian(PI *0.39999);
 
+    left_bar.set_friction(0.0);
+    right_bar.set_friction(0.0);
+
     //create circle objects
     let mut p_circle: CircleParticle = CircleParticle::new(ap.get_new_id());
     let mut p_circle2: CircleParticle = CircleParticle::new(ap.get_new_id());
@@ -107,6 +110,9 @@ fn main()
 
     p_circle.set_elasticity(0.7);
     p_circle2.set_elasticity(0.7);
+
+    p_circle.set_friction(0.0);
+    p_circle2.set_friction(0.0);
     
     p_circle.set_velocity(&Vector::new(0.0, 400.0));
     p_circle2.set_velocity(&Vector::new(0.0, 400.0));
