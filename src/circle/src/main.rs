@@ -88,6 +88,9 @@ fn main()
     left_bar.set_radian(f64::consts::PI *0.69999);
     right_bar.set_radian(f64::consts::PI *0.39999);
 
+    left_bar.set_friction(0.0);
+    right_bar.set_friction(0.0);
+
     //create circle objects
     let mut p_circle: circle_particle = circle_particle::new(ap.get_new_id());
     let mut p_circle2: circle_particle = circle_particle::new(ap.get_new_id());
@@ -103,6 +106,9 @@ fn main()
 
     p_circle.set_elasticity(0.7);
     p_circle2.set_elasticity(0.7);
+
+    p_circle.set_friction(0.0);
+    p_circle2.set_friction(0.0);
     
     p_circle.set_velocity(&vector::new(0.0, 400.0));
     p_circle2.set_velocity(&vector::new(0.0, 400.0));
@@ -152,7 +158,7 @@ fn main()
         }
 
 
-        if now.elapsed().as_secs() > 15 || exit
+        if now.elapsed().as_secs() > 30 || exit
         {
             break;
         }
