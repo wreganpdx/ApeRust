@@ -14,42 +14,43 @@ Final Project
  * ore information, see  https://github.com/arctwelve/ape-js-port/tree/master/org/cove/ape
  */
 
-use crate::vector::vector;
-use crate::particle::particle;
-use crate::polygon_particle::polygon_particle;
-use crate::circle_particle::circle_particle;
-use crate::rectangle_particle::rectangle_particle;
-use crate::poly_poly_constraint::poly_poly_constraint;
-use crate::APEngine::APValues;
+use crate::vector::Vector;
+use crate::particle::Particle;
+use crate::polygon_particle::PolygonParticle;
+use crate::circle_particle::CircleParticle;
+use crate::rectangle_particle::RectangleParticle;
+use crate::poly_poly_constraint::PolyPolyConstraint;
+use crate::ap_engine::APValues;
 use crate::collision_detector;
-use crate::APEngine::Paint;
+use crate::ap_engine::Paint;
 use std::default::Default;
 
 extern crate piston;
 extern crate graphics;
 extern crate glutin_window;
-extern crate opengl_graphics;
+//extern crate opengl_graphics;
 
 use piston::input::*;
-use opengl_graphics::{ GlGraphics, OpenGL };
+use opengl_graphics::GlGraphics;
+//use opengl_graphics::OpenGL;
 
 #[allow(unused_variables)]
 #[derive(Default)]
 #[allow(dead_code)]
-pub struct particle_collection
+pub struct ParticleCollection
 {
 	pub collide_internal:bool,
-    poly_particles:Vec<polygon_particle>,
-	circle_particles:Vec<circle_particle>,
-	rectangle_particles:Vec<rectangle_particle>,
-	poly_poly_constraints:Vec<poly_poly_constraint>,
+    poly_particles:Vec<PolygonParticle>,
+	circle_particles:Vec<CircleParticle>,
+	rectangle_particles:Vec<RectangleParticle>,
+	poly_poly_constraints:Vec<PolyPolyConstraint>,
 	is_composite:bool,
-	center:vector, 
-	delta:vector,
+	center:Vector, 
+	delta:Vector,
 	id:i64,
 }
 
-impl Paint for particle_collection
+impl Paint for ParticleCollection
 {
 	fn paint(&mut self, args: &RenderArgs, gl:&mut GlGraphics)
 	{
@@ -75,7 +76,7 @@ impl Paint for particle_collection
 	}
 }
 
-pub fn getRelativeAngle(delta:&mut vector, center:&mut vector, p:&mut vector) ->f64
+pub fn get_relative_angle(delta:&mut Vector, center:&mut Vector, p:&mut Vector) ->f64
 {
 	delta.set_to(&p.x - &center.x, &p.y - &center.y);
 	return delta.y.atan2(delta.x.clone());
@@ -83,9 +84,9 @@ pub fn getRelativeAngle(delta:&mut vector, center:&mut vector, p:&mut vector) ->
 
 
 #[allow(dead_code)]
-impl particle_collection
+impl ParticleCollection
 {
-	pub fn get_circle_by_id(&mut self, i:&i64)->Option<&mut circle_particle>
+	pub fn get_circle_by_id(&mut self, i:&i64)->Option<&mut CircleParticle>
 	{
 		for p in self.circle_particles.iter_mut()
 		{
@@ -97,17 +98,17 @@ impl particle_collection
 		return Option::None;
 	}
 
-	pub fn check_collisions_vs_collection(&mut self, rem2:&mut particle_collection, ap:&APValues)
+	pub fn check_collisions_vs_collection(&mut self, rem2:&mut ParticleCollection, ap:&APValues)
 	{
 		self.check_rectangles_vs_collection(rem2, ap);
 		self.check_circs_vs_collection(rem2, ap);
 	}
-	pub fn init_composite(&mut self, v:vector)
+	pub fn init_composite(&mut self, v:Vector)
 	{
 		self.center = v;
 		self.is_composite = true;
 	}
-	pub fn get_center(&mut self)->&vector
+	pub fn get_center(&mut self)->&Vector
 	{
 		return &self.center;
 	}
@@ -120,14 +121,14 @@ impl particle_collection
 		}
 	}
 
-	pub fn rotate_by_radian(&mut self, angleRadians:f64, center:vector) 
+	pub fn rotate_by_radian(&mut self, angle_radians:f64, _center:Vector) 
 	{
 		for p in self.poly_particles.iter_mut()
 		{
 			let mut c = &mut self.center;
 			let mut d = &mut self.delta;
 			let radius:f64 = p.get_center().distance(c);
-			let angle:f64 = getRelativeAngle(&mut d, &mut c, &mut p.get_center()) + angleRadians;
+			let angle:f64 = get_relative_angle(&mut d, &mut c, &mut p.get_center()) + angle_radians;
 			p.set_px((angle.cos() * radius) + c.x);
 			p.set_py((angle.sin() * radius) + c.y);
 		}
@@ -138,51 +139,51 @@ impl particle_collection
 	{
 		self.collide_internal = c;
 	}
-	pub fn new(i:i64) -> particle_collection 
+	pub fn new(i:i64) -> ParticleCollection 
     {
-        let mut p = particle_collection::default();
+        let mut p = ParticleCollection::default();
 		p.id = i;
 		return p;
     }
 
-	fn get_poly_particles(&self)->&Vec<polygon_particle>
+	fn get_poly_particles(&self)->&Vec<PolygonParticle>
 	{
 		return &self.poly_particles;
 	}
 
-	pub fn add_poly_particle(&mut self, p:polygon_particle)
+	pub fn add_poly_particle(&mut self, p:PolygonParticle)
 	{
 		self.poly_particles.push(p);
 	}
 
 
 
-	fn get_poly_poly_constraint(&self)->&Vec<poly_poly_constraint>
+	fn get_poly_poly_constraint(&self)->&Vec<PolyPolyConstraint>
 	{
 		return &self.poly_poly_constraints;
 	}
 
-	pub fn add_poly_poly_constraint(&mut self, p:poly_poly_constraint)
+	pub fn add_poly_poly_constraint(&mut self, p:PolyPolyConstraint)
 	{
 		self.poly_poly_constraints.push(p);
 	}
 
-	fn get_circle_particles(&self)->&Vec<circle_particle>
+	fn get_circle_particles(&self)->&Vec<CircleParticle>
 	{
 		return &self.circle_particles;
 	}
 
-	pub fn add_circle_particle(&mut self, p:circle_particle)
+	pub fn add_circle_particle(&mut self, p:CircleParticle)
 	{
 		self.circle_particles.push(p);
 	}
 
-	fn get_rectangle_particles(&self)->&Vec<rectangle_particle>
+	fn get_rectangle_particles(&self)->&Vec<RectangleParticle>
 	{
 		return &self.rectangle_particles;
 	}
 
-	pub fn add_rectangle_particle(&mut self, p:rectangle_particle)
+	pub fn add_rectangle_particle(&mut self, p:RectangleParticle)
 	{
 		self.rectangle_particles.push(p);
 	}
@@ -224,10 +225,10 @@ impl particle_collection
 			self.poly_poly_constraints.insert(i, c);
 		}
 	}	
-	pub fn satisfy_constraint_rect_rect(&mut self,constraint: &mut poly_poly_constraint, ap:&APValues)
+	pub fn satisfy_constraint_rect_rect(&mut self,constraint: &mut PolyPolyConstraint, _ap:&APValues)
 	{
 		let tuple = constraint.get_particles();
-		let mut length:usize = self.poly_particles.len();
+		let mut _length:usize = self.poly_particles.len();
 		let mut i:usize = 0;
 		let mut p1 = loop
 		{
@@ -237,7 +238,7 @@ impl particle_collection
 			}
 			i+= 1;
 		};
-		length = self.rectangle_particles.len();
+		_length = self.rectangle_particles.len();
 		i = 0;
 		let mut p2 = loop
 		{
@@ -254,10 +255,10 @@ impl particle_collection
 		self.rectangle_particles.push(p1);
 		self.rectangle_particles.push(p2);
 	}	
-	pub fn satisfy_constraint_circ_rect(&mut self,constraint: &mut poly_poly_constraint, ap:&APValues)
+	pub fn satisfy_constraint_circ_rect(&mut self,constraint: &mut PolyPolyConstraint, _ap:&APValues)
 	{
 		let tuple = constraint.get_particles();
-		let mut length:usize = self.circle_particles.len();
+		let mut _length:usize = self.circle_particles.len();
 		let mut i:usize = 0;
 		let mut p1 = loop
 		{
@@ -267,7 +268,7 @@ impl particle_collection
 			}
 			i+= 1;
 		};
-		length = self.rectangle_particles.len();
+		_length = self.rectangle_particles.len();
 		i = 0;
 		let mut p2 = loop
 		{
@@ -284,10 +285,10 @@ impl particle_collection
 		self.circle_particles.push(p1);
 		self.rectangle_particles.push(p2);
 	}	
-	pub fn satisfy_constraint_circ_circ(&mut self,constraint: &mut poly_poly_constraint, ap:&APValues)
+	pub fn satisfy_constraint_circ_circ(&mut self,constraint: &mut PolyPolyConstraint, _ap:&APValues)
 	{
 		let tuple = constraint.get_particles();
-		let mut length:usize = self.circle_particles.len();
+		let mut _length:usize = self.circle_particles.len();
 		let mut i:usize = 0;
 		let mut p1 = loop
 		{
@@ -297,7 +298,7 @@ impl particle_collection
 			}
 			i+= 1;
 		};
-		length = self.circle_particles.len();
+		_length = self.circle_particles.len();
 		i = 0;
 		let mut p2 = loop
 		{
@@ -385,7 +386,7 @@ impl particle_collection
 		self.check_circ_circ_internal_collisions(ap);
 		self.check_rect_circ_internal_collisions(ap);
 	}
-	pub fn check_rectangles_vs_collection(&mut self, col:&mut particle_collection, ap:&APValues)
+	pub fn check_rectangles_vs_collection(&mut self, col:&mut ParticleCollection, ap:&APValues)
 	{
 		let length:usize = self.rectangle_particles.len();
 		for i in 0..length
@@ -403,7 +404,7 @@ impl particle_collection
 		}
 	}
 
-	pub fn check_circs_vs_collection(&mut self, col:&mut particle_collection, ap:&APValues)
+	pub fn check_circs_vs_collection(&mut self, col:&mut ParticleCollection, ap:&APValues)
 	{
 		let length:usize = self.circle_particles.len();
 		for i in 0..length

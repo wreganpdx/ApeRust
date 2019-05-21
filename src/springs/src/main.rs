@@ -1,19 +1,19 @@
-extern crate ApeRust;
+extern crate ape_rust;
 extern crate piston;
 extern crate graphics;
 extern crate glutin_window;
 extern crate opengl_graphics;
 
-use ApeRust::vector::vector;
-use ApeRust::APEngine::APEngine;
-use ApeRust::polygon_particle::polygon_particle;
-use ApeRust::rectangle_particle::rectangle_particle;
-use ApeRust::circle_particle::circle_particle;
+use ape_rust::vector::Vector;
+use ape_rust::ap_engine::APEngine;
+use ape_rust::polygon_particle::PolygonParticle;
+use ape_rust::rectangle_particle::RectangleParticle;
+use ape_rust::circle_particle::CircleParticle;
 use std::{thread, time};
 use std::time::{Duration, Instant};
-use ApeRust::particle::particle;
-use ApeRust::particle_collection::particle_collection;
-use ApeRust::APEngine::Paint;
+use ape_rust::particle::Particle;
+use ape_rust::particle_collection::ParticleCollection;
+use ape_rust::ap_engine::Paint;
 //use crate object_helper::create_rectangle; 
 mod object_helper;
 
@@ -47,10 +47,10 @@ fn main()
     ap.init(0.01);
 
     //boundries
-    let mut left: rectangle_particle = rectangle_particle::new(ap.get_new_id());
-    let mut right: rectangle_particle = rectangle_particle::new(ap.get_new_id());
-    let mut top: rectangle_particle = rectangle_particle::new(ap.get_new_id());
-    let mut bottom: rectangle_particle = rectangle_particle::new(ap.get_new_id());
+    let mut left: RectangleParticle = RectangleParticle::new(ap.get_new_id());
+    let mut right: RectangleParticle = RectangleParticle::new(ap.get_new_id());
+    let mut top: RectangleParticle = RectangleParticle::new(ap.get_new_id());
+    let mut bottom: RectangleParticle = RectangleParticle::new(ap.get_new_id());
 
     left.create_rectangle(5.0,800.0);
 
@@ -58,11 +58,11 @@ fn main()
     top.create_rectangle(790.0,5.0);
     bottom.create_rectangle(800.0,5.0);
 
-    left.set_position(&vector::new(5.0, 400.0));
+    left.set_position(&Vector::new(5.0, 400.0));
 
-    right.set_position(&vector::new(797.5, 405.0));
-    top.set_position(&vector::new(400.0, 802.5));
-    bottom.set_position(&vector::new(400.0, 2.5));
+    right.set_position(&Vector::new(797.5, 405.0));
+    top.set_position(&Vector::new(400.0, 802.5));
+    bottom.set_position(&Vector::new(400.0, 2.5));
 
     top.set_collidable(true);
     bottom.set_collidable(true);
@@ -76,19 +76,19 @@ fn main()
 
 
     //objects
-    let mut rect: rectangle_particle = rectangle_particle::new(ap.get_new_id());
-    let mut circ: circle_particle = circle_particle::new(ap.get_new_id());
+    let mut rect: RectangleParticle = RectangleParticle::new(ap.get_new_id());
+    let mut circ: CircleParticle = CircleParticle::new(ap.get_new_id());
 
-    let mut p_circle: circle_particle = circle_particle::new(ap.get_new_id());
+    let mut p_circle: CircleParticle = CircleParticle::new(ap.get_new_id());
 
-    let mut wheel: circle_particle = circle_particle::new(ap.get_new_id());
+    let mut wheel: CircleParticle = CircleParticle::new(ap.get_new_id());
 
     
     p_circle.init_circle(25.0);
     wheel.init_circle(25.0);
     wheel.init_wheel(2.0);
 
-    p_circle.set_position(&vector::new(200.0, 600.0));
+    p_circle.set_position(&Vector::new(200.0, 600.0));
 
     rect.create_rectangle(40.0,40.0);
     circ.init_circle(20.0);
@@ -106,17 +106,17 @@ fn main()
     circ.set_elasticity(0.9);
     wheel.set_elasticity(0.9);
 
-    circ.set_position(&vector::new(600.0,415.0));
-    rect.set_position(&vector::new(225.0,415.0));
-    wheel.set_position(&vector::new(400.0,215.0));
+    circ.set_position(&Vector::new(600.0,415.0));
+    rect.set_position(&Vector::new(225.0,415.0));
+    wheel.set_position(&Vector::new(400.0,215.0));
 
-    rect.set_velocity(&vector::new(20.0,70.0));
-    circ.set_velocity(&vector::new(20.0,-4.000));
-    wheel.set_velocity(&vector::new(-200.0,30.0));
+    rect.set_velocity(&Vector::new(20.0,70.0));
+    circ.set_velocity(&Vector::new(20.0,-4.000));
+    wheel.set_velocity(&Vector::new(-200.0,30.0));
 
-    let mut p3 = particle_collection::new();
+    let mut p3 = ParticleCollection::new();
 
-    p3.init_composite(vector::new(400.0, 415.0));
+    p3.init_composite(Vector::new(400.0, 415.0));
 
     object_helper::create_rectangle(&mut p3, 
     (ap.get_new_id(), ap.get_new_id(),
@@ -126,7 +126,7 @@ fn main()
 
     p3.set_collide_internal(false);
 
-    let mut list:particle_collection = particle_collection::new();
+    let mut list:ParticleCollection = ParticleCollection::new();
 
     list.add_rectangle_particle(rect);
     list.add_circle_particle(circ);
@@ -141,17 +141,17 @@ fn main()
 
 
 
-    ap.set_force(vector::new(0.0,20.0));
+    ap.set_force(Vector::new(0.0,20.0));
 
     for i in 0..10
     {
-        let mut w = circle_particle::new(ap.get_new_id());
+        let mut w = CircleParticle::new(ap.get_new_id());
         w.init_circle(25.0);
         w.init_wheel(2.0);
         w.set_elasticity(0.4);
         w.set_collidable(true);
-        w.set_position(&vector::new((i as f64) * -60.0 + 600.0,215.0 + (i as f64) * -30.0));
-        w.set_velocity(&vector::new(-200.0,30.0));
+        w.set_position(&Vector::new((i as f64) * -60.0 + 600.0,215.0 + (i as f64) * -30.0));
+        w.set_velocity(&Vector::new(-200.0,30.0));
         list.add_circle_particle(w);
     }
 

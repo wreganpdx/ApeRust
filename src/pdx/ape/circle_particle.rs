@@ -23,50 +23,50 @@ extern crate opengl_graphics;
 use piston::input::*;
 use opengl_graphics::{ GlGraphics};
 
-use crate::rim_particle::rim_particle;
-use crate::vector::vector;
-use crate::interval::interval;
-use crate::collision::collision;
-use crate::particle::particle;
-use crate::APEngine::APValues;
-use crate::APEngine::Paint;
+use crate::rim_particle::RimParticle;
+use crate::vector::Vector;
+use crate::interval::Interval;
+use crate::collision::Collision;
+use crate::particle::Particle;
+use crate::ap_engine::APValues;
+use crate::ap_engine::Paint;
 use std::any::Any;
 use std::f64;
 
 #[allow(unused_variables)]
 #[derive(Default)]
-pub struct circle_particle 
+pub struct CircleParticle 
 {
 	pub id:i64,
     radian:f64,
     density:f64,
-    original_vertices:Vec<vector>,
-    vertices:Vec<vector>,
+    original_vertices:Vec<Vector>,
+    vertices:Vec<Vector>,
     num_vertices:usize,
-    axes:Vec<vector>,
-    curr:vector,
-    prev:vector,
-    temp:vector,
-    samp:vector,
-    forces:vector,
-    velocity:vector,
+    axes:Vec<Vector>,
+    curr:Vector,
+    prev:Vector,
+    temp:Vector,
+    samp:Vector,
+    forces:Vector,
+    velocity:Vector,
     mass:f64,
     friction:f64,
     elasticity:f64,
     rest_loops:i64,
     rest_count:i64,
-    center:vector,
+    center:Vector,
     pinned:bool,
-    pinned_to: Vec<Box<particle>>,//to make this work, it had to be a vector, but only one should be stored here.
-    pin:vector,
+    pinned_to: Vec<Box<Particle>>,//to make this work, it had to be a vector, but only one should be stored here.
+    pin:Vector,
     smashable:bool,
     max_exit_velocity:f64,
     at_rest:bool,
     left_max:f64,
     right_max:f64,
     multi_sampe:i64,
-    coll:collision,
-    interval:interval, 
+    coll:Collision,
+    interval:Interval, 
     kfr:f64,
     inv_mass:f64,
     fixed:bool,
@@ -75,27 +75,27 @@ pub struct circle_particle
 	height:f64,
 	radius:f64,
 	is_wheel:bool,
-	rim:rim_particle,
+	rim:RimParticle,
 	traction:f64,
-	norm_slip:vector,
+	norm_slip:Vector,
     primary_color:[f32; 4],
     secondary_color:[f32; 4]
 }
 
-impl circle_particle
+impl CircleParticle
 {
 	pub fn init_wheel(&mut self, mt:f64)
 	{
-		self.rim = rim_particle::new();
+		self.rim = RimParticle::new();
 		self.rim.init(self.radius, mt);
 		//self.rim.max_torque = mt;
 		self.friction = 0.0;
 		self.traction = 1.0;
 		self.is_wheel = true;
 	}
-    pub fn new(id:i64)->circle_particle
+    pub fn new(id:i64)->CircleParticle
     {
-		let mut p = circle_particle::default();
+		let mut p = CircleParticle::default();
 		p.set_id(id);
         return p;
     }
@@ -115,14 +115,14 @@ impl circle_particle
 
 	}
 
-	pub fn get_interval_x(&mut self)->&interval
+	pub fn get_interval_x(&mut self)->&Interval
 	{
 		self.interval.min = self.curr.x - self.radius;
 		self.interval.max = self.curr.x + self.radius;
 		return &self.interval;
 	}
 
-	pub fn get_interval_y(&mut self)->&interval
+	pub fn get_interval_y(&mut self)->&Interval
 	{
 		self.interval.min = self.curr.y - self.radius;
 		self.interval.max = self.curr.y + self.radius;
@@ -134,7 +134,7 @@ impl circle_particle
 		return &self.radius;
 	}
 
-	pub fn resolve_wheel(&mut self, mtd:&vector, vel:&vector, n:&vector, d:f64, o:i32)
+	pub fn resolve_wheel(&mut self, _mtd:&Vector, _vel:&Vector, n:&Vector, _d:f64, _o:i32)
 	{
 		
 		let mut tan = self.rim.get_curr().swap_with_neg_y();
@@ -160,7 +160,7 @@ impl circle_particle
 	}
 }
 
-impl Paint for circle_particle
+impl Paint for CircleParticle
 {
 	fn paint(&mut self, args: &RenderArgs, gl:&mut GlGraphics)
 	{
@@ -191,14 +191,14 @@ impl Paint for circle_particle
 	}
 }
 
-impl PartialEq for circle_particle 
+impl PartialEq for CircleParticle 
 {
-    fn eq(&self, other: &circle_particle) -> bool {
+    fn eq(&self, other: &CircleParticle) -> bool {
         self.id == other.id
     }
 }
 
-impl particle for circle_particle 
+impl Particle for CircleParticle 
 {
     fn set_primary_color(&mut self, c:[f32;4])
     {
@@ -244,30 +244,30 @@ impl particle for circle_particle
         self.elasticity = e;
     }
 
-	fn get_curr(&self)-> &vector
+	fn get_curr(&self)-> &Vector
     {
         return &self.curr;
     }
-	fn set_curr(&mut self, c:&vector)
+	fn set_curr(&mut self, c:&Vector)
     {
         self.curr.copy(c);
     }
 
-	fn get_position(&self)-> vector
+	fn get_position(&self)-> Vector
     {
         return self.curr.clone();
     }
-	fn set_position(&mut self, c:&vector)
+	fn set_position(&mut self, c:&Vector)
     {
         self.curr.copy(c);
         self.prev.copy(c);
     }
 
-	fn get_prev(&self)-> &vector
+	fn get_prev(&self)-> &Vector
     {
         return &self.prev;
     }
-	fn set_prev(&mut self, p:&vector)
+	fn set_prev(&mut self, p:&Vector)
     {
          self.prev.copy(p);
     }
@@ -311,48 +311,48 @@ impl particle for circle_particle
     }
     
 
-	fn get_samp(&self)-> vector
+	fn get_samp(&self)-> Vector
     {
         return self.samp.clone();
     }
-	fn set_samp(&mut self, s:vector)
+	fn set_samp(&mut self, s:Vector)
     {
         self.samp.copy(&s);
     }
 
-	fn get_interval(&self)-> &interval
+	fn get_interval(&self)-> &Interval
     {
         return &self.interval;
     }
-	fn set_interval(&mut self, i:interval)
+	fn set_interval(&mut self, i:Interval)
     {
         self.interval.max = i.max;
         self.interval.min = i.min;
     }
 
-	fn get_temp(&self)-> vector
+	fn get_temp(&self)-> Vector
     {
         return self.temp.clone();
     }
-	fn set_temp(&mut self, t:&vector)
+	fn set_temp(&mut self, t:&Vector)
     {
         self.temp.copy(t);
     }
 
-	fn get_forces(&self)-> vector
+	fn get_forces(&self)-> Vector
     {
         return self.forces.clone();
     }
-	fn set_forces(&mut self, f:&vector)
+	fn set_forces(&mut self, f:&Vector)
     {
         self.forces.copy(f);
     }
 
-	fn get_collision(&self)-> &collision
+	fn get_collision(&self)-> &Collision
     {
         return &self.coll;
     }
-	fn set_collision(&mut self, f:&collision)
+	fn set_collision(&mut self, f:&Collision)
     {
         self.coll = f.clone();
     }
@@ -362,14 +362,14 @@ impl particle for circle_particle
 	{
 		return self.axes.len();
 	}
-	fn get_axes(&mut self)->&Vec<vector>
+	fn get_axes(&mut self)->&Vec<Vector>
 	{
 			return &self.axes;
 	}
 	
 
 
-	fn get_projection(&mut self, axis:&vector)->&interval 
+	fn get_projection(&mut self, axis:&Vector)->&Interval 
 	{
 		let c:f64 = self.samp.dot(axis);
 		self.interval.min = c -  self.radius;
@@ -442,33 +442,33 @@ impl particle for circle_particle
 			_pin = null;*/
     }
 
-	fn get_pinned_to(&self)-> &particle
+	fn get_pinned_to(&self)-> &Particle
     {
         return self;
     }
 
-	fn set_pinned_to(&mut self, p:&particle, v:&vector)
+	fn set_pinned_to(&mut self, _p:&Particle, v:&Vector)
     {
         self.pinned = true;
         self.pin = v.clone();
         //self.pinned_to = p;
     }
 
-	fn set_pin(&mut self, v:vector)
+	fn set_pin(&mut self, v:Vector)
     {
         self.pin = v;
     }
 
-	fn get_pin(&self)-> vector
+	fn get_pin(&self)-> Vector
     {
         return self.pin.clone();
     }
 
-	fn get_center(&self)-> vector
+	fn get_center(&self)-> Vector
     {
         return self.center.clone();
     }
-	fn set_center(&mut self, c:vector)
+	fn set_center(&mut self, c:Vector)
     {
         self.center = c.clone();
     }
@@ -500,11 +500,11 @@ impl particle for circle_particle
         self.max_exit_velocity = ev;
     }
 
-	fn get_velocity(&self)-> vector
+	fn get_velocity(&self)-> Vector
     {   
         return self.velocity.clone();
     }
-	fn set_velocity(&mut self, i:&vector)
+	fn set_velocity(&mut self, i:&Vector)
     {
         self.velocity.copy(i);
     }
@@ -554,12 +554,12 @@ impl particle for circle_particle
         self.right_max = rm;
     }
 
-	fn add_force(&mut self, f:vector)
+	fn add_force(&mut self, f:Vector)
     {
         self.forces.plus_equals(&f.mult(self.inv_mass));
     }
 
-	fn add_massless_force(&mut self, f:vector)
+	fn add_massless_force(&mut self, f:Vector)
     {
         self.forces.plus_equals(&f);
     }
@@ -581,7 +581,7 @@ impl particle for circle_particle
 			//println!("velocity {:?}", self.velocity);
 			self.velocity.mult_equals(ap.damping);
 			self.velocity.plus_equals(&self.forces.mult(ap.time_step));
-			//let mut nv:vector = self.velocity.plus(&self.forces.mult(ap.time_step));
+			//let mut nv:Vector = self.velocity.plus(&self.forces.mult(ap.time_step));
 			//println!("velocity {:?}, adding: {:?}", self.velocity,self.velocity.mult(ap.time_step));
 			self.curr.plus_equals(&self.velocity.mult(ap.time_step));
 			
@@ -598,15 +598,15 @@ impl particle for circle_particle
 			}
     }
 
-	fn get_components(&mut self, cn:&vector)->collision
+	fn get_components(&mut self, cn:&Vector)->Collision
     {
-		let mut vel:vector = self.velocity.clone();
+		let vel:Vector = self.velocity.clone();
 		let vdotn:f64 = cn.dot(&vel);
 		self.coll.vn = cn.mult(vdotn);
 		self.coll.vt = vel.minus(&self.coll.vn);	
 		return self.coll.clone();
     }
-	fn resolve_collision(&mut self, mtd:&vector, vel:&vector, n:&vector, d:f64, o:i32)
+	fn resolve_collision(&mut self, mtd:&Vector, vel:&Vector, n:&Vector, d:f64, o:i32)
 	{
 		if !self.fixed
 		{
@@ -650,7 +650,7 @@ impl particle for circle_particle
 		}
 			
 	}
-	fn resolve_velocities(&mut self, dv:vector, dw:f64, normal:vector)
+	fn resolve_velocities(&mut self, dv:Vector, _dw:f64, _normal:Vector)
     {
 		if !self.fixed
 		{
@@ -670,7 +670,7 @@ impl particle for circle_particle
 		return 0.0;
     }
 
-	fn set_ang_velocity(&self, a:f64)
+	fn set_ang_velocity(&self, _a:f64)
     {
 		//do nothing
     }

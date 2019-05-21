@@ -14,25 +14,25 @@ Final Project
  * For more information, see  https://github.com/arctwelve/ape-js-port/tree/master/org/cove/ape
  */
 
-use crate::vector::vector;
-use crate::interval::interval;
-use crate::collision::collision;
-use crate::polygon_particle::polygon_particle;
-use crate::particle_collection::particle_collection;
-use crate::APEngine::APEngine;
-use crate::APEngine::APValues;
+use crate::vector::Vector;
+use crate::interval::Interval;
+use crate::collision::Collision;
+use crate::polygon_particle::PolygonParticle;
+//use crate::particle_collection::ParticleCollection;
+//use crate::ap_engine::ApEngine;
+use crate::ap_engine::APValues;
 use std::any::Any;
 
-use std::default::Default;
+//use std::default::Default;
 
 
-pub enum shapes
+pub enum Shapes
 {
-	Polygon(polygon_particle),
+	Polygon(PolygonParticle),
 }
 
 #[allow(unused_variables)]
-pub trait particle 
+pub trait Particle 
 {
 
 	fn set_primary_color(&mut self, c:[f32;4]);
@@ -43,11 +43,11 @@ pub trait particle
 
 	fn as_any(&self) -> &dyn Any;
 	
-	fn get_axes(&mut self)->&Vec<vector>;
+	fn get_axes(&mut self)->&Vec<Vector>;
 	fn set_axes(&mut self);
 
 
-	fn get_projection(&mut self, axis:&vector)->&interval;
+	fn get_projection(&mut self, axis:&Vector)->&Interval;
 
     fn get_mass(&self)-> f64;
     fn set_mass(&mut self, m:f64);
@@ -55,14 +55,14 @@ pub trait particle
 	fn get_elasticity(&self)-> f64;
 	fn set_elasticity(&mut self, e:f64);
 
-	fn get_curr(&self)-> &vector;
-	fn set_curr(&mut self, c:&vector);
+	fn get_curr(&self)-> &Vector;
+	fn set_curr(&mut self, c:&Vector);
 
-	fn get_position(&self)-> vector;
-	fn set_position(&mut self, c:&vector);
+	fn get_position(&self)-> Vector;
+	fn set_position(&mut self, c:&Vector);
 
-	fn get_prev(&self)-> &vector;
-	fn set_prev(&mut self, p:&vector);
+	fn get_prev(&self)-> &Vector;
+	fn set_prev(&mut self, p:&Vector);
 
 	fn get_px(&self)-> f64;
 	fn set_px(&mut self, f:f64);
@@ -76,24 +76,24 @@ pub trait particle
 	fn get_curr_y(&self)-> f64;
 	fn set_curr_y(&mut self, f:f64);
 
-	fn get_samp(&self)-> vector;
-	fn set_samp(&mut self, s:vector);
+	fn get_samp(&self)-> Vector;
+	fn set_samp(&mut self, s:Vector);
 
-	fn get_interval(&self)-> &interval;
-	fn set_interval(&mut self, i:interval);
+	fn get_interval(&self)-> &Interval;
+	fn set_interval(&mut self, i:Interval);
 
-	fn get_temp(&self)-> vector;
-	fn set_temp(&mut self, t:&vector);
+	fn get_temp(&self)-> Vector;
+	fn set_temp(&mut self, t:&Vector);
 
-	fn get_forces(&self)-> vector;
-	fn set_forces(&mut self, f:&vector);
+	fn get_forces(&self)-> Vector;
+	fn set_forces(&mut self, f:&Vector);
 
-	fn get_collision(&self)-> &collision;
-	fn set_collision(&mut self, f:&collision);
+	fn get_collision(&self)-> &Collision;
+	fn set_collision(&mut self, f:&Collision);
 /*
-	fn get_parent(&self)-> Box<particle_collection>;
+	fn get_parent(&self)-> Box<ParticleCollection>;
 	
-	fn set_parent(&mut self, pc:&particle_collection);
+	fn set_parent(&mut self, pc:&ParticleCollection);
 */
 	fn get_kfr(&self)-> f64;
 	fn set_kfr(&mut self, kfr:f64);
@@ -112,14 +112,14 @@ pub trait particle
 	fn get_pinned(&self)-> bool;
 	fn set_pinned(&mut self, f:bool);
 
-	fn get_pinned_to(&self)-> &particle;
-	fn set_pinned_to(&mut self, p:&particle, v:&vector);
+	fn get_pinned_to(&self)-> &Particle;
+	fn set_pinned_to(&mut self, p:&Particle, v:&Vector);
 
-	fn get_pin(&self)-> vector;
-	fn set_pin(&mut self, p:vector);
+	fn get_pin(&self)-> Vector;
+	fn set_pin(&mut self, p:Vector);
 
-	fn get_center(&self)-> vector;
-	fn set_center(&mut self, c:vector);
+	fn get_center(&self)-> Vector;
+	fn set_center(&mut self, c:Vector);
 
 	fn get_multi_sample(&self)-> i64;
 	fn set_multi_sample(&mut self, i:i64);
@@ -130,8 +130,8 @@ pub trait particle
 	fn get_max_exit_velocity(&self)-> f64;
 	fn set_max_exit_velocity(&mut self, ev:f64);
 
-	fn get_velocity(&self)-> vector;
-	fn set_velocity(&mut self, i:&vector);
+	fn get_velocity(&self)-> Vector;
+	fn set_velocity(&mut self, i:&Vector);
 
 	fn get_at_rest(&self)-> bool;
 	fn set_at_rest(&mut self, i:bool);
@@ -148,18 +148,18 @@ pub trait particle
 	fn get_right_max_x(&self)-> f64;
 	fn set_right_max_x(&mut self, rm:f64);
 
-	fn add_force(&mut self, f:vector);
+	fn add_force(&mut self, f:Vector);
 
-	fn add_massless_force(&mut self, f:vector);
+	fn add_massless_force(&mut self, f:Vector);
 
 	fn update(&mut self,ap:&APValues);
 
-	fn get_components(&mut self, cn:&vector)->collision;
+	fn get_components(&mut self, cn:&Vector)->Collision;
 
-	fn resolve_collision(&mut self, mtd:&vector, vel:&vector, n:&vector, d:f64, o:i32);
-	//fn resolve_collision(mtd:vector, vel:vector, n:vector, d:f64, o:int, p:particle);
+	fn resolve_collision(&mut self, mtd:&Vector, vel:&Vector, n:&Vector, d:f64, o:i32);
+	//fn resolve_collision(mtd:Vector, vel:Vector, n:Vector, d:f64, o:int, p:particle);
 
-	fn resolve_velocities(&mut self, dv:vector, dw:f64, normal:vector);
+	fn resolve_velocities(&mut self, dv:Vector, dw:f64, normal:Vector);
 
 	fn get_inv_inertia(&self)->f64;
 
@@ -180,7 +180,7 @@ pub trait particle
 
 	fn get_rotation(&self)->f64;
 
-	//fn resolve_collision(&mut self, mtd:vector, vel:vector, n:vector, d:f64, o:i64, p:&particle);
+	//fn resolve_collision(&mut self, mtd:Vector, vel:Vector, n:Vector, d:f64, o:i64, p:&particle);
 
 }
 

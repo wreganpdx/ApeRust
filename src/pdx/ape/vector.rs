@@ -17,13 +17,13 @@ use std::fmt;
 use std::f64;
 #[allow(unused_variables)]
 #[derive(Default)]
-pub struct vector
+pub struct Vector
 {
     pub x:f64,
     pub y:f64,
 }
 
-impl vector
+impl Vector
 {
 
     pub fn get_x(&mut self)-> f64
@@ -34,14 +34,14 @@ impl vector
     {
         return self.y.clone();
     }
-	pub fn new(x: f64, y: f64) -> vector 
+	pub fn new(x: f64, y: f64) -> Vector 
     {
-        vector { x: x, y: y }
+        Vector { x: x, y: y }
     }
 
-    pub fn clone(&self) -> vector 
+    pub fn clone(&self) -> Vector 
     {
-        return vector::new(self.x.clone(), self.y.clone());
+        return Vector::new(self.x.clone(), self.y.clone());
     }
 
     pub fn set_to(&mut self, px: f64, py: f64)
@@ -49,48 +49,48 @@ impl vector
 		self.x = px;
 		self.y = py;
 	}
-    pub fn copy(&mut self, v:&vector)
+    pub fn copy(&mut self, v:&Vector)
     {
         self.x = v.x;
         self.y = v.y;
 	}
 
-    pub fn dot(&self, v:&vector)->f64 
+    pub fn dot(&self, v:&Vector)->f64 
     {
 		return self.x * v.x + self.y * v.y;
 	}
 
-    pub fn cross(&self, v:&vector)-> f64
+    pub fn cross(&self, v:&Vector)-> f64
     {
 		return self.x * v.y - self.y * v.x;
 	}
 
-    pub fn plus(&self, v:&vector)-> vector
+    pub fn plus(&self, v:&Vector)-> Vector
     {
-		return vector::new(self.x + v.x, self.y + v.y);
+		return Vector::new(self.x + v.x, self.y + v.y);
 	}
 
     		
-	pub fn plus_equals(&mut self, v:&vector)
+	pub fn plus_equals(&mut self, v:&Vector)
     {
         self.x += v.x;
         self.y += v.y;
 	}
 
-    pub fn minus(&self, v:&vector) ->vector 
+    pub fn minus(&self, v:&Vector) ->Vector 
     {
-		return vector::new(self.x - v.x, self.y - v.y);  
+		return Vector::new(self.x - v.x, self.y - v.y);  
 	}
 
-    pub fn minus_equals(&mut self, v:&vector)
+    pub fn minus_equals(&mut self, v:&Vector)
     {
         self.x -= v.x;
         self.y -= v.y;
 	}
 
-    pub fn mult(& self, s:f64)->vector 
+    pub fn mult(& self, s:f64)->Vector 
     {
-        return vector::new(self.x *s, self.y *s);
+        return Vector::new(self.x *s, self.y *s);
 	}
 
     pub fn mult_equals(&mut self, s:f64)
@@ -99,12 +99,12 @@ impl vector
         self.y *= s;
 	}
 
-    pub fn times(&self, v:&vector) ->vector 
+    pub fn times(&self, v:&Vector) ->Vector 
     {
-		return vector::new(self.x * v.x, self.y * v.y);  
+		return Vector::new(self.x * v.x, self.y * v.y);  
 	}
 
-    pub fn times_equals(&mut self, v:&vector)
+    pub fn times_equals(&mut self, v:&Vector)
     {
 		self.x = self.x * v.x;
         self.y = self.y * v.y;  
@@ -118,11 +118,11 @@ impl vector
         self.y /= s;
 	}
 
-    pub fn divided_by(&self, mut s:f64) ->vector 
+    pub fn divided_by(&self, mut s:f64) ->Vector 
     {
         if s == 0.0
         { s = 0.0001;}
-		return vector::new(self.x / s, self.y /s);  
+		return Vector::new(self.x / s, self.y /s);  
 	}
 
     pub fn magnitude(&self)->f64 
@@ -136,11 +136,11 @@ impl vector
         let mut c:f64 = w/b;
         b = (b+c) * 0.5;
         let mut a:f64 = b-c;
-        if (a < 0.0)
+        if a < 0.0
         {
             a *= -1.0;
         }
-        while (a > 0.2)
+        while a > 0.2
         {
             c = w/b;
             b = (b+c) * 0.5;
@@ -153,7 +153,7 @@ impl vector
     pub fn mag_or_one(&self)->f64 
     {
         let mag = self.magnitude();
-        if (mag < 1.0)
+        if mag < 1.0
         {
             return 1.0
         }
@@ -165,9 +165,9 @@ impl vector
         return f64::sqrt(self.x * self.x + self.y * self.y);
     }
 
-    pub fn distance(&self, v:&vector)->f64 
+    pub fn distance(&self, v:&Vector)->f64 
     {
-        let delta:vector = self.minus(&v);
+        let delta:Vector = self.minus(&v);
         let mut mag:f64 = delta.magnitude();
         if mag == 0.0
         {
@@ -175,7 +175,7 @@ impl vector
         }
         return mag;
     }
-    pub fn normalize(&mut self)->vector 
+    pub fn normalize(&mut self)->Vector 
     {
         let mut m:f64 = self.magnitude();
         if m == 0.0
@@ -194,25 +194,25 @@ impl vector
         }
         self.mult_equals(1.0/m);
 	}
-	pub fn rotate(&self, r:&f64) ->vector 
+	pub fn rotate(&self, r:&f64) ->Vector 
     {
         let c = r.cos();
         let s = r.sin();
-        return vector::new(self.x*c-self.y*s,self.x*s+self.y*c);
+        return Vector::new(self.x*c-self.y*s,self.x*s+self.y*c);
 	}
 
-    pub fn swap(&self)-> vector
+    pub fn swap(&self)-> Vector
     {
-        return vector::new(self.y.clone(), self.x.clone());
+        return Vector::new(self.y.clone(), self.x.clone());
     }
 
-    pub fn swap_with_neg_y(&self)-> vector
+    pub fn swap_with_neg_y(&self)-> Vector
     {
-        return vector::new(-self.y.clone(), self.x.clone());
+        return Vector::new(-self.y.clone(), self.x.clone());
     }
 }
 
-impl fmt::Debug for vector {
+impl fmt::Debug for Vector {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Vector {{ x: {}, y: {} }}", self.x, self.y)
     }

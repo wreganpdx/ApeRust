@@ -17,22 +17,22 @@ use std::fmt;
 
 #[allow(unused_variables)]
 #[derive(Default)]
-pub struct interval
+pub struct Interval
 {
     pub min:f64,
     pub max:f64,
 }
 
-impl interval
+impl Interval
 {
-	pub fn new(min: f64, max: f64) -> interval 
+	pub fn new(min: f64, max: f64) -> Interval 
     {
-        interval { min:min, max:max }
+        Interval { min:min, max:max }
     }
 }
 
-impl fmt::Debug for interval {
+impl fmt::Debug for Interval {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "interval {{ min: {}, max: {} }}", self.min, self.max)
+        write!(f, "Interval {{ min: {}, max: {} }}", self.min, self.max)
     }
 }

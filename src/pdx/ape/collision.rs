@@ -7,32 +7,32 @@ Final Project
 */
 
 /**
- * interval.rs
+ * collision.rs
  * 
- * Summary: Simple interval for deciding the minimum and maximum for an object. Basically used to decide which objects may be about to collide.
+ * Summary: Simple collision for deciding the minimum and maximum for an object. Basically used to decide which objects may be about to collide.
  * 
  * For more information, see  https://github.com/arctwelve/ape-js-port/tree/master/org/cove/ape
  */
-use std::fmt;
-use crate::vector::vector;
+//use std::fmt;
+use crate::vector::Vector;
 
 #[allow(unused_variables)]
 #[derive(Default)]
-pub struct collision
+pub struct Collision
 {
-    pub vn:vector,
-    pub vt:vector,
+    pub vn:Vector,
+    pub vt:Vector,
 }
 
-impl collision
+impl Collision
 {
-	pub fn new(vn:vector, vt:vector) -> collision 
+	pub fn new(vn:Vector, vt:Vector) -> Collision 
     {
-        collision { vn:vn, vt:vt}
+        Collision { vn:vn, vt:vt}
     }
 
-    pub fn clone(&self) -> collision
+    pub fn clone(&self) -> Collision
     {
-        return collision::new(self.vn.clone(), self.vt.clone());
+        return Collision::new(self.vn.clone(), self.vt.clone());
     }
 }

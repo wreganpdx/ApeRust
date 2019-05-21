@@ -1,30 +1,30 @@
-use crate::vector::vector;
-use crate::APEngine::APValues;
+use crate::vector::Vector;
+use crate::ap_engine::APValues;
 use std::f64;
 
 #[derive(Default)]
-pub struct rim_particle
+pub struct RimParticle
 {
     pub speed:f64,
-    curr:vector,
-    prev:vector,
+    curr:Vector,
+    prev:Vector,
     wr:f64,
     av:f64,
     max_torque:f64,
 }
 
-impl rim_particle
+impl RimParticle
 {
-    pub fn new()->rim_particle
+    pub fn new()->RimParticle
     {
-		let mut p = rim_particle::default();
+		let p = RimParticle::default();
         return p;
     }
-    pub fn set_prev(&mut self, vec:&vector)
+    pub fn set_prev(&mut self, vec:&Vector)
     {
         self.prev = vec.clone();
     }
-    pub fn get_curr(&mut self)->vector
+    pub fn get_curr(&mut self)->Vector
     {
         return self.curr.clone();
     }
@@ -53,8 +53,8 @@ impl rim_particle
         self.wr = r;
         self.speed = 0.0;
         self.av = 0.0;
-        self.curr = vector::new(r.clone(), 0.0);
-        self.prev = vector::new(0.0,0.0);
+        self.curr = Vector::new(r.clone(), 0.0);
+        self.prev = Vector::new(0.0,0.0);
     }
 
     pub fn get_angular_velocity(&mut self)->&f64
@@ -78,7 +78,7 @@ impl rim_particle
         dx = dx/len;
         dy = dy/len;
 
-        self.curr.plus_equals(&vector::new(self.speed*dx, self.speed*dy));
+        self.curr.plus_equals(&Vector::new(self.speed*dx, self.speed*dy));
 
         let ox = self.prev.get_x();
         let oy = self.prev.get_y();
@@ -86,7 +86,7 @@ impl rim_particle
         self.prev.y = self.curr.get_y().clone();
         let px = self.prev.get_x();
         let py = self.prev.get_y();
-        self.curr.plus_equals(&vector::new(ap.damping * (px - ox), ap.damping * (py-oy)));
+        self.curr.plus_equals(&Vector::new(ap.damping * (px - ox), ap.damping * (py-oy)));
         let clen:f64 = self.curr.length();
         let diff = (clen - self.wr) / clen;
         self.curr.minus_equals(&self.curr.mult(diff));

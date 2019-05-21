@@ -20,24 +20,25 @@ extern crate graphics;
 extern crate glutin_window;
 extern crate opengl_graphics;
 
-use piston::window::WindowSettings;
-use piston::event_loop::*;
+//use piston::window::WindowSettings;
+//use piston::event_loop::*;
 use piston::input::*;
-use glutin_window::GlutinWindow as Window;
-use opengl_graphics::{ GlGraphics, OpenGL };
+//use glutin_window::GlutinWindow as Window;
+use opengl_graphics::GlGraphics;
+//use opengl_graphics::OpenGL;
 
-use crate::circle_particle::circle_particle;
-use crate::vector::vector;
-use crate::particle_collection::particle_collection;
+use crate::circle_particle::CircleParticle;
+use crate::vector::Vector;
+use crate::particle_collection::ParticleCollection;
 extern crate time;
 
 
 
 #[derive(Default)]
-pub struct APEngine
+pub struct ApEngine
 {
-	pub force:vector,
-	pub massless_force:vector,
+	pub force:Vector,
+	pub massless_force:Vector,
 	time_step:f64,
 	last_step:f64,
 	pub delta:f64,
@@ -45,7 +46,7 @@ pub struct APEngine
 	pub damping:f64,
 	constraint_cycles:i64,
 	constraint_collision_cycles:i64,
-	part_collection:Vec<particle_collection>,
+	part_collection:Vec<ParticleCollection>,
 	id_count:i64,
 }
 
@@ -57,19 +58,19 @@ pub trait Paint
 #[derive(Default)]
 pub struct APValues
 {
-	pub force:vector,
-	pub massless_force:vector,
+	pub force:Vector,
+	pub massless_force:Vector,
 	pub damping:f64,
 	pub time_step:f64,
 }
 
-impl Paint for APEngine
+impl Paint for ApEngine
 {
 	fn paint(&mut self, args: &RenderArgs, gl:&mut GlGraphics)
 	{
 		use graphics::*;
 		const GREEN: [f32; 4] = [0.6, 0.6, 0.6, 1.0];
-		gl.draw(args.viewport(), |c, gl| {
+		gl.draw(args.viewport(), |_c, gl| {
             // Clear the screen.
             clear(GREEN, gl);
         });
@@ -82,18 +83,18 @@ impl Paint for APEngine
 impl APValues
 {
 	
-	pub fn new(_damping:&f64, m_force:&vector, force:&vector, time:&f64) -> APValues
+	pub fn new(_damping:&f64, m_force:&Vector, force:&Vector, time:&f64) -> APValues
 	{
 		let damping:f64 = _damping.clone();
-		let massless_force:vector = m_force.clone();
-		let force:vector = force.clone();
+		let massless_force:Vector = m_force.clone();
+		let force:Vector = force.clone();
 		let time_step:f64 = time.clone();
 		APValues { force:force, massless_force:massless_force, damping:damping, time_step:time_step}
 	}
 }
 
 
-impl APEngine
+impl ApEngine
 {
 	/**
 		 * The main step function of the engine. This method should be called
@@ -102,7 +103,7 @@ impl APEngine
 		 * this in your main program loop. 
 		 */		
 
-	pub fn get_circle_by_id(&mut self, i:i64)->&mut circle_particle
+	pub fn get_circle_by_id(&mut self, i:i64)->&mut CircleParticle
 	{
 		for p in self.part_collection.iter_mut()
 		{
@@ -158,12 +159,12 @@ impl APEngine
 			return false;
 		}
 		self.integrate();
-		for i in 0..self.constraint_cycles
+		for _i in 0..self.constraint_cycles
 		{
 			self.satisfy_constraints();
 		}
 
-		for i in 0..self.constraint_collision_cycles
+		for _i in 0..self.constraint_collision_cycles
 		{
 			self.satisfy_constraints();
 			self.check_collisions();
@@ -219,9 +220,9 @@ impl APEngine
 		self.last_step = cur;
 		self.num_groups = 0;
 		//self.groups = new Array();	
-		self.force = vector::new(0.0,0.0);
-		self.massless_force = vector::new(0.0,0.0);
-		self.damping = 1.0-(delta);
+		self.force = Vector::new(0.0,0.0);
+		self.massless_force = Vector::new(0.0,0.0);
+		self.damping = 1.0 - delta;
 		self.constraint_cycles = 0;
 		self.constraint_collision_cycles = 1;
 		println!("Ape Engine Initialized");
@@ -234,21 +235,21 @@ impl APEngine
 		return &self.damping
 	}
 
-	pub fn new() -> APEngine
+	pub fn new() -> ApEngine
 	{
-		return APEngine::default();
+		return ApEngine::default();
 	}
 
-	pub fn add_particle_collection(&mut self, pc:particle_collection)
+	pub fn add_particle_collection(&mut self, pc:ParticleCollection)
 	{
 		self.part_collection.push(pc);
 	}
 
-	pub fn set_massless_force(&mut self, v:vector)
+	pub fn set_massless_force(&mut self, v:Vector)
 	{
 		self.massless_force = v;
 	}
-	pub fn set_force(&mut self, v:vector)
+	pub fn set_force(&mut self, v:Vector)
 	{
 		self.force = v;
 	}

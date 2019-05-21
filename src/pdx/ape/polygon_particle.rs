@@ -24,53 +24,53 @@ use piston::input::*;
 use opengl_graphics::{ GlGraphics};
 
 
-use crate::vector::vector;
-use crate::interval::interval;
-use crate::collision::collision;
-use crate::particle::particle;
-use crate::APEngine::APValues;
-use crate::APEngine::Paint;
+use crate::vector::Vector;
+use crate::interval::Interval;
+use crate::collision::Collision;
+use crate::particle::Particle;
+use crate::ap_engine::APValues;
+use crate::ap_engine::Paint;
 use std::any::Any;
 use std::f64;
-use std::num::FpCategory::Infinite;
+//use std::num::FpCategory::Infinite;
 use num_traits;
-use std::num::FpCategory;
-use num_traits::float::FloatCore;
+//use std::num::FpCategory;
+//use num_traits::float::FloatCore;
 
 #[allow(unused_variables)]
 #[derive(Default)]
-pub struct polygon_particle 
+pub struct PolygonParticle 
 {
 	pub id:i64,
     radian:f64,
     density:f64,
-    original_vertices:Vec<vector>,
-    vertices:Vec<vector>,
+    original_vertices:Vec<Vector>,
+    vertices:Vec<Vector>,
     num_vertices:usize,
-    axes:Vec<vector>,
-    curr:vector,
-    prev:vector,
-    temp:vector,
-    samp:vector,
-    forces:vector,
-    velocity:vector,
+    axes:Vec<Vector>,
+    curr:Vector,
+    prev:Vector,
+    temp:Vector,
+    samp:Vector,
+    forces:Vector,
+    velocity:Vector,
     mass:f64,
     friction:f64,
     elasticity:f64,
     rest_loops:i64,
     rest_count:i64,
-    center:vector,
+    center:Vector,
     pinned:bool,
-    pinned_to: Vec<Box<particle>>,//to make this work, it had to be a vector, but only one should be stored here.
-    pin:vector,
+    pinned_to: Vec<Box<Particle>>,//to make this work, it had to be a vector, but only one should be stored here.
+    pin:Vector,
     smashable:bool,
     max_exit_velocity:f64,
     at_rest:bool,
     left_max:f64,
     right_max:f64,
     multi_sampe:i64,
-    coll:collision,
-    interval:interval, 
+    coll:Collision,
+    interval:Interval, 
     kfr:f64,
     inv_mass:f64,
     fixed:bool,
@@ -81,11 +81,11 @@ pub struct polygon_particle
     secondary_color:[f32; 4]
 }
 
-impl polygon_particle
+impl PolygonParticle
 {
-    pub fn new(id:i64)->polygon_particle
+    pub fn new(id:i64)->PolygonParticle
     {
-		let mut p = polygon_particle::default();
+		let mut p = PolygonParticle::default();
 		p.set_id(id);
         return p;
     }
@@ -97,16 +97,16 @@ impl polygon_particle
 		self.vertices = Vec::new();
 		self.original_vertices = Vec::new();
 		
-		self.original_vertices.push(vector::new(width/2.0, height/2.0));
-		self.original_vertices.push(vector::new(-width/2.0, height/2.0));
-		self.original_vertices.push(vector::new(-width/2.0, -height/2.0));
-		self.original_vertices.push(vector::new(width/2.0, -height/2.0));
+		self.original_vertices.push(Vector::new(width/2.0, height/2.0));
+		self.original_vertices.push(Vector::new(-width/2.0, height/2.0));
+		self.original_vertices.push(Vector::new(-width/2.0, -height/2.0));
+		self.original_vertices.push(Vector::new(width/2.0, -height/2.0));
 		
 		self.num_vertices = self.original_vertices.len();
 
 		self.axes = Vec::new();
-		self.axes.push(vector::new(0.0,0.0));
-		self.axes.push(vector::new(0.0,0.0));
+		self.axes.push(Vector::new(0.0,0.0));
+		self.axes.push(Vector::new(0.0,0.0));
 		println!("rect init");
 		self.set_radian(0.0);
 		println!("rect init complete");
@@ -116,10 +116,10 @@ impl polygon_particle
 	}
 
 	
-	pub fn get_interval_and_axe(&mut self, i:usize)->(vector, interval)
+	pub fn get_interval_and_axe(&mut self, i:usize)->(Vector, Interval)
 	{
 		//println!("made it here: {:?}", self.axes );
-		let vec:vector = self.axes[i].clone();
+		let vec:Vector = self.axes[i].clone();
 		//println!("made it here: {:?}", self.axes );
 		let c:f64 =  self.get_curr().dot(&vec);
 		//println!("made it here: {:?}", self.axes );
@@ -137,7 +137,7 @@ impl polygon_particle
 				pos_rad = rad;
 			}
 		}
-		let interv:interval = interval::new(c + neg_rad,c + pos_rad );
+		let interv:Interval = Interval::new(c + neg_rad,c + pos_rad );
 		return (vec, interv);
 		//self.interval.min = c + negRad;
 		//self.interval.max = c + posRad;
@@ -153,18 +153,18 @@ impl polygon_particle
 		}
 	}
 
-	pub fn get_vertices_and_position(&mut self)->(&Vec<vector>, vector)
+	pub fn get_vertices_and_position(&mut self)->(&Vec<Vector>, Vector)
 	{
 		return (&self.vertices, self.curr.clone());
 	}
 
-	pub fn get_vertices(&mut self)->&Vec<vector>
+	pub fn get_vertices(&mut self)->&Vec<Vector>
 	{
 		return &self.vertices;
 	}
 }
 
-impl Paint for polygon_particle
+impl Paint for PolygonParticle
 {
 	fn paint(&mut self, args: &RenderArgs, gl:&mut GlGraphics)
 	{
@@ -180,14 +180,14 @@ impl Paint for polygon_particle
 	}
 }
 
-impl PartialEq for polygon_particle 
+impl PartialEq for PolygonParticle 
 {
-    fn eq(&self, other: &polygon_particle) -> bool {
+    fn eq(&self, other: &PolygonParticle) -> bool {
         self.id == other.id
     }
 }
 
-impl particle for polygon_particle 
+impl Particle for PolygonParticle 
 {
 	fn set_id(&mut self, i:i64)
 	{
@@ -227,30 +227,30 @@ impl particle for polygon_particle
         self.elasticity = e;
     }
 
-	fn get_curr(&self)-> &vector
+	fn get_curr(&self)-> &Vector
     {
         return &self.curr;
     }
-	fn set_curr(&mut self, c:&vector)
+	fn set_curr(&mut self, c:&Vector)
     {
         self.curr.copy(c);
     }
 
-	fn get_position(&self)-> vector
+	fn get_position(&self)-> Vector
     {
         return self.curr.clone();
     }
-	fn set_position(&mut self, c:&vector)
+	fn set_position(&mut self, c:&Vector)
     {
         self.curr.copy(c);
         self.prev.copy(c);
     }
 
-	fn get_prev(&self)-> &vector
+	fn get_prev(&self)-> &Vector
     {
         return &self.prev;
     }
-	fn set_prev(&mut self, p:&vector)
+	fn set_prev(&mut self, p:&Vector)
     {
          self.prev.copy(p);
     }
@@ -294,60 +294,60 @@ impl particle for polygon_particle
     }
     
 
-	fn get_samp(&self)-> vector
+	fn get_samp(&self)-> Vector
     {
         return self.samp.clone();
     }
-	fn set_samp(&mut self, s:vector)
+	fn set_samp(&mut self, s:Vector)
     {
         self.samp.copy(&s);
     }
 
-	fn get_interval(&self)-> &interval
+	fn get_interval(&self)-> &Interval
     {
         return &self.interval;
     }
-	fn set_interval(&mut self, i:interval)
+	fn set_interval(&mut self, i:Interval)
     {
         self.interval.max = i.max;
         self.interval.min = i.min;
     }
 
-	fn get_temp(&self)-> vector
+	fn get_temp(&self)-> Vector
     {
         return self.temp.clone();
     }
-	fn set_temp(&mut self, t:&vector)
+	fn set_temp(&mut self, t:&Vector)
     {
         self.temp.copy(t);
     }
 
-	fn get_forces(&self)-> vector
+	fn get_forces(&self)-> Vector
     {
         return self.forces.clone();
     }
-	fn set_forces(&mut self, f:&vector)
+	fn set_forces(&mut self, f:&Vector)
     {
         self.forces.copy(f);
     }
 
-	fn get_collision(&self)-> &collision
+	fn get_collision(&self)-> &Collision
     {
         return &self.coll;
     }
-	fn set_collision(&mut self, f:&collision)
+	fn set_collision(&mut self, f:&Collision)
     {
         self.coll = f.clone();
     }
 /*
-	fn get_parent(&self)-> Box<particle_collection>
+	fn get_parent(&self)-> Box<ParticleCollection>
 	{
 		return &self.collection;
 	}
 
 	This is probably never going to happen because Rust says you can't have an object reference in more than one place.
 
-	fn set_parent(&mut self, pc:&particle_collection)
+	fn set_parent(&mut self, pc:&ParticleCollection)
 	{
 		self.collection = Box::new(pc);
 	}
@@ -358,7 +358,7 @@ impl particle for polygon_particle
 	{
 		return self.axes.len();
 	}
-	fn get_axes(&mut self)->&Vec<vector>
+	fn get_axes(&mut self)->&Vec<Vector>
 	{
 			return &self.axes;
 	}
@@ -371,10 +371,10 @@ impl particle for polygon_particle
 		let mut j:usize = self.num_vertices - 1;
 		for i in 0..self.num_vertices
 		{
-			let e0:vector = self.vertices[j].clone();
-			let e1:vector = self.vertices[i].clone();
-			let e:vector = e1.minus(&e0);
-			let curr_axis:vector = (vector::new(-e.y, e.x)).normalize();
+			let e0:Vector = self.vertices[j].clone();
+			let e1:Vector = self.vertices[i].clone();
+			let e:Vector = e1.minus(&e0);
+			let curr_axis:Vector = (Vector::new(-e.y, e.x)).normalize();
 			self.axes.push(curr_axis);
 			j=i;
 		}
@@ -382,7 +382,7 @@ impl particle for polygon_particle
 
 
 
-	fn get_projection(&mut self, axis:&vector)->&interval 
+	fn get_projection(&mut self, axis:&Vector)->&Interval 
 	{
 		let c:f64 = self.curr.dot(axis);
 		
@@ -399,7 +399,7 @@ impl particle for polygon_particle
 				pos_rad = rad;
 			}
 		}
-		let i:interval = interval::new(c + neg_rad,c + pos_rad );
+		let i:Interval = Interval::new(c + neg_rad,c + pos_rad );
 		self.set_interval(i);
 		//self.interval.min = c + negRad;
 		//self.interval.max = c + posRad;
@@ -472,33 +472,33 @@ impl particle for polygon_particle
 			_pin = null;*/
     }
 
-	fn get_pinned_to(&self)-> &particle
+	fn get_pinned_to(&self)-> &Particle
     {
         return self;
     }
 
-	fn set_pinned_to(&mut self, p:&particle, v:&vector)
+	fn set_pinned_to(&mut self, _p:&Particle, v:&Vector)
     {
         self.pinned = true;
         self.pin = v.clone();
         //self.pinned_to = p;
     }
 
-	fn set_pin(&mut self, v:vector)
+	fn set_pin(&mut self, v:Vector)
     {
         self.pin = v;
     }
 
-	fn get_pin(&self)-> vector
+	fn get_pin(&self)-> Vector
     {
         return self.pin.clone();
     }
 
-	fn get_center(&self)-> vector
+	fn get_center(&self)-> Vector
     {
         return self.center.clone();
     }
-	fn set_center(&mut self, c:vector)
+	fn set_center(&mut self, c:Vector)
     {
         self.center = c.clone();
     }
@@ -530,11 +530,11 @@ impl particle for polygon_particle
         self.max_exit_velocity = ev;
     }
 
-	fn get_velocity(&self)-> vector
+	fn get_velocity(&self)-> Vector
     {   
         return self.curr.minus(&self.prev);
     }
-	fn set_velocity(&mut self, i:&vector)
+	fn set_velocity(&mut self, i:&Vector)
     {
         self.velocity.copy(i);
     }
@@ -584,12 +584,12 @@ impl particle for polygon_particle
         self.right_max = rm;
     }
 
-	fn add_force(&mut self, f:vector)
+	fn add_force(&mut self, f:Vector)
     {
         self.forces.plus_equals(&f.mult(self.inv_mass));
     }
 
-	fn add_massless_force(&mut self, f:vector)
+	fn add_massless_force(&mut self, f:Vector)
     {
         self.forces.plus_equals(&f);
     }
@@ -609,7 +609,7 @@ impl particle for polygon_particle
 			// integrate
 			self.set_temp(&self.get_position());
 			
-			let mut nv:vector = self.velocity.plus(&self.forces.mult(ap.time_step));
+			let nv:Vector = self.velocity.plus(&self.forces.mult(ap.time_step));
 			self.curr.plus_equals(&nv.mult(ap.damping));
 			self.set_prev(&self.get_temp());
 
@@ -617,15 +617,15 @@ impl particle for polygon_particle
 			self.forces.set_to(0.0,0.0);
     }
 
-	fn get_components(&mut self, cn:&vector)->collision
+	fn get_components(&mut self, cn:&Vector)->Collision
     {
-		let mut vel:vector = self.get_velocity();
+		let vel:Vector = self.get_velocity();
 		let vdotn:f64 = cn.dot(&vel);
 		self.coll.vn = cn.mult(vdotn);
 		self.coll.vt = vel.minus(&self.coll.vn);	
 		return self.coll.clone();
     }
-	fn resolve_collision(&mut self, mtd:&vector, vel:&vector, n:&vector, d:f64, o:i32)
+	fn resolve_collision(&mut self, mtd:&Vector, vel:&Vector, _n:&Vector, _d:f64, _o:i32)
 	{
 		if !self.fixed
 		{
@@ -645,7 +645,7 @@ impl particle for polygon_particle
 		}
 			
 	}
-	fn resolve_velocities(&mut self, dv:vector, dw:f64, normal:vector)
+	fn resolve_velocities(&mut self, dv:Vector, _dw:f64, _normal:Vector)
     {
 		if !self.fixed
 		{
@@ -665,7 +665,7 @@ impl particle for polygon_particle
 		return 0.0;
     }
 
-	fn set_ang_velocity(&self, a:f64)
+	fn set_ang_velocity(&self, _a:f64)
     {
 		//do nothing
     }

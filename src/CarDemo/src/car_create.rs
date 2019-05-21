@@ -1,46 +1,46 @@
-extern crate ApeRust;
-use ApeRust::polygon_particle::polygon_particle;
-use ApeRust::circle_particle::circle_particle;
-use ApeRust::particle_collection::particle_collection;
-use ApeRust::poly_poly_constraint::poly_poly_constraint;
-use ApeRust::vector::vector;
-use ApeRust::particle::particle;
+extern crate ape_rust;
+//use ape_rust::polygon_particle::PolygonParticle;
+use ape_rust::circle_particle::CircleParticle;
+use ape_rust::particle_collection::ParticleCollection;
+use ape_rust::poly_poly_constraint::PolyPolyConstraint;
+use ape_rust::vector::Vector;
+use ape_rust::particle::Particle;
 
-pub fn car_create(part:&mut particle_collection, tuple:(i64,i64,i64))
+pub fn car_create(part:&mut ParticleCollection, tuple:(i64,i64,i64))
 {
-    let ctr = &part.get_center();
-    let rw:f64 = 14.0;
-    let rh:f64 = 14.0;
+    let _ctr = &part.get_center();
+    let _rw:f64 = 14.0;
+    let _rh:f64 = 14.0;
     let rad:f64 = 14.0;
 
-    let mut cpA = circle_particle::new(tuple.0);
+    let mut cp_a = CircleParticle::new(tuple.0);
 
 
-    let mut cpB = circle_particle::new(tuple.1);
+    let mut cp_b = CircleParticle::new(tuple.1);
 
-    cpA.set_collidable(true);
-    cpB.set_collidable(true);
+    cp_a.set_collidable(true);
+    cp_b.set_collidable(true);
 
-    cpA.init_circle(rad);
-    cpB.init_circle(rad);
+    cp_a.init_circle(rad);
+    cp_b.init_circle(rad);
 
-    cpA.init_wheel(2.0);
-    cpB.init_wheel(2.0);
+    cp_a.init_wheel(2.0);
+    cp_b.init_wheel(2.0);
     
 
     
-    cpA.set_position(&vector::new(140.0, 10.0));
-    cpB.set_position(&vector::new(200.0, 10.0));
+    cp_a.set_position(&Vector::new(140.0, 10.0));
+    cp_b.set_position(&Vector::new(200.0, 10.0));
 
-    let mut sprA = poly_poly_constraint::new(tuple.2);
+    let mut spr_a = PolyPolyConstraint::new(tuple.2);
 
-    sprA.init_spring((tuple.0,tuple.1), cpA.get_position().distance(&cpB.get_position()), 0.5);
+    spr_a.init_spring((tuple.0,tuple.1), cp_a.get_position().distance(&cp_b.get_position()), 0.5);
 
-    sprA.circ_circ = true;
-    sprA.set_height(2.0);
+    spr_a.circ_circ = true;
+    spr_a.set_height(2.0);
 
-    part.add_circle_particle(cpA);
-    part.add_circle_particle(cpB);
+    part.add_circle_particle(cp_a);
+    part.add_circle_particle(cp_b);
     
-    part.add_poly_poly_constraint(sprA);
+    part.add_poly_poly_constraint(spr_a);
 }

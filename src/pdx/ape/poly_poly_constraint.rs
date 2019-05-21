@@ -7,26 +7,26 @@ use piston::input::*;
 use opengl_graphics::{ GlGraphics};
 
 
-use crate::vector::vector;
-use crate::interval::interval;
-use crate::collision::collision;
-use crate::particle::particle;
-use crate::polygon_particle::polygon_particle;
-use crate::circle_particle::circle_particle;
-use crate::rectangle_particle::rectangle_particle;
-use crate::APEngine::APEngine;
-use crate::APEngine::APValues;
-use crate::collision_detector;
-use crate::APEngine::Paint;
-use std::any::Any;
+use crate::vector::Vector;
+//use crate::interval::Interval;
+//use crate::collision::Collision;
+use crate::particle::Particle;
+use crate::polygon_particle::PolygonParticle;
+use crate::circle_particle::CircleParticle;
+use crate::rectangle_particle::RectangleParticle;
+//use crate::ap_engine::ApEngine;
+//use crate::ap_engine::APValues;
+//use crate::collision_detector;
+use crate::ap_engine::Paint;
+//use std::any::Any;
 use std::f64;
 use std::default::Default;
 
 #[derive(Default)]
-pub struct poly_poly_constraint
+pub struct PolyPolyConstraint
 {
 	particles:(i64,i64),
-	delta:vector,
+	delta:Vector,
 	min_ang:f64,
 	max_ang:f64,	
 	low_mid:f64,
@@ -43,11 +43,11 @@ pub struct poly_poly_constraint
 	width:f64,
 	height:f64,
 	radian:f64,
-	curr:vector,
+	curr:Vector,
     primary_color:[f32; 4],
     secondary_color:[f32; 4]
 }
-impl Paint for poly_poly_constraint
+impl Paint for PolyPolyConstraint
 {
 	fn paint(&mut self, args: &RenderArgs, gl:&mut GlGraphics)
 	{
@@ -61,7 +61,7 @@ impl Paint for poly_poly_constraint
         });
 	}
 }
-impl poly_poly_constraint
+impl PolyPolyConstraint
 {
 	pub fn set_height(&mut self, h:f64)
 	{
@@ -116,9 +116,9 @@ impl poly_poly_constraint
 	{
 		return self.is_angular;
 	}
-	pub fn new(id:i64)->poly_poly_constraint
+	pub fn new(id:i64)->PolyPolyConstraint
     {
-		let mut p = poly_poly_constraint::default();
+		let mut p = PolyPolyConstraint::default();
 		p.primary_color= [1.0, 0.0, 0.0, 1.0];
 		p.is_angular = false;
 		p.is_spring = false;
@@ -154,12 +154,12 @@ impl poly_poly_constraint
 		self.max_ang = p;
 	}
 
-	pub fn calcMidAngles(&mut self)
+	pub fn calc_mid_angles(&mut self)
 	{
 		self.low_mid = (self.max_ang - self.min_ang) / 2.0;
 		self.high_mid = (self.max_ang +self.min_ang) / 2.0;
 	}
-	pub fn get_curr_angle(&self, p1:&mut polygon_particle,p2:&mut polygon_particle)->f64
+	pub fn get_curr_angle(&self, p1:&mut PolygonParticle,p2:&mut PolygonParticle)->f64
 	{
 		let ang1:f64 = p1.get_radian().clone();
 		let ang2:f64 = p2.get_radian().clone();
@@ -170,13 +170,13 @@ impl poly_poly_constraint
 		
 		return ang;
 	}
-	pub fn set_angle(&mut self, p1:&vector,p2:&vector)
+	pub fn set_angle(&mut self, p1:&Vector,p2:&Vector)
 	{
 		let angle = p2.minus(p1);
 		self.radian = f64::atan2(angle.x, -angle.y) + (f64::consts::PI) * 0.5;
 
 	}
-	pub fn set_position(&mut self, p1:&vector,p2:&vector)
+	pub fn set_position(&mut self, p1:&Vector,p2:&Vector)
 	{
 		self.curr = p2.plus(p1);
 		self.curr.mult_equals(0.5);
@@ -187,33 +187,33 @@ impl poly_poly_constraint
 		return &self.curr_length; 
 	}
 
-	pub fn resolve_angular(&mut self,p1:&mut polygon_particle,p2:&mut polygon_particle) 
+	pub fn resolve_angular(&mut self,p1:&mut PolygonParticle,p2:&mut PolygonParticle) 
 	{
 		let ca:f64 = self.get_curr_angle(p1,p2);
-		let mut delta:f64 = 0.0;
+		let mut _delta:f64 = 0.0;
 		
 		let mut diff:f64 = self.high_mid - ca;
 		while diff > (f64::consts::PI) * 2.0 {diff -= (f64::consts::PI) * 2.0};
 		while diff < -(f64::consts::PI) * 2.0 {diff += (f64::consts::PI) * 2.0};
 		
 		if diff > self.low_mid{
-			delta = diff - self.low_mid;
+			_delta = diff - self.low_mid;
 		}else if diff < - self.low_mid{
-			delta = diff + self.low_mid;
+			_delta = diff + self.low_mid;
 		}else{
 			return;
 		}
 		
-		let invInertiaTotal:f64 = p1.get_inv_inertia() + p2.get_inv_inertia() ;
-		let deltaAng1:f64 = delta * p1.get_inv_inertia() /invInertiaTotal;
-		let deltaAng2:f64 = delta * -p2.get_inv_inertia() /invInertiaTotal;
-		p1.set_ang_velocity(p1.get_ang_velocity() -deltaAng1 * self.stiffness); 
-		p2.set_ang_velocity(p2.get_ang_velocity() -deltaAng2 * self.stiffness); 			
+		let inv_inertia_total:f64 = p1.get_inv_inertia() + p2.get_inv_inertia() ;
+		let delta_ang1:f64 = _delta * p1.get_inv_inertia() /inv_inertia_total;
+		let delta_ang2:f64 = _delta * -p2.get_inv_inertia() /inv_inertia_total;
+		p1.set_ang_velocity(p1.get_ang_velocity() -delta_ang1 * self.stiffness); 
+		p2.set_ang_velocity(p2.get_ang_velocity() -delta_ang2 * self.stiffness); 			
 	}
 	/**
 		 * @private
 		 */			
-	pub fn resolve_spring(&mut self,p1:&mut polygon_particle,p2:&mut polygon_particle) 
+	pub fn resolve_spring(&mut self,p1:&mut PolygonParticle,p2:&mut PolygonParticle) 
 	{
 		if p1.get_fixed() && p2.get_fixed()
 		{ return;}
@@ -223,13 +223,13 @@ impl poly_poly_constraint
 		
 		//let deltaLength:f64 = self.curr_length;			
 		let diff:f64 = (&self.curr_length - self.rest_length) / (&self.curr_length * (p1.get_inv_mass() + p2.get_inv_mass()));
-		let dmds:vector = self.delta.mult(diff * self.stiffness);
+		let dmds:Vector = self.delta.mult(diff * self.stiffness);
 	
 		p1.set_curr(&p1.get_position().minus(&dmds.mult(p1.get_inv_mass())));
 		p2.set_curr(&p2.get_position().plus(&dmds.mult(p2.get_inv_mass())));
 	}
 
-	pub fn resolve_spring_rect_rect(&mut self,p1:&mut rectangle_particle,p2:&mut rectangle_particle) 
+	pub fn resolve_spring_rect_rect(&mut self,p1:&mut RectangleParticle,p2:&mut RectangleParticle) 
 	{
 		if p1.get_fixed() && p2.get_fixed()
 		{ return;}
@@ -239,7 +239,7 @@ impl poly_poly_constraint
 		
 		//let deltaLength:f64 = self.curr_length;			
 		let diff:f64 = (&self.curr_length - self.rest_length) / (&self.curr_length * (p1.get_inv_mass() + p2.get_inv_mass()));
-		let dmds:vector = self.delta.mult(diff * self.stiffness);
+		let dmds:Vector = self.delta.mult(diff * self.stiffness);
 	
 		if !p1.get_fixed()
 		{
@@ -253,7 +253,7 @@ impl poly_poly_constraint
 		self.set_position(&p1.get_position(),&p2.get_position());
 	}
 
-	pub fn resolve_spring_circ_circ(&mut self,p1:&mut circle_particle,p2:&mut circle_particle) 
+	pub fn resolve_spring_circ_circ(&mut self,p1:&mut CircleParticle,p2:&mut CircleParticle) 
 	{
 		if p1.get_fixed() && p2.get_fixed()
 		{ return;}
@@ -263,7 +263,7 @@ impl poly_poly_constraint
 		
 		//let deltaLength:f64 = self.curr_length;			
 		let diff:f64 = (&self.curr_length - self.rest_length) / (&self.curr_length * (p1.get_inv_mass() + p2.get_inv_mass()));
-		let dmds:vector = self.delta.mult(diff * self.stiffness);
+		let dmds:Vector = self.delta.mult(diff * self.stiffness);
 	
 		if !p1.get_fixed()
 		{
@@ -278,7 +278,7 @@ impl poly_poly_constraint
 		self.set_position(&p1.get_position(),&p2.get_position());
 	}
 
-	pub fn resolve_spring_circ_rect(&mut self,p1:&mut circle_particle,p2:&mut rectangle_particle) 
+	pub fn resolve_spring_circ_rect(&mut self,p1:&mut CircleParticle,p2:&mut RectangleParticle) 
 	{
 		if p1.get_fixed() && p2.get_fixed()
 		{ return;}
@@ -288,7 +288,7 @@ impl poly_poly_constraint
 		
 		//let deltaLength:f64 = self.curr_length;			
 		let diff:f64 = (&self.curr_length - self.rest_length) / (&self.curr_length * (p1.get_inv_mass() + p2.get_inv_mass()));
-		let dmds:vector = self.delta.mult(diff * self.stiffness);
+		let dmds:Vector = self.delta.mult(diff * self.stiffness);
 
 
 		
