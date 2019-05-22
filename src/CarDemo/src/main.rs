@@ -160,10 +160,8 @@ fn main()
 
     loop
     {
-        for i in 0..100
-        {
-            _step = ap.step();
-        }
+        
+        ap.step();
         
         if now_render.elapsed().as_millis() * 3 > 100
         {

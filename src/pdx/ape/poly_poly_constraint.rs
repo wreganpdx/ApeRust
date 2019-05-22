@@ -45,8 +45,9 @@ pub struct PolyPolyConstraint
 	radian:f64,
 	curr:Vector,
     primary_color:[f32; 4],
-    secondary_color:[f32; 4]
+    secondary_color:[f32; 4],
 }
+
 impl Paint for PolyPolyConstraint
 {
 	fn paint(&mut self, args: &RenderArgs, gl:&mut GlGraphics)
@@ -61,6 +62,7 @@ impl Paint for PolyPolyConstraint
         });
 	}
 }
+
 impl PolyPolyConstraint
 {
 	pub fn set_height(&mut self, h:f64)
