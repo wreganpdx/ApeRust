@@ -667,12 +667,19 @@ impl Particle for CircleParticle
 
 	fn get_ang_velocity(&self)->f64
     {
-		return 0.0;
+		if self.is_wheel
+        {
+            return self.rim.get_angular_velocity().clone();
+        }
+        return 0.0;
     }
 
-	fn set_ang_velocity(&self, _a:f64)
+	fn set_ang_velocity(&mut self, _a:f64)
     {
-		//do nothing
+		if self.is_wheel
+        {
+            self.rim.set_angular_velocity(_a);
+        }
     }
 
 	fn get_radian(&self)->&f64

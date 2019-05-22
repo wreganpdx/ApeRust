@@ -165,7 +165,7 @@ pub trait Particle
 
 	fn get_ang_velocity(&self)->f64;
 
-	fn set_ang_velocity(&self, a:f64);
+	fn set_ang_velocity(&mut self, a:f64);
 
 	fn get_radian(&self)->&f64;
 	fn set_radian(&mut self, r:f64);

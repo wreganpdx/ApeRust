@@ -665,7 +665,7 @@ impl Particle for PolygonParticle
 		return 0.0;
     }
 
-	fn set_ang_velocity(&self, _a:f64)
+	fn set_ang_velocity(&mut self, _a:f64)
     {
 		//do nothing
     }

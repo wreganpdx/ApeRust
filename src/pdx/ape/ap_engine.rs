@@ -147,6 +147,7 @@ impl ApEngine
 
 		if elapsed > self.delta
 		{
+			//print!("Elapsed: {}", elapsed);
 			//print!(" *Delta: {} * ", self.delta);
 			//print!(" *Stepping Elapsed: {} * ", elapsed);
 			//println!("--");
@@ -155,7 +156,7 @@ impl ApEngine
 		}
 		else
 		{
-			//sprint!("Elapsed: {}", elapsed);
+			print!("Return Elapsed: {}", elapsed);
 			return false;
 		}
 		self.integrate();

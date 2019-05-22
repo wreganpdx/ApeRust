@@ -57,7 +57,7 @@ impl RimParticle
         self.prev = Vector::new(0.0,0.0);
     }
 
-    pub fn get_angular_velocity(&mut self)->&f64
+    pub fn get_angular_velocity(&self)->&f64
     {
         return &self.av;
     }

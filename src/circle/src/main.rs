@@ -121,6 +121,7 @@ fn main()
     //p_circle2.set_friction(0.0);
 
     let mut list:ParticleCollection = ParticleCollection::new(ap.get_new_id());
+    let mut list2:ParticleCollection = ParticleCollection::new(ap.get_new_id());
 
     list.add_rectangle_particle(left);
     list.add_rectangle_particle(right);
@@ -131,8 +132,11 @@ fn main()
     list.add_circle_particle(p_circle);
     list.add_circle_particle(p_circle2);
     list.set_collide_internal(true);
+   // list.set_collide_internal(true);
 
     ap.add_particle_collection(list);
+    //ap.add_particle_collection(list2);
+
 
     ap.set_force(Vector::new(0.0,75.0));
 

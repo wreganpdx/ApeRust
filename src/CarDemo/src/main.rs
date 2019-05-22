@@ -160,7 +160,11 @@ fn main()
 
     loop
     {
-        _step = ap.step();
+        for i in 0..100
+        {
+            _step = ap.step();
+        }
+        
         if now_render.elapsed().as_millis() * 3 > 100
         {
             while let Some(e) = events.next(&mut window) 
@@ -217,5 +221,5 @@ fn main()
 pub fn speed_up_wheel(i:i64, s:f64, ap:&mut ApEngine)
 {
     let p = &mut ap.get_circle_by_id(i);
-    p.set_speed(s);
+    p.set_ang_velocity(s);
 }
