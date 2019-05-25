@@ -78,6 +78,7 @@ pub struct CircleParticle
 	rim:RimParticle,
 	traction:f64,
 	norm_slip:Vector,
+    orientation:Vector,
     primary_color:[f32; 4],
     secondary_color:[f32; 4]
 }
@@ -90,8 +91,9 @@ impl CircleParticle
 		self.rim.init(self.radius, mt);
 		//self.rim.max_torque = mt;
 		self.friction = 0.0;
-		self.traction = 1.0;
+		self.set_traction(1.0);
 		self.is_wheel = true;
+        self.orientation = Vector::new(0.0,0.0);
 	}
     pub fn new(id:i64)->CircleParticle
     {
@@ -140,9 +142,9 @@ impl CircleParticle
 		let mut tan = self.rim.get_curr().swap_with_neg_y();
 		tan.normalize_self();
 		let wheel_surf_vel = tan.mult(self.rim.get_speed());
-		
-		let combined_vel = self.get_velocity().plus(&wheel_surf_vel);
-		let cp = combined_vel.cross(&n);
+		self.velocity.plus_equals(&wheel_surf_vel);
+		//let combined_vel = self.get_velocity().plus(&wheel_surf_vel);
+		let cp = self.velocity.cross(&n);
 		tan.mult_equals(cp);
 		let prev = &self.rim.get_curr().minus(&tan);
 	 	self.rim.set_prev(prev);
@@ -158,6 +160,16 @@ impl CircleParticle
 	{
 		self.rim.speed = s;
 	}
+
+    
+    pub fn get_traction(& self)->f64
+    {
+        return 1.0 - self.traction;
+    }
+    pub fn set_traction(&mut self, t:f64)
+    {
+        self.traction = 1.0-t;
+    }
 }
 
 impl Paint for CircleParticle
@@ -594,7 +606,8 @@ impl Particle for CircleParticle
 			if self.is_wheel
 			{
 				self.rim.update(ap);
-				self.radian = f64::atan2(self.rim.get_curr_x(), self.rim.get_curr_y()) + f64::consts::PI//Math.atan2(orientation.y, orientation.x) + Math.PI;
+                //self.orientation.set_to(self.rim.curr.get_x(), self.rim.curr.get_y());
+				self.radian = f64::atan2(self.rim.get_curr_y(), self.rim.get_curr_x()) + f64::consts::PI//Math.atan2(orientation.y, orientation.x) + Math.PI;
 			}
     }
 
@@ -724,4 +737,5 @@ impl Particle for CircleParticle
 	{
 		return (180.0/f64::consts::PI) * self.get_radian();
 	}
+
 }

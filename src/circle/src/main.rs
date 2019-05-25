@@ -99,23 +99,33 @@ fn main()
     p_circle.init_circle(25.0);
     p_circle2.init_circle(25.0);
 
+    let mut p_wheel: CircleParticle = CircleParticle::new(ap.get_new_id());
+    p_wheel.init_circle(25.0);
+
+    p_wheel.init_wheel(2.0);
+
     p_circle.set_position(&Vector::new(200.0, 100.0));
     p_circle2.set_position(&Vector::new(600.0, 100.0));
 
+    p_wheel.set_position(&Vector::new(600.0, 140.0));
+
     p_circle.set_friction(0.0);
     p_circle2.set_friction(0.0);
+
+    p_wheel.set_friction(0.0);
 
     p_circle.set_collidable(true);
     p_circle2.set_collidable(true);
+    p_wheel.set_collidable(true);
 
     p_circle.set_elasticity(0.7);
     p_circle2.set_elasticity(0.7);
+    p_wheel.set_elasticity(0.7);
 
-    p_circle.set_friction(0.0);
-    p_circle2.set_friction(0.0);
     
     p_circle.set_velocity(&Vector::new(0.0, 400.0));
     p_circle2.set_velocity(&Vector::new(0.0, 400.0));
+    p_wheel.set_velocity(&Vector::new(0.0, 400.0));
 
     //p_circle.set_friction(0.0);
     //p_circle2.set_friction(0.0);
@@ -131,6 +141,7 @@ fn main()
     list.add_rectangle_particle(right_bar);
     list.add_circle_particle(p_circle);
     list.add_circle_particle(p_circle2);
+    list.add_circle_particle(p_wheel);
     list.set_collide_internal(true);
    // list.set_collide_internal(true);
 
