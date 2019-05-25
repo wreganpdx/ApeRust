@@ -591,12 +591,24 @@ impl Particle for CircleParticle
 			// integrate
 			self.set_temp(&self.get_position());
 			//println!("velocity {:?}", self.velocity);
-			self.velocity.mult_equals(ap.damping);
+			//self.velocity.mult_equals(ap.damping);
 			self.velocity.plus_equals(&self.forces.mult(ap.time_step));
 			//let mut nv:Vector = self.velocity.plus(&self.forces.mult(ap.time_step));
 			//println!("velocity {:?}, adding: {:?}", self.velocity,self.velocity.mult(ap.time_step));
 			self.curr.plus_equals(&self.velocity.mult(ap.time_step));
-			
+			/*
+            			// integrate
+			self.set_temp(&self.get_position());
+            self.forces.mult_equals(ap.time_step);
+            let nv = self.velocity.plus(&self.forces);
+            //self.curr.plu
+			//println!("velocity {:?}", self.velocity);
+			//self.velocity.mult_equals(ap.damping);
+			//self.velocity.plus_equals(&self.forces.mult(ap.time_step));
+			//let mut nv:Vector = self.velocity.plus(&self.forces.mult(ap.time_step));
+			//println!("velocity {:?}, adding: {:?}", self.velocity,self.velocity.mult(ap.time_step));
+			self.curr.plus_equals(&nv.mult(ap.damping));
+			*/
 			
 			self.set_prev(&self.get_temp());
 
@@ -623,9 +635,11 @@ impl Particle for CircleParticle
 	{
 		if !self.fixed
 		{
-			  self.curr.plus_equals(mtd);
+            self.prev.copy(&self.curr.clone());
+			self.curr.plus_equals(mtd);
             self.velocity.copy(vel);
 /*
+            self.prev = self.curr.minus(vel);	
 			self.curr.plus_equals(mtd);
             //println!("{:?}", self.velocity);
             let mag = self.velocity.mag_or_one();
