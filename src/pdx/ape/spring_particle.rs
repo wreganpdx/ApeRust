@@ -40,10 +40,6 @@ pub struct SpringParticle
 	pub circ_circ:bool,
 	pub rect_circ:bool,
 	radian:f64,
-	curr:Vector,
-    primary_color:[f32; 4],
-    secondary_color:[f32; 4],
-	is_collidable:bool,
 
 	pub id:i64,
     density:f64,
@@ -880,11 +876,11 @@ impl Particle for SpringParticle
 		return (180.0/f64::consts::PI) * self.get_radian();
 	}
 
-    fn set_primary_color(&mut self, c:[f32;4])
+    pub fn set_primary_color(&mut self, c:[f32;4])
     {
         self.primary_color = c;
     }
-	fn set_secondary_color(&mut self, c:[f32;4])
+	pub fn set_secondary_color(&mut self, c:[f32;4])
     {
         self.secondary_color = c;
     }

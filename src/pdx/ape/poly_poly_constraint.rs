@@ -83,11 +83,11 @@ impl PolyPolyConstraint
 	{
 		return self.radian.clone();
 	}
-	fn set_primary_color(&mut self, c:[f32;4])
+	pub fn set_primary_color(&mut self, c:[f32;4])
     {
         self.primary_color = c;
     }
-	fn set_secondary_color(&mut self, c:[f32;4])
+	pub fn set_secondary_color(&mut self, c:[f32;4])
     {
         self.secondary_color = c;
     }

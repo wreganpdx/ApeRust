@@ -6,7 +6,7 @@ use ape_rust::poly_poly_constraint::PolyPolyConstraint;
 use ape_rust::vector::Vector;
 use ape_rust::particle::Particle;
 
-pub fn car_create(part:&mut ParticleCollection, tuple:(i64,i64,i64))
+pub fn car_create(part:&mut ParticleCollection, tuple:(i64,i64,i64), col_c:[f32; 4], col_e:[f32; 4])
 {
     let _ctr = &part.get_center();
     let _rw:f64 = 14.0;
@@ -39,8 +39,16 @@ pub fn car_create(part:&mut ParticleCollection, tuple:(i64,i64,i64))
     spr_a.circ_circ = true;
     spr_a.set_height(2.0);
 
+    cp_a.set_primary_color(col_c.clone());
+    cp_b.set_primary_color(col_c.clone());
+    spr_a.set_primary_color(col_c.clone());
+
+    cp_a.set_secondary_color(col_e.clone());
+    cp_b.set_secondary_color(col_e.clone());
+    spr_a.set_secondary_color(col_e.clone());
+
+
     part.add_circle_particle(cp_a);
     part.add_circle_particle(cp_b);
-    
     part.add_poly_poly_constraint(spr_a);
 }

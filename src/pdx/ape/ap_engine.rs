@@ -48,6 +48,7 @@ pub struct ApEngine
 	constraint_collision_cycles:i64,
 	part_collection:Vec<ParticleCollection>,
 	id_count:i64,
+	background_color:[f32; 4]
 }
 
 pub trait Paint
@@ -69,10 +70,10 @@ impl Paint for ApEngine
 	fn paint(&mut self, args: &RenderArgs, gl:&mut GlGraphics)
 	{
 		use graphics::*;
-		const GREEN: [f32; 4] = [0.6, 0.6, 0.6, 1.0];
+		
 		gl.draw(args.viewport(), |_c, gl| {
             // Clear the screen.
-            clear(GREEN, gl);
+            clear(self.background_color, gl);
         });
 
 		//let rect = rectangle::rectangle_by_corners(0.0, 0.0, args.width/2.0, args.height/2.0);
@@ -151,12 +152,14 @@ impl ApEngine
 			//print!(" *Delta: {} * ", self.delta);
 			//print!(" *Stepping Elapsed: {} * ", elapsed);
 			//println!("--");
+			//print!("Elapsed: {}", elapsed);
 			self.time_step = elapsed;
 			self.last_step = cur;
 		}
 		else
 		{
-			print!("Return Elapsed: {}", elapsed);
+			//print!("Time {:?}", timespec);
+			//print!("Return Elapsed: {}", elapsed);
 			return false;
 		}
 		self.integrate();
@@ -238,7 +241,14 @@ impl ApEngine
 
 	pub fn new() -> ApEngine
 	{
-		return ApEngine::default();
+		let mut ap = ApEngine::default();
+		ap.background_color = [0.6, 0.6, 0.6, 1.0];
+		return ap;
+	}
+
+	pub fn set_background_color(&mut self, col:[f32;4])
+	{
+		self.background_color = col;
 	}
 
 	pub fn add_particle_collection(&mut self, pc:ParticleCollection)

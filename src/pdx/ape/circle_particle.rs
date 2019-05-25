@@ -134,15 +134,15 @@ impl CircleParticle
 		return &self.radius;
 	}
 
-	pub fn resolve_wheel(&mut self, _mtd:&Vector, _vel:&Vector, n:&Vector, _d:f64, _o:i32)
+	pub fn resolve_wheel(&mut self, n:Vector)
 	{
-		
+
 		let mut tan = self.rim.get_curr().swap_with_neg_y();
 		tan.normalize_self();
 		let wheel_surf_vel = tan.mult(self.rim.get_speed());
 		
 		let combined_vel = self.get_velocity().plus(&wheel_surf_vel);
-		let cp = combined_vel.cross(n);
+		let cp = combined_vel.cross(&n);
 		tan.mult_equals(cp);
 		let prev = &self.rim.get_curr().minus(&tan);
 	 	self.rim.set_prev(prev);
@@ -646,10 +646,17 @@ impl Particle for CircleParticle
 
 		if self.is_wheel
 		{
-			self.resolve_wheel(mtd, vel, n, d, o);
+            let mut val = 1.0;
+            if d * (o as f64) < 0.0
+            {
+                val = -1.0;
+            }
+            let vec = n.mult(val);
+			self.resolve_wheel(vec);
 		}
 			
 	}
+    
 	fn resolve_velocities(&mut self, dv:Vector, _dw:f64, _normal:Vector)
     {
 		if !self.fixed

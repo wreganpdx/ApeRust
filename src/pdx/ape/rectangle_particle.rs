@@ -129,13 +129,12 @@ impl Paint for RectangleParticle
 	fn paint(&mut self, args: &RenderArgs, gl:&mut GlGraphics)
 	{
 		use graphics::*;
-		const RED:   [f32; 4] = [1.0, 0.0, 0.0, 1.0];
 		let rect = rectangle::rectangle_by_corners(0.0, 0.0, self.get_width(), self.get_height());
 
 		gl.draw(args.viewport(), |c, gl| 
 		{
             let transform = c.transform.trans(self.get_curr_x(), self.get_curr_y()).rot_rad(self.get_radian().clone()).trans(-self.get_width()/2.0, -self.get_height()/2.0);
-            rectangle(RED, rect, transform, gl);
+            rectangle(self.primary_color, rect, transform, gl);
         });
 	}
 }

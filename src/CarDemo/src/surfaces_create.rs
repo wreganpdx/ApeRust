@@ -7,7 +7,7 @@ use ape_rust::rectangle_particle::RectangleParticle;
 use ape_rust::vector::Vector;
 use ape_rust::particle::Particle;
 
-pub fn surfaces_create(part:&mut ParticleCollection, tuple:(i64,i64,i64,i64,i64,i64,i64,i64,i64,i64,i64,i64,i64,i64,i64,i64,))
+pub fn surfaces_create(part:&mut ParticleCollection, tuple:(i64,i64,i64,i64,i64,i64,i64,i64,i64,i64,i64,i64,i64,i64,i64,i64,), col_d:[f32; 4], col_b:[f32; 4])
 {
     /*
     var floor:RectangleParticle = new RectangleParticle(340,327,550,50,0,true);
@@ -82,6 +82,7 @@ pub fn surfaces_create(part:&mut ParticleCollection, tuple:(i64,i64,i64,i64,i64,
     floor.create_rectangle(550.0,50.0);
     floor.set_fixed(true);
     floor.set_collidable(true);
+    floor.set_primary_color(col_d.clone());
     part.add_rectangle_particle(floor);
 
 
@@ -90,6 +91,7 @@ pub fn surfaces_create(part:&mut ParticleCollection, tuple:(i64,i64,i64,i64,i64,
     ceil.create_rectangle(649.0,80.0);
     ceil.set_fixed(true);
     ceil.set_collidable(true);
+    ceil.set_primary_color(col_d.clone());
     part.add_rectangle_particle(ceil);
 
 
@@ -99,6 +101,7 @@ pub fn surfaces_create(part:&mut ParticleCollection, tuple:(i64,i64,i64,i64,i64,
     ramp_right.set_fixed(true);
     ramp_right.set_radian(0.405);
     ramp_right.set_collidable(true);
+    ramp_right.set_primary_color(col_d.clone());
     part.add_rectangle_particle(ramp_right);
 
 
@@ -108,6 +111,7 @@ pub fn surfaces_create(part:&mut ParticleCollection, tuple:(i64,i64,i64,i64,i64,
     ramp_left.set_fixed(true);
     ramp_left.set_radian(-0.7);
     ramp_left.set_collidable(true);
+    ramp_left.set_primary_color(col_d.clone());
     part.add_rectangle_particle(ramp_left);
 
 
@@ -116,6 +120,7 @@ pub fn surfaces_create(part:&mut ParticleCollection, tuple:(i64,i64,i64,i64,i64,
     ramp.init_circle(60.0);
     ramp.set_fixed(true);
     ramp.set_collidable(true);
+    ramp.set_primary_color(col_d.clone());
     part.add_circle_particle(ramp);
 
 
@@ -124,6 +129,7 @@ pub fn surfaces_create(part:&mut ParticleCollection, tuple:(i64,i64,i64,i64,i64,
     bump.init_circle(400.0);
     bump.set_fixed(true);
     bump.set_collidable(true);
+    bump.set_primary_color(col_d.clone());
     part.add_circle_particle(bump);
 
 
@@ -133,6 +139,7 @@ pub fn surfaces_create(part:&mut ParticleCollection, tuple:(i64,i64,i64,i64,i64,
     bounce_pad.set_fixed(true);
     bounce_pad.set_collidable(true);
     bounce_pad.set_elasticity(4.0);
+    bounce_pad.set_primary_color(col_d.clone());
     part.add_rectangle_particle(bounce_pad);
 
 
@@ -141,6 +148,7 @@ pub fn surfaces_create(part:&mut ParticleCollection, tuple:(i64,i64,i64,i64,i64,
     left_wall.create_rectangle(30.0,500.0);
     left_wall.set_fixed(true);
     left_wall.set_collidable(true);
+    left_wall.set_primary_color(col_d.clone());
     part.add_rectangle_particle(left_wall);
 
 
@@ -149,6 +157,7 @@ pub fn surfaces_create(part:&mut ParticleCollection, tuple:(i64,i64,i64,i64,i64,
     left_wall_ch.create_rectangle(20.0,150.0);
     left_wall_ch.set_fixed(true);
     left_wall_ch.set_collidable(true);
+    left_wall_ch.set_primary_color(col_d.clone());
     part.add_rectangle_particle(left_wall_ch);
 
     let mut left_wall_ch_i = RectangleParticle::new(tuple.0);
@@ -156,6 +165,7 @@ pub fn surfaces_create(part:&mut ParticleCollection, tuple:(i64,i64,i64,i64,i64,
     left_wall_ch_i.create_rectangle(20.0,94.0);
     left_wall_ch_i.set_fixed(true);
     left_wall_ch_i.set_collidable(true);
+    left_wall_ch_i.set_primary_color(col_d.clone());
     part.add_rectangle_particle(left_wall_ch_i);
 
     let mut left_wall_ch_a = RectangleParticle::new(tuple.0);
@@ -164,6 +174,7 @@ pub fn surfaces_create(part:&mut ParticleCollection, tuple:(i64,i64,i64,i64,i64,
     left_wall_ch_a.set_fixed(true);
     left_wall_ch_a.set_collidable(true);
     left_wall_ch_a.set_radian(-0.7);
+    left_wall_ch_a.set_primary_color(col_d.clone());
     part.add_rectangle_particle(left_wall_ch_a);
 
      let mut top_left_ang = RectangleParticle::new(tuple.0);
@@ -172,6 +183,7 @@ pub fn surfaces_create(part:&mut ParticleCollection, tuple:(i64,i64,i64,i64,i64,
     top_left_ang.set_fixed(true);
     top_left_ang.set_collidable(true);
     top_left_ang.set_radian(-0.7);
+    top_left_ang.set_primary_color(col_d.clone());
     part.add_rectangle_particle(top_left_ang);
 
     let mut right_wall = RectangleParticle::new(tuple.0);
@@ -179,6 +191,7 @@ pub fn surfaces_create(part:&mut ParticleCollection, tuple:(i64,i64,i64,i64,i64,
     right_wall.create_rectangle(50.0,500.0);
     right_wall.set_fixed(true);
     right_wall.set_collidable(true);
+    right_wall.set_primary_color(col_d.clone());
     part.add_rectangle_particle(right_wall);
 
     let mut bridge_start = RectangleParticle::new(tuple.0);
@@ -186,6 +199,7 @@ pub fn surfaces_create(part:&mut ParticleCollection, tuple:(i64,i64,i64,i64,i64,
     bridge_start.create_rectangle(75.0,25.0);
     bridge_start.set_fixed(true);
     bridge_start.set_collidable(true);
+    bridge_start.set_primary_color(col_d.clone());
     part.add_rectangle_particle(bridge_start);
 
     let mut bridge_end = RectangleParticle::new(tuple.0);
@@ -193,6 +207,7 @@ pub fn surfaces_create(part:&mut ParticleCollection, tuple:(i64,i64,i64,i64,i64,
     bridge_end.create_rectangle(100.0,15.0);
     bridge_end.set_fixed(true);
     bridge_end.set_collidable(true);
+    bridge_end.set_primary_color(col_d.clone());
     part.add_rectangle_particle(bridge_end);
 
 }

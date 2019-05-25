@@ -44,82 +44,17 @@ fn main()
     let mut gl:GlGraphics = GlGraphics::new(opengl);
     let mut ap:ApEngine = ApEngine::new();
 
-    ap.init(0.01);
+    ap.init(0.001);
 
-    //boundries
-    let mut left: RectangleParticle = RectangleParticle::new(ap.get_new_id());
-    let mut right: RectangleParticle = RectangleParticle::new(ap.get_new_id());
-    let mut top: RectangleParticle = RectangleParticle::new(ap.get_new_id());
-    let mut bottom: RectangleParticle = RectangleParticle::new(ap.get_new_id());
+  
 
-    left.create_rectangle(5.0,800.0);
-    right.create_rectangle(5.0,800.0);
-    top.create_rectangle(790.0,5.0);
-    bottom.create_rectangle(800.0,5.0);
+    let col_a = [51.0/255.0, 68.0/255.0, 51.0/255.0, 1.0];
+    let col_b = [51.0/255.0, 102.0/255.0, 170.0/255.0, 1.0];
+    let col_c = [170.0/255.0, 187.0/255.0, 187.0/255.0, 1.0];
+    let col_d = [102.0/255.0, 153.0/255.0, 170.0/255.0, 1.0];
+    let col_e = [119.0/255.0, 136.0/255.0, 119.0/255.0, 1.0];
 
-    left.set_position(&Vector::new(5.0, 400.0));
-    right.set_position(&Vector::new(797.5, 405.0));
-    top.set_position(&Vector::new(400.0, 802.5));
-    bottom.set_position(&Vector::new(400.0, 2.5));
-
-    left.set_collidable(true);
-    right.set_collidable(true);
-    top.set_collidable(true);
-    bottom.set_collidable(true);
-
-    left.set_fixed(true);
-    right.set_fixed(true);
-    top.set_fixed(true);
-    bottom.set_fixed(true);
-
-    //objects
-    let mut rect: RectangleParticle = RectangleParticle::new(ap.get_new_id());
-    let mut circ: CircleParticle = CircleParticle::new(ap.get_new_id());
-    let mut p_circle: CircleParticle = CircleParticle::new(ap.get_new_id());
-    let mut wheel: CircleParticle = CircleParticle::new(ap.get_new_id());
-
-    
-    p_circle.init_circle(25.0);
-    wheel.init_circle(25.0);
-    wheel.init_wheel(2.0);
-
-    p_circle.set_position(&Vector::new(200.0, 600.0));
-
-    rect.create_rectangle(40.0,40.0);
-    circ.init_circle(20.0);
-
-    //p.set_radian(f64::consts::PI /2.0);
-    //p2.set_radian(f64::consts::PI /2.0);
-
-    rect.set_collidable(true);
-    circ.set_collidable(true);
-    wheel.set_collidable(true);
-    p_circle.set_collidable(true);
-
-    rect.set_elasticity(0.9);
-    circ.set_elasticity(0.9);
-    wheel.set_elasticity(0.9);
-
-    circ.set_position(&Vector::new(600.0,415.0));
-    rect.set_position(&Vector::new(225.0,415.0));
-    wheel.set_position(&Vector::new(400.0,215.0));
-
-    rect.set_velocity(&Vector::new(20.0,70.0));
-    circ.set_velocity(&Vector::new(20.0,-4.000));
-    wheel.set_velocity(&Vector::new(-200.0,30.0));
-
-    let mut list:ParticleCollection = ParticleCollection::new(ap.get_new_id());
-
-    list.add_rectangle_particle(rect);
-    list.add_circle_particle(circ);
-    list.add_rectangle_particle(left);
-    list.add_rectangle_particle(right);
-    list.add_rectangle_particle(top);
-    list.add_rectangle_particle(bottom);
-    list.add_circle_particle(wheel);
-    list.add_circle_particle(p_circle);
-
-    list.set_collide_internal(true);
+    ap.set_background_color(col_a.clone());
 
     let mut cap = ParticleCollection::new(ap.get_new_id());
     capsule_create::capsule_create(&mut cap, (ap.get_new_id(),ap.get_new_id(),ap.get_new_id()));
@@ -130,7 +65,8 @@ fn main()
         ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),  
         ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),  
         ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),  
-        ));
+        ),
+        col_d.clone(), col_b.clone());
 
     //let mut car = ParticleCollection::new(ap.get_new_id());
 
@@ -139,10 +75,9 @@ fn main()
     let mut car = ParticleCollection::new(ap.get_new_id());
     let wheel_id_1 = ap.get_new_id();
     let wheel_id_2 = ap.get_new_id();
-    car_create::car_create(&mut car, (wheel_id_1.clone(), wheel_id_2.clone(), ap.get_new_id()));
+    car_create::car_create(&mut car, (wheel_id_1.clone(), wheel_id_2.clone(), ap.get_new_id()), col_c.clone(), col_e.clone());
 
     ap.add_particle_collection(car);
-    ap.add_particle_collection(list);
     ap.add_particle_collection(cap);
     ap.add_particle_collection(surf);
     

@@ -6,16 +6,12 @@ extern crate opengl_graphics;
 
 use ape_rust::vector::Vector;
 use ape_rust::ap_engine::ApEngine;
-//use ape_rust::polygon_particle::PolygonParticle;
 use ape_rust::rectangle_particle::RectangleParticle;
 use ape_rust::circle_particle::CircleParticle;
-//use std::{thread, time};
 use std::time::Instant;
-//use std::time::Duration;
 use ape_rust::particle::Particle;
 use ape_rust::particle_collection::ParticleCollection;
 use ape_rust::ap_engine::Paint;
-//use crate object_helper::create_rectangle; 
 mod object_helper;
 
 use piston::window::WindowSettings;
@@ -25,7 +21,6 @@ use glutin_window::GlutinWindow as Window;
 use opengl_graphics::{ GlGraphics, OpenGL };
 use std::f64::consts::PI;
 
-//use std::f64;
 
 fn main() 
 {
