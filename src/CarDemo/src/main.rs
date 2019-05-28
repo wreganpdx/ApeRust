@@ -57,7 +57,7 @@ fn main()
     ap.set_background_color(col_a.clone());
 
     let mut cap = ParticleCollection::new(ap.get_new_id());
-    capsule_create::capsule_create(&mut cap, (ap.get_new_id(),ap.get_new_id(),ap.get_new_id()));
+    capsule_create::capsule_create(&mut cap, (ap.get_new_id(),ap.get_new_id(),ap.get_new_id()),col_c.clone());
 
     let mut surf = ParticleCollection::new(ap.get_new_id());
     surfaces_create::surfaces_create(&mut surf, (
@@ -96,7 +96,7 @@ fn main()
     loop
     {
         
-        ap.step();
+        _step = ap.step();
         
         if now_render.elapsed().as_millis() * 3 > 100
         {

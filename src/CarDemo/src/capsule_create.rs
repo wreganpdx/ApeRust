@@ -6,7 +6,7 @@ use ape_rust::poly_poly_constraint::PolyPolyConstraint;
 use ape_rust::vector::Vector;
 use ape_rust::particle::Particle;
 
-pub fn capsule_create(part:&mut ParticleCollection, tuple:(i64,i64,i64))
+pub fn capsule_create(part:&mut ParticleCollection, tuple:(i64,i64,i64), col_c:[f32; 4])
 {
     /*
     var capsuleP1:CircleParticle = new CircleParticle(300,10,14,false,1.3,0.4);
@@ -54,9 +54,12 @@ pub fn capsule_create(part:&mut ParticleCollection, tuple:(i64,i64,i64))
 
     spr_a.circ_circ = true;
     spr_a.set_height(28.0);
-
+    spr_a.set_primary_color(col_c.clone());
+    cp_a.set_primary_color(col_c.clone());
+    cp_b.set_primary_color(col_c.clone());
     part.add_circle_particle(cp_a);
     part.add_circle_particle(cp_b);
-    
+
+   
     part.add_poly_poly_constraint(spr_a);
 }

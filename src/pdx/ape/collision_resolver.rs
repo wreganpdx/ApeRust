@@ -76,7 +76,7 @@ pub fn resolve_circle_circle(pa:&mut CircleParticle, pb:&mut CircleParticle, nor
     
     let mtd:Vector = normal.mult(depth);       
 
-    let te:f64 = ( pa.get_elasticity() + pb.get_elasticity() ) * 0.5;
+    let te:f64 = ( pa.get_elasticity() + pb.get_elasticity() );
 
     let mut tf:f64  = 1.0 - (pa.get_friction() + pb.get_friction());
     if tf > 1.0
@@ -131,7 +131,7 @@ pub fn resolve_collision_rect_rect(pa:&mut RectangleParticle, pb:&mut RectangleP
     
     let mtd:Vector = normal.mult(depth);       
 
-    let te:f64 = ( pa.get_elasticity() + pb.get_elasticity() ) * 0.5;
+    let te:f64 = ( pa.get_elasticity() + pb.get_elasticity() );
 
     let mut tf:f64  = 1.0 - (pa.get_friction() + pb.get_friction());
     if tf > 1.0
@@ -187,7 +187,7 @@ pub fn resolve_collision_rect_circ(pa:&mut CircleParticle, pb:&mut RectanglePart
     
     let mtd:Vector = normal.mult(depth);       
 
-    let mut te:f64 = ( pa.get_elasticity() + pb.get_elasticity() ) * 0.5;
+    let mut te:f64 = ( pa.get_elasticity() + pb.get_elasticity() ) ;
     if te > 1.0
     {
         te = 1.0;

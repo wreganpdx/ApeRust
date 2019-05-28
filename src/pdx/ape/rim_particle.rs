@@ -84,8 +84,8 @@ impl RimParticle
         let oy = self.prev.get_y();
         self.prev.x = self.curr.get_x().clone();
         self.prev.y = self.curr.get_y().clone();
-        let px = self.prev.get_x();
-        let py = self.prev.get_y();
+        let px = self.prev.get_x().clone();
+        let py = self.prev.get_y().clone();
         self.curr.plus_equals(&Vector::new(ap.damping * (px - ox), ap.damping * (py-oy)));
         let clen:f64 = self.curr.length();
         let diff = (clen - self.wr) / clen;
