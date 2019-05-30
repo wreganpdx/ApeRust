@@ -8,7 +8,6 @@ pub mod ap_engine;
 pub mod particle;
 pub mod interval;
 pub mod collision;
-pub mod polygon_particle;
 pub mod particle_collection;
 pub mod circle_particle;
 pub mod collision_detector;

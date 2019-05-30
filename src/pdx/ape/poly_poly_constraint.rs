@@ -8,17 +8,10 @@ use opengl_graphics::{ GlGraphics};
 
 
 use crate::vector::Vector;
-//use crate::interval::Interval;
-//use crate::collision::Collision;
 use crate::particle::Particle;
-use crate::polygon_particle::PolygonParticle;
 use crate::circle_particle::CircleParticle;
 use crate::rectangle_particle::RectangleParticle;
-//use crate::ap_engine::ApEngine;
-//use crate::ap_engine::APValues;
-//use crate::collision_detector;
 use crate::ap_engine::Paint;
-//use std::any::Any;
 use std::f64;
 use std::default::Default;
 
@@ -161,17 +154,7 @@ impl PolyPolyConstraint
 		self.low_mid = (self.max_ang - self.min_ang) / 2.0;
 		self.high_mid = (self.max_ang +self.min_ang) / 2.0;
 	}
-	pub fn get_curr_angle(&self, p1:&mut PolygonParticle,p2:&mut PolygonParticle)->f64
-	{
-		let ang1:f64 = p1.get_radian().clone();
-		let ang2:f64 = p2.get_radian().clone();
-		
-		let mut ang:f64 = ang1 - ang2;
-		while ang > (f64::consts::PI) {ang -= (f64::consts::PI) * 2.0};
-		while ang < (f64::consts::PI) {ang += (f64::consts::PI) * 2.0};
-		
-		return ang;
-	}
+
 	pub fn set_angle(&mut self, p1:&Vector,p2:&Vector)
 	{
 		let angle = p2.minus(p1);
@@ -188,48 +171,8 @@ impl PolyPolyConstraint
 	{
 		return &self.curr_length; 
 	}
-
-	pub fn resolve_angular(&mut self,p1:&mut PolygonParticle,p2:&mut PolygonParticle) 
-	{
-		let ca:f64 = self.get_curr_angle(p1,p2);
-		let mut _delta:f64 = 0.0;
-		
-		let mut diff:f64 = self.high_mid - ca;
-		while diff > (f64::consts::PI) * 2.0 {diff -= (f64::consts::PI) * 2.0};
-		while diff < -(f64::consts::PI) * 2.0 {diff += (f64::consts::PI) * 2.0};
-		
-		if diff > self.low_mid{
-			_delta = diff - self.low_mid;
-		}else if diff < - self.low_mid{
-			_delta = diff + self.low_mid;
-		}else{
-			return;
-		}
-		
-		let inv_inertia_total:f64 = p1.get_inv_inertia() + p2.get_inv_inertia() ;
-		let delta_ang1:f64 = _delta * p1.get_inv_inertia() /inv_inertia_total;
-		let delta_ang2:f64 = _delta * -p2.get_inv_inertia() /inv_inertia_total;
-		p1.set_ang_velocity(p1.get_ang_velocity() -delta_ang1 * self.stiffness); 
-		p2.set_ang_velocity(p2.get_ang_velocity() -delta_ang2 * self.stiffness); 			
-	}
-	/**
-		 * @private
-		 */			
-	pub fn resolve_spring(&mut self,p1:&mut PolygonParticle,p2:&mut PolygonParticle) 
-	{
-		if p1.get_fixed() && p2.get_fixed()
-		{ return;}
-		self.curr_length = p1.get_position().distance(&p2.get_position());
-		self.delta = p1.get_position().minus(&p2.get_position());
-		
-		
-		//let deltaLength:f64 = self.curr_length;			
-		let diff:f64 = (&self.curr_length - self.rest_length) / (&self.curr_length * (p1.get_inv_mass() + p2.get_inv_mass()));
-		let dmds:Vector = self.delta.mult(diff * self.stiffness);
 	
-		p1.set_curr(&p1.get_position().minus(&dmds.mult(p1.get_inv_mass())));
-		p2.set_curr(&p2.get_position().plus(&dmds.mult(p2.get_inv_mass())));
-	}
+
 
 	pub fn resolve_spring_rect_rect(&mut self,p1:&mut RectangleParticle,p2:&mut RectangleParticle) 
 	{
@@ -238,8 +181,7 @@ impl PolyPolyConstraint
 		self.curr_length = p1.get_position().distance(&p2.get_position());
 		self.delta = p1.get_position().minus(&p2.get_position());
 		
-		
-		//let deltaLength:f64 = self.curr_length;			
+			
 		let diff:f64 = (&self.curr_length - self.rest_length) / (&self.curr_length * (p1.get_inv_mass() + p2.get_inv_mass()));
 		let dmds:Vector = self.delta.mult(diff * self.stiffness);
 	
@@ -261,9 +203,7 @@ impl PolyPolyConstraint
 		{ return;}
 		self.curr_length = p1.get_position().distance(&p2.get_position());
 		self.delta = p1.get_position().minus(&p2.get_position());
-		
-		
-		//let deltaLength:f64 = self.curr_length;			
+				
 		let diff:f64 = (&self.curr_length - self.rest_length) / (&self.curr_length * (p1.get_inv_mass() + p2.get_inv_mass()));
 		let dmds:Vector = self.delta.mult(diff * self.stiffness);
 	
@@ -287,8 +227,7 @@ impl PolyPolyConstraint
 		self.curr_length = p1.get_position().distance(&p2.get_position());
 		self.delta = p1.get_position().minus(&p2.get_position());
 		
-		
-		//let deltaLength:f64 = self.curr_length;			
+					
 		let diff:f64 = (&self.curr_length - self.rest_length) / (&self.curr_length * (p1.get_inv_mass() + p2.get_inv_mass()));
 		let dmds:Vector = self.delta.mult(diff * self.stiffness);
 

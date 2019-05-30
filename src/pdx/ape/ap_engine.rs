@@ -20,12 +20,8 @@ extern crate graphics;
 extern crate glutin_window;
 extern crate opengl_graphics;
 
-//use piston::window::WindowSettings;
-//use piston::event_loop::*;
 use piston::input::*;
-//use glutin_window::GlutinWindow as Window;
 use opengl_graphics::GlGraphics;
-//use opengl_graphics::OpenGL;
 
 use crate::circle_particle::CircleParticle;
 use crate::vector::Vector;
@@ -72,11 +68,9 @@ impl Paint for ApEngine
 		use graphics::*;
 		
 		gl.draw(args.viewport(), |_c, gl| {
-            // Clear the screen.
             clear(self.background_color, gl);
         });
 
-		//let rect = rectangle::rectangle_by_corners(0.0, 0.0, args.width/2.0, args.height/2.0);
 
 		self.paint_all(args, gl);
 	}
@@ -96,13 +90,7 @@ impl APValues
 
 
 impl ApEngine
-{
-	/**
-		 * The main step function of the engine. This method should be called
-		 * continously to advance the simulation. The faster this method is 
-		 * called, the faster the simulation will run. Usually you would call
-		 * this in your main program loop. 
-		 */		
+{	
 
 	pub fn get_circle_by_id(&mut self, i:i64)->&mut CircleParticle
 	{
@@ -148,18 +136,11 @@ impl ApEngine
 
 		if elapsed > self.delta
 		{
-			//print!("Elapsed: {}", elapsed);
-			//print!(" *Delta: {} * ", self.delta);
-			//print!(" *Stepping Elapsed: {} * ", elapsed);
-			//println!("--");
-			//print!("Elapsed: {}", elapsed);
 			self.time_step = elapsed;
 			self.last_step = cur;
 		}
 		else
 		{
-			//print!("Time {:?}", timespec);
-			//print!("Return Elapsed: {}", elapsed);
 			return false;
 		}
 		self.integrate();
@@ -185,7 +166,6 @@ impl ApEngine
 	}
 	pub fn check_collisions(&mut self)
 	{
-	//	println!("Check collisions");
 		let values:APValues = self.get_ap_values();
 		let length = self.part_collection.len();
 		for i in 0..length
@@ -217,13 +197,15 @@ impl ApEngine
 
 	pub fn init(&mut self,delta:f64)
 	{
+		/*in our case, delta is the ideal amount of time in seconds we want between engine steps*/
 		self.delta = delta;
+		/*in our case, time_step is the *actual* amount of time between time steps*/
 		self.time_step = 0.0;
+		
 		let timespec = time::get_time();
 		let cur = (timespec.sec as f64 * 1000.0) + (timespec.nsec as f64 / 1000.0 / 1000.0);
 		self.last_step = cur;
-		self.num_groups = 0;
-		//self.groups = new Array();	
+		self.num_groups = 0;	
 		self.force = Vector::new(0.0,0.0);
 		self.massless_force = Vector::new(0.0,0.0);
 		self.damping = 1.0 - delta;

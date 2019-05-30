@@ -80,7 +80,8 @@ pub struct CircleParticle
 	norm_slip:Vector,
     orientation:Vector,
     primary_color:[f32; 4],
-    secondary_color:[f32; 4]
+    secondary_color:[f32; 4],
+    last_delta:f64
 }
 
 impl CircleParticle
@@ -140,7 +141,7 @@ impl CircleParticle
 
 		let mut tan = self.rim.get_curr().swap_with_neg_y();
 		tan.normalize_self();
-		let wheel_surf_vel = tan.mult(self.rim.get_speed());
+		let wheel_surf_vel = tan.mult(self.rim.get_speed()).mult(1.0-self.last_delta);
 		self.velocity.plus_equals(&wheel_surf_vel);
 		//let combined_vel = self.get_velocity().plus(&wheel_surf_vel);
 		let cp = self.velocity.cross(&n);
@@ -152,6 +153,7 @@ impl CircleParticle
 		self.norm_slip.set_to(slip_speed * n.y , slip_speed * n.x);
 		//println!("normslip {:?}", self.norm_slip);
 		self.curr.plus_equals(&self.norm_slip);
+        
 		self.rim.damp_speed(self.traction);
 	}
 
@@ -582,7 +584,7 @@ impl Particle for CircleParticle
                 return;
             }
 			
-			
+            self.last_delta = ap.time_step;
 			// global forces
 			self.add_force(ap.force.clone());
 			self.add_massless_force(ap.massless_force.clone());
@@ -618,7 +620,7 @@ impl Particle for CircleParticle
 			{
 				self.rim.update(ap);
                 //self.orientation.set_to(self.rim.curr.get_x(), self.rim.curr.get_y());
-				self.radian = -f64::atan2(self.rim.get_curr_y(), self.rim.get_curr_x()) + f64::consts::PI//Math.atan2(orientation.y, orientation.x) + Math.PI;
+				self.radian = -(f64::atan2(self.rim.get_curr_y(), self.rim.get_curr_x()) + f64::consts::PI)//Math.atan2(orientation.y, orientation.x) + Math.PI;
 			}
     }
 

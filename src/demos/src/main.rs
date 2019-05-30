@@ -6,16 +6,11 @@ extern crate opengl_graphics;
 
 use ape_rust::vector::Vector;
 use ape_rust::ap_engine::ApEngine;
-//use ape_rust::polygon_particle::PolygonParticle;
 use ape_rust::rectangle_particle::RectangleParticle;
-//use ape_rust::circle_particle::CircleParticle;
-//use std::{thread, time};
 use std::time::Instant;
-//use std::time::Duration;
 use ape_rust::particle::Particle;
 use ape_rust::particle_collection::ParticleCollection;
 use ape_rust::ap_engine::Paint;
-//use crate object_helper::create_rectangle; 
 mod object_helper;
 
 use piston::window::WindowSettings;
@@ -23,9 +18,6 @@ use piston::event_loop::*;
 use piston::input::*;
 use glutin_window::GlutinWindow as Window;
 use opengl_graphics::{ GlGraphics, OpenGL };
-//use std::f64::consts::PI;
-
-//use std::f64;
 
 fn main() 
 {
@@ -120,38 +112,9 @@ fn main()
     list.add_rectangle_particle(top);
     list.add_rectangle_particle(bottom);
 
-    //list.add_circle_particle(p_circle);
-
     list.set_collide_internal(true);
 
     ap.add_particle_collection(list);
-   // ap.add_particle_collection(p3);
-
-   //ap.set_force(Vector::new(0.0,20.0));
-    /*
-    println!("v = {:?}, v2 = {:?}, v3 = {:?} , v4 = {:?} , v5 = {:?}  ", v, v2, v3, v4, v5);
-    v.set_to(4.0, 5.0);
-    println!("v set to 4, 5 = {:?} ", v);
-    v2.copy(&v);
-    println!("v2 copy v = {:?}", v2);
-    v2.plus_equals(&v);
-    println!("v2 plus Equals v {:?}", v2);
-    v2.minus_equals(&v);
-    println!("v2 minus Equals v {:?}", v2);
-    v4 = v4.mult(5.0);
-    println!("v4 = v4 mult 5.0 {:?}", v4);
-    v5 = v4.times(&v4);
-    println!("v5 = v4 times v4 {:?}", v5);
-    v5.div_equals(3.0);
-    println!("v5 divEquals 3.0 {:?}", v5);
-    let c = v5.magnitude();
-    println!("c equals magnitude of v5 {}", c);
-    let t = v2.distance(&v3);
-    println!("t distance v2, v3 {}", t);
-    v5 = v5.normalize();
-    v5 = v5.rotate(&0.52);
-    println!("Hello, World! {:?}, {:?}, {}, {}, {:?}, {:?}, {:?}, {:?}", c, t, v2.cross(&v), v2.dot(&v), v2.plus(&v), v2.minus(&v), v3, v5);
-*/
     let mut _step:bool = false;
     _step = ap.step();
     _step = ap.step();

@@ -17,19 +17,13 @@ Final Project
 use crate::vector::Vector;
 use crate::interval::Interval;
 use crate::collision::Collision;
-use crate::polygon_particle::PolygonParticle;
-//use crate::particle_collection::ParticleCollection;
-//use crate::ap_engine::ApEngine;
 use crate::ap_engine::APValues;
 use std::any::Any;
 
 //use std::default::Default;
 
 
-pub enum Shapes
-{
-	Polygon(PolygonParticle),
-}
+
 
 #[allow(unused_variables)]
 pub trait Particle 

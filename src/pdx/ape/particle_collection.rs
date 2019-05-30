@@ -16,7 +16,6 @@ Final Project
 
 use crate::vector::Vector;
 use crate::particle::Particle;
-use crate::polygon_particle::PolygonParticle;
 use crate::circle_particle::CircleParticle;
 use crate::rectangle_particle::RectangleParticle;
 use crate::poly_poly_constraint::PolyPolyConstraint;
@@ -40,7 +39,6 @@ use opengl_graphics::GlGraphics;
 pub struct ParticleCollection
 {
 	pub collide_internal:bool,
-    poly_particles:Vec<PolygonParticle>,
 	circle_particles:Vec<CircleParticle>,
 	rectangle_particles:Vec<RectangleParticle>,
 	poly_poly_constraints:Vec<PolyPolyConstraint>,
@@ -54,10 +52,6 @@ impl Paint for ParticleCollection
 {
 	fn paint(&mut self, args: &RenderArgs, gl:&mut GlGraphics)
 	{
-		for poly in self.poly_particles.iter_mut()
-		{
-			poly.paint(args, gl);
-		}
 
 		for poly in self.circle_particles.iter_mut()
 		{
@@ -123,7 +117,7 @@ impl ParticleCollection
 
 	pub fn rotate_by_radian(&mut self, angle_radians:f64, _center:Vector) 
 	{
-		for p in self.poly_particles.iter_mut()
+		for p in self.circle_particles.iter_mut()
 		{
 			let mut c = &mut self.center;
 			let mut d = &mut self.delta;
@@ -146,15 +140,7 @@ impl ParticleCollection
 		return p;
     }
 
-	fn get_poly_particles(&self)->&Vec<PolygonParticle>
-	{
-		return &self.poly_particles;
-	}
 
-	pub fn add_poly_particle(&mut self, p:PolygonParticle)
-	{
-		self.poly_particles.push(p);
-	}
 
 
 
@@ -190,10 +176,6 @@ impl ParticleCollection
 
 	pub fn integrate(&mut self, ap:&APValues) 
 	{
-		for poly in self.poly_particles.iter_mut()
-		{
-			poly.update(ap);	
-		}
 		for poly in self.rectangle_particles.iter_mut()
 		{
 			poly.update(ap);	
@@ -228,7 +210,7 @@ impl ParticleCollection
 	pub fn satisfy_constraint_rect_rect(&mut self,constraint: &mut PolyPolyConstraint, _ap:&APValues)
 	{
 		let tuple = constraint.get_particles();
-		let mut _length:usize = self.poly_particles.len();
+		let mut _length:usize = self.rectangle_particles.len();
 		let mut i:usize = 0;
 		let mut p1 = loop
 		{

@@ -34,7 +34,7 @@ fn main()
     
     let mut window: Window = WindowSettings::new(
             "testcd.",
-            [660, 350]
+            [650, 350]
         )
         .opengl(opengl)
         .exit_on_esc(true)
@@ -44,7 +44,7 @@ fn main()
     let mut gl:GlGraphics = GlGraphics::new(opengl);
     let mut ap:ApEngine = ApEngine::new();
 
-    ap.init(0.001);
+    ap.init(0.0001);
 
   
 

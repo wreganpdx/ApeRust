@@ -29,8 +29,8 @@ pub fn car_create(part:&mut ParticleCollection, tuple:(i64,i64,i64), col_c:[f32;
     
 
     
-    cp_a.set_position(&Vector::new(140.0, 10.0));
-    cp_b.set_position(&Vector::new(200.0, 10.0));
+    cp_a.set_position(&Vector::new(240.0, 10.0));
+    cp_b.set_position(&Vector::new(300.0, 10.0));
 
     let mut spr_a = PolyPolyConstraint::new(tuple.2);
 

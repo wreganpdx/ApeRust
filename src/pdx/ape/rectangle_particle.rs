@@ -113,7 +113,6 @@ impl RectangleParticle
 		self.set_radian(0.0);
 		println!("rect init complete");
 		self.mass = 1.0;
-		self.set_friction(0.5);
 		self.inv_mass = self.mass/1.0;
         self.samp = Vector::new(0.0,0.0);
 	}
