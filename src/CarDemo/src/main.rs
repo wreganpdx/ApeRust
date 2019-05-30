@@ -114,23 +114,41 @@ fn main()
                 {
                     exit = true;
                 }
-               // if let Some(Input::Button::press_args)
+                if let Some(Button::Keyboard(key)) = e.release_args()
+                {
+                    
+                    match key 
+                    {
+                        Key::A => {
+                            println!("Release A");
+                            speed_up_wheel(wheel_id_1, 0.0, &mut ap);
+                            speed_up_wheel(wheel_id_2, 0.0, &mut ap);
+                            },
+                        Key::D => {
+                            println!("Release D");
+                            speed_up_wheel(wheel_id_1, 0.0, &mut ap);
+                            speed_up_wheel(wheel_id_2, 0.0, &mut ap);
+                            },
+                        _ => {println!("Release KEY: {:?}", key);}
+                    }
+                    
+                }
                 if let Some(Button::Keyboard(key)) = e.press_args()
                 {
                     
                     match key 
                     {
                         Key::A => {
-                            println!("A");
+                            println!("Press A");
                             speed_up_wheel(wheel_id_1, -0.2, &mut ap);
                             speed_up_wheel(wheel_id_2, -0.2, &mut ap);
                             },
                         Key::D => {
-                            println!("D");
+                            println!("Press D");
                             speed_up_wheel(wheel_id_1, 0.2, &mut ap);
                             speed_up_wheel(wheel_id_2, 0.2, &mut ap);
                             },
-                        _ => {println!("KEY: {:?}", key);}
+                        _ => {println!("Press KEY: {:?}", key);}
                     }
                     
                 }
