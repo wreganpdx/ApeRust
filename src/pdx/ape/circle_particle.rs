@@ -142,9 +142,9 @@ impl CircleParticle
 		let mut tan = self.rim.get_curr().swap_with_neg_y();
 		tan.normalize_self();
 		let wheel_surf_vel = tan.mult(self.rim.get_speed()).mult(1.0-self.last_delta);
-		self.velocity.plus_equals(&wheel_surf_vel);
+		let combined_vel = self.get_velocity().plus(&wheel_surf_vel);
 		//let combined_vel = self.get_velocity().plus(&wheel_surf_vel);
-		let cp = self.velocity.cross(&n);
+		let cp = combined_vel.cross(&n);
 		tan.mult_equals(cp);
 		let prev = &self.rim.get_curr().minus(&tan);
 	 	self.rim.set_prev(prev);
@@ -604,7 +604,7 @@ impl Particle for CircleParticle
 			{
 				self.rim.update(ap);
                 //self.orientation.set_to(self.rim.curr.get_x(), self.rim.curr.get_y());
-				self.radian = (f64::atan2(self.rim.get_curr_y(), self.rim.get_curr_x()) + f64::consts::PI)//Math.atan2(orientation.y, orientation.x) + Math.PI;
+				self.radian = f64::atan2(self.rim.get_curr_y(), self.rim.get_curr_x()) + f64::consts::PI//Math.atan2(orientation.y, orientation.x) + Math.PI;
 			}
     }
 

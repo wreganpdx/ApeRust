@@ -141,13 +141,13 @@ fn main()
                     {
                         Key::A => {
                             println!("Press A");
-                            speed_up_wheel(wheel_id_1, -0.2, &mut ap);
-                            speed_up_wheel(wheel_id_2, -0.2, &mut ap);
+                            speed_up_wheel(wheel_id_1, -0.4, &mut ap);
+                            speed_up_wheel(wheel_id_2, -0.4, &mut ap);
                             },
                         Key::D => {
                             println!("Press D");
-                            speed_up_wheel(wheel_id_1, 0.2, &mut ap);
-                            speed_up_wheel(wheel_id_2, 0.2, &mut ap);
+                            speed_up_wheel(wheel_id_1, 0.4, &mut ap);
+                            speed_up_wheel(wheel_id_2, 0.4, &mut ap);
                             },
                         _ => {println!("Press KEY: {:?}", key);}
                     }
