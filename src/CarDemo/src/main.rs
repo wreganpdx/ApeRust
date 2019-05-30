@@ -44,7 +44,7 @@ fn main()
     let mut gl:GlGraphics = GlGraphics::new(opengl);
     let mut ap:ApEngine = ApEngine::new();
 
-    ap.init(0.0001);
+    ap.init(0.01);
 
   
 
@@ -112,6 +112,7 @@ fn main()
 
                 if let Some(_r) = e.close_args()
                 {
+                 
                     exit = true;
                 }
                 if let Some(Button::Keyboard(key)) = e.release_args()

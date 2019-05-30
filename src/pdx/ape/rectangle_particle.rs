@@ -476,13 +476,13 @@ impl Particle for RectangleParticle
         self.max_exit_velocity = ev;
     }
 
-	fn get_velocity(&self)-> Vector
+    fn get_velocity(&self)-> Vector
     {   
-        return self.velocity.clone();
+        return self.curr.minus(&self.prev);
     }
 	fn set_velocity(&mut self, i:&Vector)
     {
-        self.velocity.copy(i);
+        self.prev.copy(&self.curr.minus(i));
     }
 
 	fn get_at_rest(&self)-> bool
@@ -547,21 +547,19 @@ impl Particle for RectangleParticle
                 return;
             }
 			
-            self.velocity.mult_equals(ap.damping);
-			
+            //self.last_delta = ap.time_step;
 			// global forces
 			self.add_force(ap.force.clone());
 			self.add_massless_force(ap.massless_force.clone());
 	
 			// integrate
 			self.set_temp(&self.get_position());
+            let nv = self.velocity.plus(&self.get_forces().mult(ap.time_step));
+            self.curr.plus_equals(&nv);
 			
-			self.velocity.plus_equals(&self.forces.mult(ap.time_step));
-			self.curr.plus_equals(&self.velocity.mult(ap.time_step));
+			
 			self.set_prev(&self.get_temp());
-
-			// clear the forces
-			self.forces.set_to(0.0,0.0);
+            self.forces.set_to(0.0,0.0);
     }
 
 	fn get_components(&mut self, cn:&Vector)->Collision
@@ -576,6 +574,7 @@ impl Particle for RectangleParticle
 	{
 		if !self.fixed
 		{
+            self.prev.copy(&self.curr.clone());
             self.curr.plus_equals(mtd);
             self.velocity.copy(vel);
             /*

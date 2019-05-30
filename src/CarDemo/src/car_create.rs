@@ -9,8 +9,6 @@ use ape_rust::particle::Particle;
 pub fn car_create(part:&mut ParticleCollection, tuple:(i64,i64,i64), col_c:[f32; 4], col_e:[f32; 4])
 {
     let _ctr = &part.get_center();
-    let _rw:f64 = 14.0;
-    let _rh:f64 = 14.0;
     let rad:f64 = 14.0;
 
     let mut cp_a = CircleParticle::new(tuple.0);
@@ -29,15 +27,15 @@ pub fn car_create(part:&mut ParticleCollection, tuple:(i64,i64,i64), col_c:[f32;
     
 
     
-    cp_a.set_position(&Vector::new(240.0, 10.0));
-    cp_b.set_position(&Vector::new(300.0, 10.0));
+    cp_a.set_position(&Vector::new(160.0, 10.0));
+    cp_b.set_position(&Vector::new(220.0, 10.0));
 
     let mut spr_a = PolyPolyConstraint::new(tuple.2);
 
     spr_a.init_spring((tuple.0,tuple.1), cp_a.get_position().distance(&cp_b.get_position()), 0.5);
 
     spr_a.circ_circ = true;
-    spr_a.set_height(2.0);
+    spr_a.set_height(8.0);
 
     cp_a.set_primary_color(col_c.clone());
     cp_b.set_primary_color(col_c.clone());

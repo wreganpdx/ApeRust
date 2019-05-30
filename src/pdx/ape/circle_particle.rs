@@ -515,11 +515,11 @@ impl Particle for CircleParticle
 
 	fn get_velocity(&self)-> Vector
     {   
-        return self.velocity.clone();
+        return self.curr.minus(&self.prev);
     }
 	fn set_velocity(&mut self, i:&Vector)
     {
-        self.velocity.copy(i);
+        self.prev.copy(&self.curr.minus(i));
     }
 
 	fn get_at_rest(&self)-> bool
@@ -593,10 +593,12 @@ impl Particle for CircleParticle
 			self.set_temp(&self.get_position());
 			//println!("velocity {:?}", self.velocity);
 			//self.velocity.mult_equals(ap.damping);
-			self.velocity.plus_equals(&self.forces.mult(ap.time_step));
+			//self.velocity.plus_equals(&self.forces.mult(ap.time_step));
+            let nv = self.velocity.plus(&self.get_forces().mult(ap.time_step));
+            self.curr.plus_equals(&nv);
 			//let mut nv:Vector = self.velocity.plus(&self.forces.mult(ap.time_step));
 			//println!("velocity {:?}, adding: {:?}", self.velocity,self.velocity.mult(ap.time_step));
-			self.curr.plus_equals(&self.velocity.mult(ap.time_step));
+			//self.curr.plus_equals(&self.velocity.mult(ap.time_step));
 			/*
             			// integrate
 			self.set_temp(&self.get_position());
@@ -636,7 +638,7 @@ impl Particle for CircleParticle
 	{
 		if !self.fixed
 		{
-            self.prev.copy(&self.curr.clone());
+            //self.prev.copy(&self.curr.clone());
 			self.curr.plus_equals(mtd);
             self.velocity.copy(vel);
 /*

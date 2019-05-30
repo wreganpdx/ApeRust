@@ -50,7 +50,7 @@ impl RimParticle
     pub fn init(&mut self, r:f64, mt:f64)
     {
         self.max_torque = mt;
-        self.wr = r;
+        self.wr = r.clone();
         self.speed = 0.0;
         self.av = 0.0;
         self.curr = Vector::new(r.clone(), 0.0);
@@ -68,8 +68,6 @@ impl RimParticle
 
     pub fn update(&mut self,ap:&APValues)
     {
-       // self.sp = f64::MAX(-self.max_torque, f64::MIN(self.max_torque, self.sp + self.av));
-
         self.speed = f64::max(-self.max_torque, f64::min(self.max_torque, self.speed + self.av));
 
         let mut dx = -self.curr.get_y();
