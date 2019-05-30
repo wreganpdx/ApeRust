@@ -22,6 +22,7 @@ use std::f64::consts::PI;
 
 fn main() 
 {
+    
     let opengl = OpenGL::V3_2;
     
     let mut window: Window = WindowSettings::new(

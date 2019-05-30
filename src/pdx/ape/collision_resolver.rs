@@ -113,8 +113,8 @@ pub fn resolve_collision_rect_rect(pa:&mut RectangleParticle, pb:&mut RectangleP
     vn_b.plus_equals(&cb.vt);
     
     
-    pa.resolve_collision(&mtd_a, &vn_a, &normal, depth, 1);
-    pb.resolve_collision(&mtd_b, &vn_b, &normal, depth,  -1);
+    pa.resolve_collision(&mtd_a, &vn_a, &normal, depth, -1);
+    pb.resolve_collision(&mtd_b, &vn_b, &normal, depth,  1);
 }
 
 pub fn resolve_collision_rect_circ(pa:&mut CircleParticle, pb:&mut RectangleParticle, normal:Vector, depth:f64)
@@ -175,8 +175,8 @@ pub fn resolve_collision_rect_circ(pa:&mut CircleParticle, pb:&mut RectanglePart
     vn_b.plus_equals(&cb.vt);
     
     
-    pa.resolve_collision(&mtd_a, &vn_a, &normal, depth, 1);
-    pb.resolve_collision(&mtd_b, &vn_b, &normal, depth,  -1);
+    pa.resolve_collision(&mtd_a, &vn_a, &normal, depth, -1);
+    pb.resolve_collision(&mtd_b, &vn_b, &normal, depth,  1);
 }
 
 

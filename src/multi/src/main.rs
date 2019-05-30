@@ -20,7 +20,7 @@ use piston::input::*;
 use glutin_window::GlutinWindow as Window;
 use opengl_graphics::{ GlGraphics, OpenGL };
 use std::f64::consts::PI;
-
+#[derive()]
 
 fn main() 
 {

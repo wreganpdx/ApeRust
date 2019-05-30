@@ -620,7 +620,7 @@ impl Particle for CircleParticle
 			{
 				self.rim.update(ap);
                 //self.orientation.set_to(self.rim.curr.get_x(), self.rim.curr.get_y());
-				self.radian = -(f64::atan2(self.rim.get_curr_y(), self.rim.get_curr_x()) + f64::consts::PI)//Math.atan2(orientation.y, orientation.x) + Math.PI;
+				self.radian = (f64::atan2(self.rim.get_curr_y(), self.rim.get_curr_x()) + f64::consts::PI)//Math.atan2(orientation.y, orientation.x) + Math.PI;
 			}
     }
 

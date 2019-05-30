@@ -70,7 +70,7 @@ pub struct SpringParticle
     created:bool,
     primary_color:[f32; 4],
     secondary_color:[f32; 4],
-	rectId:i32
+	pub rectId:i32
 }
 
 impl Paint for SpringParticle
