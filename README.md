@@ -10,9 +10,13 @@ git clone https://github.com/wreganpdx/ApeRust.git
   
 ### navigate to any of these folders:
 src/CarDemo	 
+
 src/circle	
+
 src/demos	 
+
 src/drawtest 	
+
 src/multi  
   
 ### then, cargo run
