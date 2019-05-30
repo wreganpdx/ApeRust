@@ -70,7 +70,7 @@ fn main()
 
     //let mut car = ParticleCollection::new(ap.get_new_id());
 
-    ap.set_force(Vector::new(0.0,200.0));
+    ap.set_massless_force(Vector::new(0.0,50.0));
 
     let mut car = ParticleCollection::new(ap.get_new_id());
     let wheel_id_1 = ap.get_new_id();

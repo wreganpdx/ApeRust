@@ -591,27 +591,9 @@ impl Particle for CircleParticle
 	
 			// integrate
 			self.set_temp(&self.get_position());
-			//println!("velocity {:?}", self.velocity);
-			//self.velocity.mult_equals(ap.damping);
-			//self.velocity.plus_equals(&self.forces.mult(ap.time_step));
             let nv = self.velocity.plus(&self.get_forces().mult(ap.time_step));
             self.curr.plus_equals(&nv);
-			//let mut nv:Vector = self.velocity.plus(&self.forces.mult(ap.time_step));
-			//println!("velocity {:?}, adding: {:?}", self.velocity,self.velocity.mult(ap.time_step));
-			//self.curr.plus_equals(&self.velocity.mult(ap.time_step));
-			/*
-            			// integrate
-			self.set_temp(&self.get_position());
-            self.forces.mult_equals(ap.time_step);
-            let nv = self.velocity.plus(&self.forces);
-            //self.curr.plu
-			//println!("velocity {:?}", self.velocity);
-			//self.velocity.mult_equals(ap.damping);
-			//self.velocity.plus_equals(&self.forces.mult(ap.time_step));
-			//let mut nv:Vector = self.velocity.plus(&self.forces.mult(ap.time_step));
-			//println!("velocity {:?}, adding: {:?}", self.velocity,self.velocity.mult(ap.time_step));
-			self.curr.plus_equals(&nv.mult(ap.damping));
-			*/
+			
 			
 			self.set_prev(&self.get_temp());
 
@@ -628,7 +610,7 @@ impl Particle for CircleParticle
 
 	fn get_components(&mut self, cn:&Vector)->Collision
     {
-		let vel:Vector = self.velocity.clone();
+		let vel:Vector = self.get_velocity();
 		let vdotn:f64 = cn.dot(&vel);
 		self.coll.vn = cn.mult(vdotn);
 		self.coll.vt = vel.minus(&self.coll.vn);	
