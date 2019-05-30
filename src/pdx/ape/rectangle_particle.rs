@@ -574,7 +574,6 @@ impl Particle for RectangleParticle
 	{
 		if !self.fixed
 		{
-            self.prev.copy(&self.curr.clone());
             self.curr.plus_equals(mtd);
             self.velocity.copy(vel);
             /*
