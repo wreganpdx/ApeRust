@@ -591,7 +591,7 @@ impl Particle for CircleParticle
 	
 			// integrate
 			self.set_temp(&self.get_position());
-            let nv = self.velocity.plus(&self.get_forces().mult(ap.time_step));
+            let nv = self.get_velocity().plus(&self.get_forces().mult(ap.time_step));
             self.curr.plus_equals(&nv);
 			
 			
@@ -620,30 +620,8 @@ impl Particle for CircleParticle
 	{
 		if !self.fixed
 		{
-            //self.prev.copy(&self.curr.clone());
 			self.curr.plus_equals(mtd);
-            self.velocity.copy(vel);
-/*
-            self.prev = self.curr.minus(vel);	
-			self.curr.plus_equals(mtd);
-            //println!("{:?}", self.velocity);
-            let mag = self.velocity.mag_or_one();
-            let mut newVel = mtd.clone().normalize().mult(mag);
-            self.velocity.times_equals(&newVel);
-            newVel.normalize_self();
-            self.velocity.normalize_self();
-            self.velocity.plus_equals(&newVel);
-            self.velocity.normalize_self();
-            self.velocity.mult_equals(mag);
-			*/
-			/*
-			self.curr.plus_equals(mtd);
-            let mag = self.velocity.magnitude();
-            let newVel = mtd.clone().normalize().mult(mag).mult(self.elasticity);
-			self.velocity.copy(&newVel);
-			*/
-			//self.curr.plus_equals(mtd);
-			//self.velocity.plus_equals(vel);
+            self.set_velocity(vel);
 		}
 		
 		if self.smashable
@@ -673,9 +651,7 @@ impl Particle for CircleParticle
     {
 		if !self.fixed
 		{
-			println!("Velocity old {:?}, velocity delta {:?}", self.velocity, dv);
-			self.velocity = self.velocity.plus(&dv);
-			println!("Velocity new {:?}, velocity delta {:?}", self.velocity, dv);
+			self.set_velocity(&self.get_velocity().plus(&dv));
 		}
     }
 

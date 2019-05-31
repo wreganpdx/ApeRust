@@ -554,7 +554,7 @@ impl Particle for RectangleParticle
 	
 			// integrate
 			self.set_temp(&self.get_position());
-            let nv = self.velocity.plus(&self.get_forces().mult(ap.time_step));
+            let nv = self.get_velocity().plus(&self.get_forces().mult(ap.time_step));
             self.curr.plus_equals(&nv);
 			
 			
@@ -575,37 +575,7 @@ impl Particle for RectangleParticle
 		if !self.fixed
 		{
             self.curr.plus_equals(mtd);
-            self.velocity.copy(vel);
-            /*
-			self.curr.plus_equals(mtd);
-            //println!("{:?}", self.velocity);
-            let mag = self.velocity.mag_or_one();
-            let mut newVel = mtd.clone().normalize().mult(mag);
-            self.velocity.times_equals(&newVel);
-            newVel.normalize_self();
-            self.velocity.normalize_self();
-            self.velocity.plus_equals(&newVel);
-            self.velocity.normalize_self();
-            self.velocity.mult_equals(mag);
-           // self.velocity.mult_equals(0.33);
-			//self.velocity.plus_equals(&newVel);
-            */
-            /*
-            self.velocity.normalize();
-            self.velocity.plus_equals(&new_vel);
-            self.velocity.div_equals(2.0);
-            self.velocity.mult_equals(mag * self.elasticity);
-			let mag = vel.magnitude();
-			let newVel = self.curr.clone().minus(&self.prev).mult(mag);
-			
-			self.prev = self.curr.clone();
-        
-			self.curr.plus_equals(mtd);
-            let mut normalMTD = mtd.clone().normalize();
-            normalMTD.mult_equals(mag);
-			self.set_velocity(&vel);
-            println!("vel: {:?}, mtd: {:?}",vel, mtd);
-            */
+            self.get_velocity().copy(vel);
 		}
 		
 		if self.smashable
@@ -623,7 +593,7 @@ impl Particle for RectangleParticle
     {
 		if !self.fixed
 		{
-			self.velocity = self.velocity.plus(&dv);
+			self.set_velocity(&self.get_velocity().plus(&dv));
 		}
     }
 

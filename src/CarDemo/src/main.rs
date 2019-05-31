@@ -6,16 +6,12 @@ extern crate opengl_graphics;
 
 use ape_rust::vector::Vector;
 use ape_rust::ap_engine::ApEngine;
-//use ape_rust::polygon_particle::PolygonParticle;
 use ape_rust::rectangle_particle::RectangleParticle;
 use ape_rust::circle_particle::CircleParticle;
-//use std::{thread, time};
 use std::time::Instant;
-//use std::time::Duration;
 use ape_rust::particle::Particle;
 use ape_rust::particle_collection::ParticleCollection;
 use ape_rust::ap_engine::Paint;
-//use crate object_helper::create_rectangle; 
 mod car_create;
 mod capsule_create;
 mod surfaces_create;
@@ -25,8 +21,6 @@ use piston::event_loop::*;
 use piston::input::*;
 use glutin_window::GlutinWindow as Window;
 use opengl_graphics::{ GlGraphics, OpenGL };
-//use std::f64::consts;
-//use std::f64;
 
 fn main() 
 {
@@ -68,9 +62,8 @@ fn main()
         ),
         col_d.clone(), col_b.clone());
 
-    //let mut car = ParticleCollection::new(ap.get_new_id());
 
-    ap.set_massless_force(Vector::new(0.0,50.0));
+    ap.set_massless_force(Vector::new(0.0,7.0));
 
     let mut car = ParticleCollection::new(ap.get_new_id());
     let wheel_id_1 = ap.get_new_id();
@@ -84,7 +77,6 @@ fn main()
     let mut _step:bool = false;
     _step = ap.step();
     _step = ap.step();
-    //let mut i:i32 = 0;
     let mut events = Events::new(EventSettings::new());
     let now = Instant::now();
     let mut now_render = Instant::now();
@@ -162,7 +154,6 @@ fn main()
 
         if now.elapsed().as_secs() > 60 || exit
         {
-            
             break;
         }
         steps = steps + 1;

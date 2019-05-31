@@ -3,7 +3,8 @@ use crate::rectangle_particle::RectangleParticle;
 use crate::vector::Vector;
 use crate::collision::Collision;
 use crate::particle::Particle;
-use crate::circle_particle::CircleParticle;
+use crate::circle_particle::CircleParticle; 
+use crate::collision_resolver;
 use std::f64;
 
 
@@ -17,17 +18,10 @@ pub fn resolve_circle_circle(pa:&mut CircleParticle, pb:&mut CircleParticle, nor
     
     let mtd:Vector = normal.mult(depth);       
 
-    let te:f64 = ( pa.get_elasticity() + pb.get_elasticity() );
-
+    let mut te:f64 = pa.get_elasticity() + pb.get_elasticity();
+    te = collision_resolver::clamp(te, 0.0, 1.0);
     let mut tf:f64  = 1.0 - (pa.get_friction() + pb.get_friction());
-    if tf > 1.0
-    {
-        tf = 1.0;
-    }
-    if tf < 0.0
-    {
-        tf = 0.0;
-    }
+    tf = collision_resolver::clamp(tf, 0.0, 1.0);
 
     let sum_inv_mass:f64 = im_pa_inv_mass + im_pb_inv_mass;
     
@@ -63,7 +57,6 @@ pub fn resolve_circle_circle(pa:&mut CircleParticle, pb:&mut CircleParticle, nor
 
 pub fn resolve_collision_rect_rect(pa:&mut RectangleParticle, pb:&mut RectangleParticle, normal:Vector, depth:f64)
 {
-    //println!("Depth {}", depth);
     let im_pb_inv_mass:f64 = pb.get_inv_mass();
     let im_pa_inv_mass:f64 = pa.get_inv_mass();
     
@@ -72,18 +65,12 @@ pub fn resolve_collision_rect_rect(pa:&mut RectangleParticle, pb:&mut RectangleP
     
     let mtd:Vector = normal.mult(depth);       
 
-    let te:f64 =  pa.get_elasticity() + pb.get_elasticity();
+    let mut te:f64 =  pa.get_elasticity() + pb.get_elasticity();
+    te = collision_resolver::clamp(te, 0.0, 1.0);
 
     let mut tf:f64  = 1.0 - (pa.get_friction() + pb.get_friction());
-    if tf > 1.0
-    {
-        tf = 1.0;
-    }
-    
-    if tf < 0.0
-    {
-        tf = 0.0;
-    }
+    tf = collision_resolver::clamp(tf, 0.0, 1.0);
+
 
     let sum_inv_mass:f64 = im_pa_inv_mass + im_pb_inv_mass;
     
@@ -122,7 +109,6 @@ pub fn resolve_collision_rect_rect(pa:&mut RectangleParticle, pb:&mut RectangleP
 
 pub fn resolve_collision_rect_circ(pa:&mut CircleParticle, pb:&mut RectangleParticle, normal:Vector, depth:f64)
 {
-    //println!("Depth {}", depth);
     let im_pb_inv_mass:f64 = pb.get_inv_mass();
     let im_pa_inv_mass:f64 = pa.get_inv_mass();
     
@@ -131,24 +117,11 @@ pub fn resolve_collision_rect_circ(pa:&mut CircleParticle, pb:&mut RectanglePart
     
     let mtd:Vector = normal.mult(depth);       
 
-    let mut te:f64 = ( pa.get_elasticity() + pb.get_elasticity() ) ;
-    if te > 1.0
-    {
-        te = 1.0;
-    }
-    if te < 0.0
-    {
-        te = 0.0;
-    }
+    let mut te:f64 = pa.get_elasticity() + pb.get_elasticity();
+    te = collision_resolver::clamp(te, 0.0, 1.0);
+
     let mut tf:f64  = 1.0 - (pa.get_friction() + pb.get_friction());
-    if tf > 1.0
-    {
-        tf = 1.0;
-    }
-    if tf < 0.0
-    {
-        tf = 0.0;
-    }
+    tf = collision_resolver::clamp(tf, 0.0, 1.0);
 
     let sum_inv_mass:f64 = im_pa_inv_mass + im_pb_inv_mass;
     
