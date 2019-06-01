@@ -68,6 +68,10 @@ impl PolyPolyConstraint
 	{
 		return self.fixed_end_limit.clone();
 	}
+	pub fn set_fixed_end_limit(&mut self, t:f64)
+	{
+		self.fixed_end_limit = t;
+	}
 	pub fn get_rect_id(&self)->i64
 	{
 		return self.rect_id.clone();

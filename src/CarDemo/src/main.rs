@@ -15,6 +15,7 @@ use ape_rust::ap_engine::Paint;
 mod car_create;
 mod capsule_create;
 mod surfaces_create;
+mod bridge_create;
 
 use piston::window::WindowSettings;
 use piston::event_loop::*;
@@ -53,6 +54,20 @@ fn main()
     let mut cap = ParticleCollection::new(ap.get_new_id());
     capsule_create::capsule_create(&mut cap, (ap.get_new_id(),ap.get_new_id(),ap.get_new_id()),col_c.clone());
 
+    let mut bridge = ParticleCollection::new(ap.get_new_id());
+                                                                                    //col_b:[f32; 4], col_c:[f32; 4], col_d:[f32; 4])
+    /*let tuple =  (ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),
+                                            ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),ap.get_new_id()
+                                            ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),ap.get_new_id()
+                                            ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),ap.get_new_id()); */                                                                  
+    
+    let tuple = (ap.get_new_id(), ap.get_new_id(),ap.get_new_id(), ap.get_new_id(),
+    ap.get_new_id(), ap.get_new_id(),ap.get_new_id(), ap.get_new_id(),
+    ap.get_new_id(), ap.get_new_id(),ap.get_new_id(), ap.get_new_id(),
+    ap.get_new_id(), ap.get_new_id(),ap.get_new_id(), ap.get_new_id()
+    );
+    bridge_create::bridge_create(&mut bridge,tuple ,col_b.clone(), col_c.clone(), col_d.clone());
+
     let mut surf = ParticleCollection::new(ap.get_new_id());
     surfaces_create::surfaces_create(&mut surf, (
         ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),  
@@ -73,6 +88,8 @@ fn main()
     ap.add_particle_collection(car);
     ap.add_particle_collection(cap);
     ap.add_particle_collection(surf);
+    ap.add_particle_collection(bridge);
+    
     
     let mut _step:bool = false;
     _step = ap.step();

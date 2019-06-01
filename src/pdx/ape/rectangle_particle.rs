@@ -81,11 +81,21 @@ pub struct RectangleParticle
     sibling1:i64,
     sibling2:i64,
     pub owner_col:OwnerCollision,
-    pub collision_pending:bool
+    pub collision_pending:bool,
+    width_scale:f64
 }
 
 impl RectangleParticle 
 {
+    pub fn set_width_scale(&mut self, scale:f64)
+    {
+        if self.width_scale != scale
+        {
+            self.width_scale = scale;
+            self.extents[0] = (scale*self.width)/2.0;
+        }
+    }
+
     pub fn resolve_spring_collision(&mut self, mtd:&Vector, vel:&Vector, _n:&Vector, _d:f64, _o:i32, p1:Option<&mut Particle>, p2:Option<&mut Particle>, collider:Option<&mut Particle>, owner:&mut PolyPolyConstraint)
 	{
 		if !self.fixed && !self.owned
@@ -152,6 +162,7 @@ impl RectangleParticle
 		self.mass = 1.0;
 		self.inv_mass = self.mass/1.0;
         self.samp = Vector::new(0.0,0.0);
+        self.width_scale = 1.0;
 	}
 
 	pub fn get_axe(&mut self, i:usize)->Vector
@@ -165,11 +176,12 @@ impl Paint for RectangleParticle
 	fn paint(&mut self, args: &RenderArgs, gl:&mut GlGraphics)
 	{
 		use graphics::*;
-		let rect = rectangle::rectangle_by_corners(0.0, 0.0, self.get_width(), self.get_height());
+        let width = self.width * self.width_scale;
+		let rect = rectangle::rectangle_by_corners(0.0, 0.0, width, self.get_height());
 
 		gl.draw(args.viewport(), |c, gl| 
 		{
-            let transform = c.transform.trans(self.get_curr_x(), self.get_curr_y()).rot_rad(self.get_radian().clone()).trans(-self.get_width()/2.0, -self.get_height()/2.0);
+            let transform = c.transform.trans(self.get_curr_x(), self.get_curr_y()).rot_rad(self.get_radian().clone()).trans(-width/2.0, -self.get_height()/2.0);
             rectangle(self.primary_color, rect, transform, gl);
         });
 	}
