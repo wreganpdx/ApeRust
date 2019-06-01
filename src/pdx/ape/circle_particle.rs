@@ -607,7 +607,10 @@ impl Particle for CircleParticle
 				self.radian = f64::atan2(self.rim.get_curr_y(), self.rim.get_curr_x()) + f64::consts::PI//Math.atan2(orientation.y, orientation.x) + Math.PI;
 			}
     }
-
+    fn get_spring_contact(&self, vec1:Vector, vec2:Vector)->f64
+    {
+        return 0.5;
+    }
 	fn get_components(&mut self, cn:&Vector)->Collision
     {
 		let vel:Vector = self.get_velocity();
@@ -616,7 +619,7 @@ impl Particle for CircleParticle
 		self.coll.vt = vel.minus(&self.coll.vn);	
 		return self.coll.clone();
     }
-	fn resolve_collision(&mut self, mtd:&Vector, vel:&Vector, n:&Vector, d:f64, o:i32)
+	fn resolve_collision(&mut self, mtd:&Vector, vel:&Vector, n:&Vector, d:f64, o:i32, _p:i64)
 	{
 		if !self.fixed
 		{

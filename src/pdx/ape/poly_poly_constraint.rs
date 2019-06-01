@@ -6,7 +6,7 @@ extern crate opengl_graphics;
 use piston::input::*;
 use opengl_graphics::{ GlGraphics};
 
-
+use crate::pending_translation::PendingTranslation;
 use crate::vector::Vector;
 use crate::particle::Particle;
 use crate::circle_particle::CircleParticle;
@@ -25,7 +25,7 @@ pub struct PolyPolyConstraint
 	low_mid:f64,
 	high_mid:f64,
 	stiffness:f64,
-	id:i64,
+	pub id:i64,
 	is_angular:bool,
 	is_spring:bool,
 	curr_length:f64,
@@ -39,6 +39,12 @@ pub struct PolyPolyConstraint
 	curr:Vector,
     primary_color:[f32; 4],
     secondary_color:[f32; 4],
+	fixed_end_limit:f64,
+
+	pub pending:bool,
+	pub translation:PendingTranslation,
+	collidable:bool,
+	rect_id:i64
 }
 
 impl Paint for PolyPolyConstraint
@@ -58,6 +64,25 @@ impl Paint for PolyPolyConstraint
 
 impl PolyPolyConstraint
 {
+	pub fn get_fixed_end_limit(&self)->f64
+	{
+		return self.fixed_end_limit.clone();
+	}
+	pub fn get_rect_id(&self)->i64
+	{
+		return self.rect_id.clone();
+	}
+
+	pub fn set_collidable(&mut self, c:bool)
+	{
+		self.collidable = c;
+	}
+
+	pub fn set_rect_id(&mut self, id:i64)
+	{
+		self.rect_id = id;
+	}
+
 	pub fn set_height(&mut self, h:f64)
 	{
 		self.height = h;
@@ -85,16 +110,6 @@ impl PolyPolyConstraint
         self.secondary_color = c;
     }
 
-	pub fn init_angular(&mut self, p:(i64,i64), _min:f64, _max:f64, _stiff:f64)
-	{
-		self.particles = p;
-		self.min_ang = _min;
-		self.max_ang = _max;
-		self.stiffness = _stiff;
-		self.is_angular = true;
-		
-	}
-
 	pub fn init_spring(&mut self, p:(i64,i64), rest_length:f64, _stiff:f64)
 	{
 		self.particles = p;
@@ -107,10 +122,7 @@ impl PolyPolyConstraint
 	{
 		return self.is_spring;
 	}
-	pub fn is_angular(&mut self)->bool
-	{
-		return self.is_angular;
-	}
+
 	pub fn new(id:i64)->PolyPolyConstraint
     {
 		let mut p = PolyPolyConstraint::default();
@@ -132,35 +144,14 @@ impl PolyPolyConstraint
 	{
 		self.particles = p;
 	}
-	pub fn get_min_angle(&mut self)->f64
-	{
-		return self.min_ang;
-	}
-	pub fn set_min_angle(&mut self, p:f64)
-	{
-		self.min_ang = p;
-	}
-	pub fn get_max_angle(&mut self)->f64
-	{
-		return self.max_ang;
-	}
-	pub fn set_max_angle(&mut self, p:f64)
-	{
-		self.max_ang = p;
-	}
-
-	pub fn calc_mid_angles(&mut self)
-	{
-		self.low_mid = (self.max_ang - self.min_ang) / 2.0;
-		self.high_mid = (self.max_ang +self.min_ang) / 2.0;
-	}
+	
 
 	pub fn set_angle(&mut self, p1:&Vector,p2:&Vector)
 	{
 		let angle = p2.minus(p1);
 		self.radian = f64::atan2(angle.x, -angle.y) + (f64::consts::PI) * 0.5;
-
 	}
+
 	pub fn set_position(&mut self, p1:&Vector,p2:&Vector)
 	{
 		self.curr = p2.plus(p1);
@@ -195,6 +186,12 @@ impl PolyPolyConstraint
 		}
 		self.set_angle(&p1.get_position(),&p2.get_position());
 		self.set_position(&p1.get_position(),&p2.get_position());
+		if self.collidable
+		{
+			println!("Creatiln!ng pending");
+			self.translation = PendingTranslation::new(&self.curr, &self.radian, self.get_rect_id());
+			self.pending = true;
+		}
 	}
 
 	pub fn resolve_spring_circ_circ(&mut self,p1:&mut CircleParticle,p2:&mut CircleParticle) 
@@ -218,6 +215,11 @@ impl PolyPolyConstraint
 		self.set_angle(&p1.get_position(),&p2.get_position());
 		
 		self.set_position(&p1.get_position(),&p2.get_position());
+		if self.collidable
+		{
+			self.translation = PendingTranslation::new(&self.curr, &self.radian, self.get_rect_id());
+			self.pending = true;
+		}
 	}
 
 	pub fn resolve_spring_circ_rect(&mut self,p1:&mut CircleParticle,p2:&mut RectangleParticle) 

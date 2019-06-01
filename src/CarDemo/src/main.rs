@@ -68,7 +68,7 @@ fn main()
     let mut car = ParticleCollection::new(ap.get_new_id());
     let wheel_id_1 = ap.get_new_id();
     let wheel_id_2 = ap.get_new_id();
-    car_create::car_create(&mut car, (wheel_id_1.clone(), wheel_id_2.clone(), ap.get_new_id()), col_c.clone(), col_e.clone());
+    car_create::car_create(&mut car, (wheel_id_1.clone(), wheel_id_2.clone(), ap.get_new_id(), ap.get_new_id()), col_c.clone(), col_e.clone());
 
     ap.add_particle_collection(car);
     ap.add_particle_collection(cap);

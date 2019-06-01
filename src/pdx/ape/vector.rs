@@ -44,6 +44,7 @@ impl Vector
         return Vector::new(self.x.clone(), self.y.clone());
     }
 
+
     pub fn set_to(&mut self, px: f64, py: f64)
     {
 		self.x = px;

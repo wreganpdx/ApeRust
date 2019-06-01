@@ -20,12 +20,18 @@ extern crate graphics;
 extern crate glutin_window;
 extern crate opengl_graphics;
 
+
 use piston::input::*;
 use opengl_graphics::GlGraphics;
 
+use crate::particle::Particle;
+use crate::owner_collision::OwnerCollision;
 use crate::circle_particle::CircleParticle;
 use crate::vector::Vector;
 use crate::particle_collection::ParticleCollection;
+use crate::rectangle_particle::RectangleParticle;
+use crate::poly_poly_constraint::PolyPolyConstraint;
+use crate::collision_resolver;
 extern crate time;
 
 
@@ -151,12 +157,109 @@ impl ApEngine
 
 		for _i in 0..self.constraint_collision_cycles
 		{
-			self.satisfy_constraints();
 			self.check_collisions();
+			self.satisfy_pending_collisions();
+			self.satisfy_constraints();
 		}
 		return true;
 	}
+	pub fn satisfy_pending_collisions(&mut self)
+	{
+		let vals = self.get_ap_values();
+		let mut constraints:Vec<&mut PolyPolyConstraint > = Vec::new();
+		let mut objects:Vec<Vec<Option<&mut Particle>>> = Vec::new();
+		let mut colliders:Vec<i64> = Vec::new();
+		let mut collisions:Vec<OwnerCollision> = Vec::new();
+		let mut indexs:Vec<usize> = Vec::new();
+		for i in 0..self.part_collection.len()
+		{
+			let mut pending:Option<OwnerCollision> = self.part_collection[i].find_pending_collision();
+			while 
+				match pending
+				{
+					Some(p)=>
+					{
+						collisions.push(p);
+						indexs.push(i);
+						true
+					}
+					None =>
+					{
+						false
+					}
+					
+				}
+				
+		    {pending = self.part_collection[i].find_pending_collision();}
+		}
+		while collisions.len() > 0
+		{
+			let col = collisions.remove(0).clone();
+			let index = indexs.remove(0);
+			let length = self.part_collection.len();
+			let mut part = self.part_collection.remove(index);
+			let mut i = 0;
+			let mut collider = loop
+			{
+				
+				let t = self.part_collection[i].get_particle_by_id(&col.collider);
+				match t
+				{
+					Some(c)=>
+					{
+						break self.part_collection[i].get_particle_by_id(&col.collider);
+					}
+					None=>
+					{
 
+					}
+				}
+				i+= 1;
+				if i >= self.part_collection.len() 
+				{
+					break None
+				}
+			};
+			part.collide_pending_spring(&mut collider, col.clone());
+			self.part_collection.insert(index, part);
+/*
+			for i in 0..length
+			{
+				println!("checking particles {}, i is {}", length, i);
+				let mut p = self.part_collection.remove(i);
+				println!("checking particles {}, i is {}, target index is: {}", self.part_collection.len(), i, index);
+				collider = p.get_particle_by_id(&col.collider);
+				println!("Success?");
+				let mut found = false;
+				match collider
+				{
+					Some(t)=>
+					{
+						found = true;
+					}
+					None=>
+					{
+
+					}
+				}
+				println!("Success");
+				self.part_collection.insert(i, p);
+				if found
+				{
+					break;
+				}
+			}
+			*/
+			
+			
+		}
+	}
+
+	pub fn satisfy_pending_collision(&mut self, collider:i64, constraint:&mut PolyPolyConstraint, objects:Vec<Option<&mut Particle>>)
+	{
+
+	}
+	
 	pub fn satisfy_constraints(&mut self)
 	{
 		let vals = self.get_ap_values();

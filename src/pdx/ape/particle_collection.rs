@@ -22,16 +22,16 @@ use crate::poly_poly_constraint::PolyPolyConstraint;
 use crate::ap_engine::APValues;
 use crate::collision_detector;
 use crate::ap_engine::Paint;
+use crate::owner_collision::OwnerCollision;
+use crate::pending_translation::PendingTranslation;
 use std::default::Default;
 
 extern crate piston;
 extern crate graphics;
 extern crate glutin_window;
-//extern crate opengl_graphics;
 
 use piston::input::*;
 use opengl_graphics::GlGraphics;
-//use opengl_graphics::OpenGL;
 
 #[allow(unused_variables)]
 #[derive(Default)]
@@ -80,6 +80,141 @@ pub fn get_relative_angle(delta:&mut Vector, center:&mut Vector, p:&mut Vector) 
 #[allow(dead_code)]
 impl ParticleCollection
 {
+	pub fn collide_pending_spring(&mut self, collider:&mut Option<&mut Particle>, pending:OwnerCollision)->bool
+	{
+		let mut dist = 0.0;
+		let mut ret = false;
+
+		match collider
+		{
+			Some(t) => 
+			{
+				dist = t.get_spring_contact(Vector::new(0.0,0.0), Vector::new(0.0,0.0));
+			}
+			None=>
+			{
+
+			}
+		}
+		let mut rectIndex = 0;
+		let mut rect = loop
+		{
+			if self.rectangle_particles[rectIndex].get_id() == &pending.ownerRect
+			{
+				break self.rectangle_particles.remove(rectIndex);
+			}
+			rectIndex+= 1;
+		};
+		let mut constraintIndex:usize = 0;
+		let mut constraint = loop
+		{
+			if self.poly_poly_constraints[constraintIndex].id == pending.ownerConstraint
+			{
+				break self.poly_poly_constraints.remove(constraintIndex);
+			}
+			constraintIndex+= 1;
+		};
+		if constraint.circ_circ
+		{
+			let c1 = 1.0 - dist;
+			let c2 = dist.clone();
+			let mut circ1Index = 0;
+			let mut circ1 = loop
+			{
+				if self.circle_particles[circ1Index].get_id() == &pending.sibling1
+				{
+					break self.circle_particles.remove(circ1Index);
+				}
+				circ1Index+= 1;
+			};
+			let mut circ2Index:usize = 0;
+			let mut circ2 = loop
+			{
+				if self.circle_particles[circ2Index].get_id() == &pending.sibling2
+				{
+					break self.circle_particles.remove(circ2Index);
+				}
+				circ2Index+= 1;
+			};
+			if circ1.get_fixed()
+			{
+				if c2 <= constraint.get_fixed_end_limit() 
+				{
+					ret = true;
+				}
+				else
+				{
+					let lambda = Vector::new(pending.mtd.x / c2, pending.mtd.y / c2);
+					circ2.set_curr(&circ2.get_position().plus(&lambda));
+					circ2.set_velocity(&pending.vel);
+				}
+			}
+			else if circ2.get_fixed()
+			{
+				if c1 <= constraint.get_fixed_end_limit() 
+				{
+					ret = true;
+				}
+				else
+				{
+					let lambda = Vector::new(pending.mtd.x / c1, pending.mtd.y / c1);
+					circ1.set_curr(&circ1.get_position().plus(&lambda));
+					circ1.set_velocity(&pending.vel);
+				}
+				
+			}
+			else
+			{
+				let denom = c1 * c1 + c2 * c2;
+				if denom == 0.0
+				{
+					ret = true;
+				}
+				else
+				{
+					let lambda = Vector::new(pending.mtd.x / denom, pending.mtd.y / denom);
+			
+					circ1.set_curr(&circ1.get_curr().plus(&lambda.mult(c1)));
+					circ2.set_curr(&circ2.get_curr().plus(&lambda.mult(c2)));
+				
+					// if collision is in the middle of SCP set the velocity of both end particles
+					if dist == 0.5 
+					{
+						circ1.set_velocity(&pending.vel);
+						circ2.set_velocity(&pending.vel);
+					
+					// otherwise change the velocity of the particle closest to contact
+					} else {
+						if dist < 0.5
+						{
+							circ1.set_velocity(&pending.vel);
+						}
+						else
+						{
+							circ2.set_velocity(&pending.vel);
+						} 
+						
+					}
+					ret = true;
+				}
+				
+			}
+			self.circle_particles.insert(circ1Index, circ1);
+			self.circle_particles.insert(circ2Index, circ2);
+
+		}
+		else if constraint.rect_circ
+		{
+			
+		}
+		else if constraint.rect_rect
+		{
+
+		}
+		self.poly_poly_constraints.insert(constraintIndex, constraint);
+		self.rectangle_particles.insert(rectIndex, rect);
+		return ret;
+	}
 	pub fn get_circle_by_id(&mut self, i:&i64)->Option<&mut CircleParticle>
 	{
 		for p in self.circle_particles.iter_mut()
@@ -90,6 +225,161 @@ impl ParticleCollection
 			}
 		}
 		return Option::None;
+	}
+
+	pub fn get_rect_by_id(&mut self, i:&i64)->Option<&mut RectangleParticle>
+	{
+		for p in self.rectangle_particles.iter_mut()
+		{
+			if p.id == *i
+			{
+				return Option::from(p);
+			}
+		}
+		return Option::None;
+	}
+
+	pub fn get_particle_by_id(&mut self, i:&i64)->Option<&mut Particle>
+	{
+		for p in self.rectangle_particles.iter_mut()
+		{
+			if p.id == *i
+			{
+				return Option::from(p as &mut Particle);
+			}
+		}
+		for p in self.circle_particles.iter_mut()
+		{
+			if p.id == *i
+			{
+				return Option::from(p as &mut Particle);
+			}
+		}
+		return Option::None;
+	}
+
+	pub fn get_constraint_and_objects(&mut self, i:&i64, r:&i64, tuple:(i64, i64, i64))->(&mut PolyPolyConstraint, Option<&mut RectangleParticle>, Vec<Option<&mut Particle>>)
+	{
+		let mut constraints = self.poly_poly_constraints.iter_mut();
+		let mut p1 = loop
+		{
+			let c:Option<&mut PolyPolyConstraint> = constraints.next();
+			match c
+			{
+				Some(b)=>
+				{
+					if b.id == *i
+					{
+						break b;
+					}
+				}
+				None=>
+				{
+					
+				}
+			}
+		};
+		let mut v: Vec<Option<&mut Particle>>= Vec::with_capacity(3);
+		for i in 0..3
+		{
+			v.push(None);
+		}
+		let mut r1:Option<&mut RectangleParticle> = None;
+		for p in self.rectangle_particles.iter_mut()
+		{
+			if &p.id == r
+			{
+				r1 = Option::from(p);
+			}
+			else
+			{
+				let t = p as &mut Particle;
+				if t.get_id() == &tuple.0
+				{
+					v[0] = Option::from(t);
+				}
+				else if t.get_id() == &tuple.1
+				{
+					v[1] = Option::from(t);
+				}
+				else if t.get_id() == &tuple.2
+				{
+					v[2] = Option::from(t);
+				}
+			}
+		}
+		
+		for p in self.circle_particles.iter_mut()
+		{
+			let t = p as &mut Particle;
+			if t.get_id() == &tuple.0
+			{
+				v[0] = Option::from(t);
+			}
+			else if t.get_id() == &tuple.1
+			{
+				v[1] = Option::from(t);
+			}
+			else if t.get_id() == &tuple.2
+			{
+				v[2] = Option::from(t);
+			}
+		}
+		return (p1, r1, v);
+	}
+	pub fn get_constraint_by_id(&mut self, i:&i64)->Option<&mut PolyPolyConstraint>
+	{
+		for p in self.poly_poly_constraints.iter_mut()
+		{
+			if p.id == *i
+			{
+				return Option::from(p);
+			}
+		}
+		return Option::None;
+	}
+	pub fn get_three_objects_by_id(&mut self, tuple:(i64,i64, i64))->Vec<Option<&mut Particle>>
+	{
+		let mut v: Vec<Option<&mut Particle>>= Vec::with_capacity(3);
+		for i in 0..3
+		{
+			v.push(None);
+		}
+
+		for p in self.rectangle_particles.iter_mut()
+		{
+			let t = p as &mut Particle;
+			if t.get_id() == &tuple.0
+			{
+				v[0] = Option::from(t);
+			}
+			else if t.get_id() == &tuple.1
+			{
+				v[1] = Option::from(t);
+			}
+			else if t.get_id() == &tuple.2
+			{
+				v[2] = Option::from(t);
+			}
+		}
+		
+		for p in self.circle_particles.iter_mut()
+		{
+			let t = p as &mut Particle;
+			if t.get_id() == &tuple.0
+			{
+				v[0] = Option::from(t);
+			}
+			else if t.get_id() == &tuple.1
+			{
+				v[1] = Option::from(t);
+			}
+			else if t.get_id() == &tuple.2
+			{
+				v[2] = Option::from(t);
+			}
+		}
+		return v;
 	}
 
 	pub fn check_collisions_vs_collection(&mut self, rem2:&mut ParticleCollection, ap:&APValues)
@@ -185,6 +475,21 @@ impl ParticleCollection
 			circ.update(ap);	
 		}
 	}
+
+	pub fn find_pending_collision(&mut self)->Option<OwnerCollision>
+	{
+		for rect in self.rectangle_particles.iter_mut()
+		{
+			if rect.collision_pending
+			{
+				rect.collision_pending = false;
+				return Some(rect.owner_col.clone());
+			}
+		}
+		
+		return None
+	}
+
 	pub fn satisfy_constraints(&mut self, ap:&APValues)
 	{
 		let length:usize = self.poly_poly_constraints.len();
@@ -203,10 +508,25 @@ impl ParticleCollection
 			{
 				self.satisfy_constraint_circ_circ(&mut c, ap);
 			}
-			
+			if c.pending
+			{
+				self.satisfy_pending_translations(c.translation.clone());
+			}
 			self.poly_poly_constraints.insert(i, c);
 		}
 	}	
+	pub fn satisfy_pending_translations(&mut self, p:PendingTranslation)
+	{
+		for rect in self.rectangle_particles.iter_mut()
+		{
+			if rect.id == p.id
+			{
+				rect.set_position(&p.loc);
+				rect.set_radian(p.radian);
+				break;
+			}
+		}
+	}
 	pub fn satisfy_constraint_rect_rect(&mut self,constraint: &mut PolyPolyConstraint, _ap:&APValues)
 	{
 		let tuple = constraint.get_particles();

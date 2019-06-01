@@ -5,6 +5,7 @@ use crate::collision::Collision;
 use crate::particle::Particle;
 use crate::circle_particle::CircleParticle; 
 use crate::collision_resolver;
+use crate::poly_poly_constraint::PolyPolyConstraint;
 use std::f64;
 
 
@@ -51,8 +52,8 @@ pub fn resolve_circle_circle(pa:&mut CircleParticle, pb:&mut CircleParticle, nor
     vn_b.plus_equals(&cb.vt);
     
     
-    pa.resolve_collision(&mtd_a, &vn_a, &normal, depth, -1);
-    pb.resolve_collision(&mtd_b, &vn_b, &normal, depth,  1);
+    pa.resolve_collision(&mtd_a, &vn_a, &normal, depth, -1, pb.id.clone());
+    pb.resolve_collision(&mtd_b, &vn_b, &normal, depth,  1, pa.id.clone());
 }
 
 pub fn resolve_collision_rect_rect(pa:&mut RectangleParticle, pb:&mut RectangleParticle, normal:Vector, depth:f64)
@@ -103,8 +104,8 @@ pub fn resolve_collision_rect_rect(pa:&mut RectangleParticle, pb:&mut RectangleP
     vn_b.plus_equals(&cb.vt);
     
     
-    pa.resolve_collision(&mtd_a, &vn_a, &normal, depth, -1);
-    pb.resolve_collision(&mtd_b, &vn_b, &normal, depth,  1);
+    pa.resolve_collision(&mtd_a, &vn_a, &normal, depth, -1, pb.id.clone());
+    pb.resolve_collision(&mtd_b, &vn_b, &normal, depth,  1, pa.id.clone());
 }
 
 pub fn resolve_collision_rect_circ(pa:&mut CircleParticle, pb:&mut RectangleParticle, normal:Vector, depth:f64)
@@ -151,10 +152,12 @@ pub fn resolve_collision_rect_circ(pa:&mut CircleParticle, pb:&mut RectanglePart
     vn_b.plus_equals(&cb.vt);
     
     
-    pa.resolve_collision(&mtd_a, &vn_a, &normal, depth, -1);
-    pb.resolve_collision(&mtd_b, &vn_b, &normal, depth,  1);
+    pa.resolve_collision(&mtd_a, &vn_a, &normal, depth, -1, pb.id);
+    pb.resolve_collision(&mtd_b, &vn_b, &normal, depth,  1, pa.id);
 }
-
+pub fn resolve_spring_collision(mtd:&Vector, vel:&Vector, _n:&Vector, _d:f64, _o:i32,stuff: (&mut PolyPolyConstraint, Option<&mut RectangleParticle>, Vec<Option<&mut Particle>>))
+{
+}
 
 pub fn clamp(mut t:f64, min:f64, max:f64)->f64
 {

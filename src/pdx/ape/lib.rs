@@ -14,4 +14,6 @@ pub mod collision_detector;
 pub mod collision_resolver;
 pub mod poly_poly_constraint;
 pub mod rectangle_particle;
+pub mod owner_collision;
 pub mod rim_particle;
+pub mod pending_translation;

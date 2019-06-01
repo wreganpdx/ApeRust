@@ -29,6 +29,7 @@ use std::any::Any;
 pub trait Particle 
 {
 
+	fn get_spring_contact(&self, vec1:Vector, vec2:Vector)->f64;
 	fn set_primary_color(&mut self, c:[f32;4]);
 	fn set_secondary_color(&mut self, c:[f32;4]);
 	fn set_id(&mut self, i:i64);
@@ -150,7 +151,7 @@ pub trait Particle
 
 	fn get_components(&mut self, cn:&Vector)->Collision;
 
-	fn resolve_collision(&mut self, mtd:&Vector, vel:&Vector, n:&Vector, d:f64, o:i32);
+	fn resolve_collision(&mut self, mtd:&Vector, vel:&Vector, n:&Vector, d:f64, o:i32, p:i64);
 	//fn resolve_collision(mtd:Vector, vel:Vector, n:Vector, d:f64, o:int, p:particle);
 
 	fn resolve_velocities(&mut self, dv:Vector, dw:f64, normal:Vector);

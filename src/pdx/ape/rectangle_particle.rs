@@ -30,11 +30,10 @@ use crate::collision::Collision;
 use crate::particle::Particle;
 use crate::ap_engine::APValues;
 use crate::ap_engine::Paint;
+use crate::owner_collision::OwnerCollision;
+use crate::poly_poly_constraint::PolyPolyConstraint;
 use std::any::Any;
 use std::f64;
-//use num_traits;
-//use std::num::FpCategory;
-//use num_traits::float::FloatCore;
 
 #[allow(unused_variables)]
 #[derive(Default)]
@@ -76,11 +75,49 @@ pub struct RectangleParticle
 	height:f64,
     created:bool,
     primary_color:[f32; 4],
-    secondary_color:[f32; 4]
+    secondary_color:[f32; 4],
+    owner:i64,
+    owned:bool,
+    sibling1:i64,
+    sibling2:i64,
+    pub owner_col:OwnerCollision,
+    pub collision_pending:bool
 }
 
-impl RectangleParticle
+impl RectangleParticle 
 {
+    pub fn resolve_spring_collision(&mut self, mtd:&Vector, vel:&Vector, _n:&Vector, _d:f64, _o:i32, p1:Option<&mut Particle>, p2:Option<&mut Particle>, collider:Option<&mut Particle>, owner:&mut PolyPolyConstraint)
+	{
+		if !self.fixed && !self.owned
+		{
+            self.curr.plus_equals(mtd);
+            self.get_velocity().copy(vel);
+		}
+		
+		if self.smashable
+		{
+			let ev:f64 = vel.magnitude();
+			if ev > self.max_exit_velocity
+			{
+				//note: These smash events are probably not necessary.
+				//dispatchEvent(new SmashEvent(SmashEvent.COLLISION, ev));
+			}
+		}
+			
+	}
+
+    pub fn set_constraint(&mut self, owner:i64, sib1:i64, sib2:i64, pos1:&Vector, pos2:&Vector, height:f64)
+    {
+        self.owned = true;
+        self.owner = owner;
+        self.sibling1 = sib1;
+        self.sibling2 = sib2;
+        let length = pos1.distance(pos2);
+        let angle = pos1.minus(pos2);
+		self.radian = f64::atan2(angle.x, -angle.y) + (f64::consts::PI) * 0.5;
+        self.create_rectangle(length, height);
+        self.set_position(&pos1.plus(pos2).divided_by(2.0));
+    }
     pub fn new(id:i64)->RectangleParticle
     {
 		let mut p = RectangleParticle::default();
@@ -109,9 +146,9 @@ impl RectangleParticle
 
 		self.extents.push(width/2.0);
 		self.extents.push(height/2.0);
-		println!("rect init");
+		//println!("rect init");
 		self.set_radian(0.0);
-		println!("rect init complete");
+		//println!("rect init complete");
 		self.mass = 1.0;
 		self.inv_mass = self.mass/1.0;
         self.samp = Vector::new(0.0,0.0);
@@ -147,6 +184,10 @@ impl PartialEq for RectangleParticle
 
 impl Particle for RectangleParticle 
 {
+    fn get_spring_contact(&self, vec1:Vector, vec2:Vector) ->f64
+    {
+        return 0.5;
+    }
 	fn set_id(&mut self, i:i64)
 	{
 		self.id = i;
@@ -297,19 +338,6 @@ impl Particle for RectangleParticle
     {
         self.coll = f.clone();
     }
-/*
-	fn get_parent(&self)-> Box<ParticleCollection>
-	{
-		return &self.collection;
-	}
-
-	This is probably never going to happen because Rust says you can't have an object reference in more than one place.
-
-	fn set_parent(&mut self, pc:&ParticleCollection)
-	{
-		self.collection = Box::new(pc);
-	}
-	*/
 
 
 
@@ -325,13 +353,13 @@ impl Particle for RectangleParticle
 	
 	fn set_axes(&mut self)
 	{
-        println!("RADIAN {}", self.radian);
+       // println!("RADIAN {}", self.radian);
 		let s = self.radian.sin();
 		let c = self.radian.cos();
-        println!("s: {},c: {}", s, c);
+       // println!("s: {},c: {}", s, c);
 		self.axes[0].set_to(c.clone(), s.clone());
 		self.axes[1].set_to(-s, c);
-        println!("{:?}, {:?}", self.axes[0], self.axes[1]);
+       // println!("{:?}, {:?}", self.axes[0], self.axes[1]);
 	}
 
 
@@ -344,10 +372,7 @@ impl Particle for RectangleParticle
         {
             projected.plus_equals(&self.curr.minus(&self.prev));
         }
-		//let next = self.curr.plus(&self.curr.minus(&self.prev));
-		//let c2 = projected.dot(axis);
         let c = self.samp.dot(axis);
-		//c.plus_equals(self.curr.minus(&self.prev));
 		self.interval.min = c - rad;
 		self.interval.max = c + rad;
 		return &self.interval;
@@ -560,6 +585,11 @@ impl Particle for RectangleParticle
 			
 			self.set_prev(&self.get_temp());
             self.forces.set_to(0.0,0.0);
+
+            if self.owned
+            {
+                
+            }
     }
 
 	fn get_components(&mut self, cn:&Vector)->Collision
@@ -570,13 +600,19 @@ impl Particle for RectangleParticle
 		self.coll.vt = vel.minus(&self.coll.vn);	
 		return self.coll.clone();
     }
-	fn resolve_collision(&mut self, mtd:&Vector, vel:&Vector, _n:&Vector, _d:f64, _o:i32)
+	fn resolve_collision(&mut self, mtd:&Vector, vel:&Vector, _n:&Vector, _d:f64, _o:i32, p:i64)
 	{
-		if !self.fixed
+		if !self.fixed && !self.owned
 		{
             self.curr.plus_equals(mtd);
             self.get_velocity().copy(vel);
 		}
+
+        if self.owned
+        {
+            self.owner_col = OwnerCollision::new(mtd, vel, _n, _d, _o, p, self.id, self.owner, self.sibling1, self.sibling2);
+            self.collision_pending = true;
+        }
 		
 		if self.smashable
 		{
@@ -589,6 +625,7 @@ impl Particle for RectangleParticle
 		}
 			
 	}
+
 	fn resolve_velocities(&mut self, dv:Vector, _dw:f64, _normal:Vector)
     {
 		if !self.fixed
