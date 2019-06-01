@@ -114,7 +114,8 @@ impl CircleParticle
 		self.mass = 1.0;
 		self.inv_mass = self.mass/1.0;
 		self.radius = radius;
-
+         self.primary_color =  [39.0/255.0, 36.0/255.0, 39.0/255.0, 1.0];
+        self.secondary_color =  [139.0/255.0, 136.0/255.0, 139.0/255.0, 1.0];
 	}
 
 	pub fn get_interval_x(&mut self)->&Interval

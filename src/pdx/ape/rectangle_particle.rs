@@ -163,6 +163,8 @@ impl RectangleParticle
 		self.inv_mass = self.mass/1.0;
         self.samp = Vector::new(0.0,0.0);
         self.width_scale = 1.0;
+        self.primary_color =  [89.0/255.0, 86.0/255.0, 89.0/255.0, 1.0];
+        self.secondary_color =  [189.0/255.0, 186.0/255.0, 189.0/255.0, 1.0];
 	}
 
 	pub fn get_axe(&mut self, i:usize)->Vector

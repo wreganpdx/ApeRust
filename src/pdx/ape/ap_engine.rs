@@ -316,6 +316,7 @@ impl ApEngine
 		self.constraint_collision_cycles = 2;
 		println!("Ape Engine Initialized");
 		self.id_count = 0;
+		self.background_color =  [79.0/255.0, 36.0/255.0, 59.0/255.0, 1.0];
 	}
 
 	pub fn get_damping(&self) -> &f64
