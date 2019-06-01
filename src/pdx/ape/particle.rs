@@ -29,7 +29,7 @@ use std::any::Any;
 pub trait Particle 
 {
 
-	fn get_spring_contact(&self, vec1:Vector, vec2:Vector)->f64;
+	fn get_spring_contact(&self, center:&Vector, vec1:&Vector, vec2:&Vector)->f64;
 	fn set_primary_color(&mut self, c:[f32;4]);
 	fn set_secondary_color(&mut self, c:[f32;4]);
 	fn set_id(&mut self, i:i64);

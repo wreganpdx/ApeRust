@@ -89,12 +89,14 @@ pub fn bridge_create(part:&mut ParticleCollection, tuple:(i64,i64,i64, i64,
     bridge_conn_a.set_secondary_color(col_b);
     bridge_conn_a.set_height(10.0);
     bridge_conn_a.set_fixed_end_limit(0.25);
+    bridge_conn_a.set_width_scale(0.8);
     bridge_conn_a.circ_circ = true;
 
     let mut bridge_conn_r_a = RectangleParticle::new(tuple.7);
     bridge_conn_r_a.set_constraint(bridge_conn_a.id.clone(), bridge_paa.id.clone(), bridge_pa.id.clone(), &bridge_paa.get_position(), &bridge_pa.get_position(), bridge_conn_a.get_height());
     bridge_conn_r_a.set_width_scale(0.8);
     bridge_conn_r_a.set_collidable(true);
+    bridge_conn_r_a.set_primary_color(col_b);
     bridge_conn_a.set_rect_id(bridge_conn_r_a.get_id().clone());
 
 
@@ -103,13 +105,15 @@ pub fn bridge_create(part:&mut ParticleCollection, tuple:(i64,i64,i64, i64,
     bridge_conn_b.init_spring((bridge_pa.id.clone(), bridge_pb.id.clone()), bridge_pa.get_position().distance(&bridge_pb.get_position()), 0.9);
     bridge_conn_b.set_primary_color(col_c);
     bridge_conn_b.set_secondary_color(col_b);
-    bridge_conn_b.set_height(10.0);
+    bridge_conn_b.set_height(5.0);
+    bridge_conn_b.set_width_scale(0.8);
     bridge_conn_b.circ_circ = true;
 
     let mut bridge_conn_r_b = RectangleParticle::new(tuple.9);
-    bridge_conn_r_b.set_constraint(bridge_conn_b.id.clone(), bridge_pa.id.clone(), bridge_pb.id.clone(), &bridge_pa.get_position(), &bridge_pb.get_position(), bridge_conn_b.get_height());
+    bridge_conn_r_b.set_constraint(bridge_conn_b.id.clone(), bridge_pa.id.clone(), bridge_pb.id.clone(), &bridge_pa.get_position(), &bridge_pb.get_position(), bridge_conn_b.get_height()*2.0);
     bridge_conn_r_b.set_width_scale(0.8);
     bridge_conn_r_b.set_collidable(true);
+    bridge_conn_r_b.set_primary_color(col_b);
     bridge_conn_b.set_rect_id(bridge_conn_r_b.get_id().clone());
 
 
@@ -117,39 +121,45 @@ pub fn bridge_create(part:&mut ParticleCollection, tuple:(i64,i64,i64, i64,
     bridge_conn_c.init_spring((bridge_pb.id.clone(), bridge_pc.id.clone()), bridge_pb.get_position().distance(&bridge_pc.get_position()), 0.9);
     bridge_conn_c.set_primary_color(col_c);
     bridge_conn_c.set_secondary_color(col_b);
-    bridge_conn_c.set_height(10.0);
+    bridge_conn_c.set_height(5.0);
+    bridge_conn_c.set_width_scale(0.8);
     bridge_conn_c.circ_circ = true;
 
     let mut bridge_conn_r_c = RectangleParticle::new(tuple.11);
-    bridge_conn_r_c.set_constraint(bridge_conn_c.id.clone(), bridge_pb.id.clone(), bridge_pc.id.clone(), &bridge_pb.get_position(), &bridge_pc.get_position(), bridge_conn_c.get_height());
+    bridge_conn_r_c.set_constraint(bridge_conn_c.id.clone(), bridge_pb.id.clone(), bridge_pc.id.clone(), &bridge_pb.get_position(), &bridge_pc.get_position(), bridge_conn_c.get_height()*2.0);
     bridge_conn_r_c.set_width_scale(0.8);
     bridge_conn_r_c.set_collidable(true);
+    bridge_conn_r_c.set_primary_color(col_b);
     bridge_conn_c.set_rect_id(bridge_conn_r_c.get_id().clone());
 
     let mut bridge_conn_d = PolyPolyConstraint::new(tuple.12);
     bridge_conn_d.init_spring((bridge_pc.id.clone(), bridge_pd.id.clone()), bridge_pc.get_position().distance(&bridge_pd.get_position()), 0.9);
     bridge_conn_d.set_primary_color(col_c);
     bridge_conn_d.set_secondary_color(col_b);
-    bridge_conn_d.set_height(10.0);
+    bridge_conn_d.set_height(5.0);
+    bridge_conn_d.set_width_scale(0.8);
     bridge_conn_d.circ_circ = true;
 
     let mut bridge_conn_r_d = RectangleParticle::new(tuple.13);
-    bridge_conn_r_d.set_constraint(bridge_conn_d.id.clone(), bridge_pc.id.clone(), bridge_pd.id.clone(), &bridge_pc.get_position(), &bridge_pd.get_position(), bridge_conn_d.get_height());
+    bridge_conn_r_d.set_constraint(bridge_conn_d.id.clone(), bridge_pc.id.clone(), bridge_pd.id.clone(), &bridge_pc.get_position(), &bridge_pd.get_position(), bridge_conn_d.get_height()*2.0);
     bridge_conn_r_d.set_width_scale(0.8);
     bridge_conn_r_d.set_collidable(true);
+    bridge_conn_r_d.set_primary_color(col_b);
     bridge_conn_d.set_rect_id(bridge_conn_r_d.get_id().clone());
 
     let mut bridge_conn_e = PolyPolyConstraint::new(tuple.14);
     bridge_conn_e.init_spring((bridge_pd.id.clone(), bridge_pdd.id.clone()), bridge_pd.get_position().distance(&bridge_pdd.get_position()), 0.9);
     bridge_conn_e.set_primary_color(col_c);
     bridge_conn_e.set_secondary_color(col_b);
-    bridge_conn_e.set_height(10.0);
+    bridge_conn_e.set_height(5.0);
+    bridge_conn_e.set_width_scale(0.8);
     bridge_conn_e.circ_circ = true;
 
     let mut bridge_conn_r_e = RectangleParticle::new(tuple.15);
-    bridge_conn_r_e.set_constraint(bridge_conn_e.id.clone(), bridge_pd.id.clone(), bridge_pdd.id.clone(), &bridge_pd.get_position(), &bridge_pdd.get_position(), bridge_conn_e.get_height());
+    bridge_conn_r_e.set_constraint(bridge_conn_e.id.clone(), bridge_pd.id.clone(), bridge_pdd.id.clone(), &bridge_pd.get_position(), &bridge_pdd.get_position(), bridge_conn_e.get_height()*2.0);
     bridge_conn_r_e.set_width_scale(0.8);
     bridge_conn_r_e.set_collidable(true);
+    bridge_conn_r_e.set_primary_color(col_b);
     bridge_conn_e.set_rect_id(bridge_conn_r_e.get_id().clone());
 
     part.add_circle_particle(bridge_paa);

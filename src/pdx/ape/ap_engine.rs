@@ -149,12 +149,12 @@ impl ApEngine
 		{
 			return false;
 		}
+		
 		self.integrate();
 		for _i in 0..self.constraint_cycles
 		{
 			self.satisfy_constraints();
 		}
-
 		for _i in 0..self.constraint_collision_cycles
 		{
 			self.check_collisions();
@@ -312,11 +312,10 @@ impl ApEngine
 		self.force = Vector::new(0.0,0.0);
 		self.massless_force = Vector::new(0.0,0.0);
 		self.damping = 1.0 - delta;
-		self.constraint_cycles = 0;
-		self.constraint_collision_cycles = 1;
+		self.constraint_cycles = 1;
+		self.constraint_collision_cycles = 2;
 		println!("Ape Engine Initialized");
 		self.id_count = 0;
-
 	}
 
 	pub fn get_damping(&self) -> &f64

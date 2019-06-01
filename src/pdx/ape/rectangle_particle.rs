@@ -169,6 +169,112 @@ impl RectangleParticle
 	{
 		return self.axes[i].clone();
 	}
+    fn closest_pt_segment_segment(&self, pp2:&Vector, pq2:&Vector, pp1:&Vector, pq1:&Vector)->f64
+    {
+        let d1 = pq1.minus(pp1);
+        let d2 = pq2.minus(pp2);
+        let r = pp1.minus(pp2);
+        let a = d1.dot(&d1);
+        let e = d2.dot(&d2);
+        let f = d2.dot(&r);
+        let c = d1.dot(&r);
+        let b = d1.dot(&d2);
+        let denom = a * e - b* b;
+
+        let mut s = 0.5;
+        if denom != 0.0
+        {
+            s = (b*f - c * e)/denom;
+            if s > 1.0
+            {
+                s = 1.0;
+            }
+            else if s < 0.0
+            {
+                s = 0.0;
+            }
+        }
+        let mut t = (b * s + f) / e;
+			 
+        if t < 0.0
+        {
+            t = 0.0;
+            s = -c / a;
+            if s > 1.0
+            {
+                s = 1.0
+            }
+            else if s < 0.0
+            {
+                s = 0.0
+            }
+        } 
+        else if t > 0.0
+        {
+            t = 1.0;
+            s = (b - c) / a;
+            if s > 1.0
+            {
+                s = 1.0
+            }
+            else if s < 0.0
+            {
+                s = 0.0
+            }
+        }
+        let c1 = pp1.plus(&d1.mult(s));
+		let c2 = pp2.plus(&d2.mult(t));
+		let c1mc2:Vector = c1.minus(&c2);
+		return c1mc2.dot(&c1mc2);
+    }
+    fn get_corners(&self, i:i32)->(Vector, Vector)
+    {
+        let rx = self.curr.x.clone();
+        let ry = self.curr.y.clone();
+        let mut rca = Vector::new(0.0, 0.0);
+        let mut rcb = Vector::new(0.0, 0.0);
+        
+        let ae0_x = self.axes[0].x * self.extents[0];
+        let ae0_y = self.axes[0].y * self.extents[0];
+        let ae1_x = self.axes[1].x * self.extents[1];
+        let ae1_y = self.axes[1].y * self.extents[1];
+        
+        let emx = ae0_x - ae1_x;
+        let emy = ae0_y - ae1_y;
+        let epx = ae0_x + ae1_x;
+        let epy = ae0_y + ae1_y;
+        
+        
+        if i == 0 {
+            // 0 and 1
+            rca.x = rx - epx;
+            rca.y = ry - epy;
+            rcb.x = rx + emx;
+            rcb.y = ry + emy;
+        
+        } else if i == 1 {
+            // 1 and 2
+            rca.x = rx + emx;
+            rca.y = ry + emy;
+            rcb.x = rx + epx;
+            rcb.y = ry + epy;
+            
+        } else if i == 2 {
+            // 2 and 3
+            rca.x = rx + epx;
+            rca.y = ry + epy;
+            rcb.x = rx - emx;
+            rcb.y = ry - emy;
+            
+        } else if i == 3 {
+            // 3 and 0
+            rca.x = rx - emx;
+            rca.y = ry - emy;
+            rcb.x = rx - epx;
+            rcb.y = ry - epy;
+        }
+        return (rca, rcb);
+    }
 }
 
 impl Paint for RectangleParticle
@@ -196,9 +302,20 @@ impl PartialEq for RectangleParticle
 
 impl Particle for RectangleParticle 
 {
-    fn get_spring_contact(&self, vec1:Vector, vec2:Vector) ->f64
+    fn get_spring_contact(&self, center:&Vector, vec1:&Vector, vec2:&Vector) ->f64
     {
-        return 0.5;
+        let mut shortest_distance = 10000000.0;
+        for i in 0..4
+        {
+            let tuple = self.get_corners(i);
+            
+            let d = self.closest_pt_segment_segment(&tuple.0, &tuple.1, vec1, vec2);
+            if d < shortest_distance 
+            {
+                shortest_distance = d;
+            }
+        }
+        return shortest_distance;
     }
 	fn set_id(&mut self, i:i64)
 	{

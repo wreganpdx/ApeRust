@@ -45,8 +45,8 @@ pub fn capsule_create(part:&mut ParticleCollection, tuple:(i64,i64,i64), col_c:[
 
 
     //300,10,14,false,1.3,0.4);
-    cp_a.set_position(&Vector::new(300.0, 10.0));
-    cp_b.set_position(&Vector::new(325.0, 10.0));
+    cp_a.set_position(&Vector::new(300.0, 120.0));
+    cp_b.set_position(&Vector::new(325.0, 120.0));
 
     let mut spr_a = PolyPolyConstraint::new(tuple.2);
 

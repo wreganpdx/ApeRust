@@ -84,18 +84,6 @@ impl ParticleCollection
 	{
 		let mut dist = 0.0;
 		let mut ret = false;
-
-		match collider
-		{
-			Some(t) => 
-			{
-				dist = t.get_spring_contact(Vector::new(0.0,0.0), Vector::new(0.0,0.0));
-			}
-			None=>
-			{
-
-			}
-		}
 		let mut rectIndex = 0;
 		let mut rect = loop
 		{
@@ -105,6 +93,8 @@ impl ParticleCollection
 			}
 			rectIndex+= 1;
 		};
+		
+		
 		let mut constraintIndex:usize = 0;
 		let mut constraint = loop
 		{
@@ -116,6 +106,7 @@ impl ParticleCollection
 		};
 		if constraint.circ_circ
 		{
+			
 			let c1 = 1.0 - dist;
 			let c2 = dist.clone();
 			let mut circ1Index = 0;
@@ -136,6 +127,17 @@ impl ParticleCollection
 				}
 				circ2Index+= 1;
 			};
+			match collider
+			{
+				Some(t) => 
+				{
+					dist = t.get_spring_contact(rect.get_curr(), circ1.get_curr(), circ2.get_curr());
+				}
+				None=>
+				{
+
+				}
+			}
 			if circ1.get_fixed()
 			{
 				if c2 <= constraint.get_fixed_end_limit() 
@@ -205,11 +207,201 @@ impl ParticleCollection
 		}
 		else if constraint.rect_circ
 		{
+			let c1 = 1.0 - dist;
+			let c2 = dist.clone();
+			let mut circ1Index = 0;
+			let mut circ1 = loop
+			{
+				if self.circle_particles[circ1Index].get_id() == &pending.sibling1 || self.circle_particles[circ1Index].get_id() == &pending.sibling2
+				{
+					break self.circle_particles.remove(circ1Index);
+				}
+				circ1Index+= 1;
+			};
+			let mut rect1Index:usize = 0;
+			let mut rect1 = loop
+			{
+				if self.rectangle_particles[rect1Index].get_id() == &pending.sibling2 || self.rectangle_particles[rect1Index].get_id() == &pending.sibling1
+				{
+					break self.rectangle_particles.remove(rect1Index);
+				}
+				rect1Index+= 1;
+			};
+			match collider
+			{
+				Some(t) => 
+				{
+					dist = t.get_spring_contact(rect.get_curr(), circ1.get_curr(), rect1.get_curr());
+				}
+				None=>
+				{
+
+				}
+			}
+			if circ1.get_fixed()
+			{
+				if c2 <= constraint.get_fixed_end_limit() 
+				{
+					ret = true;
+				}
+				else
+				{
+					let lambda = Vector::new(pending.mtd.x / c2, pending.mtd.y / c2);
+					rect1.set_curr(&rect1.get_position().plus(&lambda));
+					rect1.set_velocity(&pending.vel);
+				}
+			}
+			else if rect1.get_fixed()
+			{
+				if c1 <= constraint.get_fixed_end_limit() 
+				{
+					ret = true;
+				}
+				else
+				{
+					let lambda = Vector::new(pending.mtd.x / c1, pending.mtd.y / c1);
+					circ1.set_curr(&circ1.get_position().plus(&lambda));
+					circ1.set_velocity(&pending.vel);
+				}
+				
+			}
+			else
+			{
+				let denom = c1 * c1 + c2 * c2;
+				if denom == 0.0
+				{
+					ret = true;
+				}
+				else
+				{
+					let lambda = Vector::new(pending.mtd.x / denom, pending.mtd.y / denom);
 			
+					circ1.set_curr(&circ1.get_curr().plus(&lambda.mult(c1)));
+					rect1.set_curr(&rect1.get_curr().plus(&lambda.mult(c2)));
+				
+					// if collision is in the middle of SCP set the velocity of both end particles
+					if dist == 0.5 
+					{
+						circ1.set_velocity(&pending.vel);
+						rect1.set_velocity(&pending.vel);
+					
+					// otherwise change the velocity of the particle closest to contact
+					} else {
+						if dist < 0.5
+						{
+							circ1.set_velocity(&pending.vel);
+						}
+						else
+						{
+							rect1.set_velocity(&pending.vel);
+						} 
+						
+					}
+					ret = true;
+				}
+				
+			}
+			self.circle_particles.insert(circ1Index, circ1);
+			self.rectangle_particles.insert(rect1Index, rect1);
 		}
 		else if constraint.rect_rect
 		{
+			let c1 = 1.0 - dist;
+			let c2 = dist.clone();
+			let mut rect1Index = 0;
+			let mut rect1 = loop
+			{
+				if self.rectangle_particles[rect1Index].get_id() == &pending.sibling1
+				{
+					break self.rectangle_particles.remove(rect1Index);
+				}
+				rect1Index+= 1;
+			};
+			let mut rect2Index:usize = 0;
+			let mut rect2 = loop
+			{
+				if self.rectangle_particles[rect2Index].get_id() == &pending.sibling2
+				{
+					break self.rectangle_particles.remove(rect2Index);
+				}
+				rect2Index+= 1;
+			};
+			match collider
+			{
+				Some(t) => 
+				{
+					dist = t.get_spring_contact(rect.get_curr(), rect1.get_curr(), rect2.get_curr());
+				}
+				None=>
+				{
 
+				}
+			}
+			if rect1.get_fixed()
+			{
+				if c2 <= constraint.get_fixed_end_limit() 
+				{
+					ret = true;
+				}
+				else
+				{
+					let lambda = Vector::new(pending.mtd.x / c2, pending.mtd.y / c2);
+					rect2.set_curr(&rect2.get_position().plus(&lambda));
+					rect2.set_velocity(&pending.vel);
+				}
+			}
+			else if rect2.get_fixed()
+			{
+				if c1 <= constraint.get_fixed_end_limit() 
+				{
+					ret = true;
+				}
+				else
+				{
+					let lambda = Vector::new(pending.mtd.x / c1, pending.mtd.y / c1);
+					rect1.set_curr(&rect1.get_position().plus(&lambda));
+					rect1.set_velocity(&pending.vel);
+				}
+				
+			}
+			else
+			{
+				let denom = c1 * c1 + c2 * c2;
+				if denom == 0.0
+				{
+					ret = true;
+				}
+				else
+				{
+					let lambda = Vector::new(pending.mtd.x / denom, pending.mtd.y / denom);
+			
+					rect1.set_curr(&rect1.get_curr().plus(&lambda.mult(c1)));
+					rect2.set_curr(&rect2.get_curr().plus(&lambda.mult(c2)));
+				
+					// if collision is in the middle of SCP set the velocity of both end particles
+					if dist == 0.5 
+					{
+						rect1.set_velocity(&pending.vel);
+						rect2.set_velocity(&pending.vel);
+					
+					// otherwise change the velocity of the particle closest to contact
+					} else {
+						if dist < 0.5
+						{
+							rect1.set_velocity(&pending.vel);
+						}
+						else
+						{
+							rect2.set_velocity(&pending.vel);
+						} 
+						
+					}
+					ret = true;
+				}
+				
+			}
+			self.rectangle_particles.insert(rect1Index, rect1);
+			self.rectangle_particles.insert(rect2Index, rect2);
 		}
 		self.poly_poly_constraints.insert(constraintIndex, constraint);
 		self.rectangle_particles.insert(rectIndex, rect);
@@ -521,8 +713,10 @@ impl ParticleCollection
 		{
 			if rect.id == p.id
 			{
+				println!("satisfying pending");
 				rect.set_position(&p.loc);
 				rect.set_radian(p.radian);
+				rect.set_velocity(&p.vel);
 				break;
 			}
 		}

@@ -41,10 +41,12 @@ pub struct PolyPolyConstraint
     secondary_color:[f32; 4],
 	fixed_end_limit:f64,
 
+	width_scale:f64,
 	pub pending:bool,
 	pub translation:PendingTranslation,
 	collidable:bool,
-	rect_id:i64
+	rect_id:i64, 
+	velocity:Vector,
 }
 
 impl Paint for PolyPolyConstraint
@@ -52,11 +54,12 @@ impl Paint for PolyPolyConstraint
 	fn paint(&mut self, args: &RenderArgs, gl:&mut GlGraphics)
 	{
 		use graphics::*;
-		let rect = rectangle::rectangle_by_corners(0.0, 0.0, self.width.clone(), self.height.clone());
+		let width = self.width * self.width_scale;
+		let rect = rectangle::rectangle_by_corners(0.0, 0.0, width, self.height.clone());
 
 		gl.draw(args.viewport(), |c, gl| 
 		{
-            let transform = c.transform.trans(self.curr.x.clone(), self.curr.y.clone()).rot_rad(self.radian.clone()).trans(-self.width.clone()/2.0, -self.height.clone()/2.0);
+            let transform = c.transform.trans(self.curr.x.clone(), self.curr.y.clone()).rot_rad(self.radian.clone()).trans(-width/2.0, -self.height.clone()/2.0);
             rectangle(self.primary_color, rect, transform, gl);
         });
 	}
@@ -101,6 +104,11 @@ impl PolyPolyConstraint
 		return self.width.clone();
 	}
 
+	pub fn set_width_scale(&mut self, s:f64)
+	{
+		self.width_scale = s;
+	}
+
 	fn get_radian(&mut self)->f64
 	{
 		return self.radian.clone();
@@ -120,6 +128,7 @@ impl PolyPolyConstraint
 		self.stiffness = _stiff;
 		self.rest_length = rest_length;
 		self.width = rest_length;
+		self.width_scale = 1.0;
 		self.is_spring = true;
 	}
 	pub fn is_spring(&mut self)->bool
@@ -167,7 +176,15 @@ impl PolyPolyConstraint
 		return &self.curr_length; 
 	}
 	
+	pub fn get_velocity(& self)->Vector 
+	{
+		return self.velocity.clone(); 
+	}
 
+	pub fn set_velocity(&mut self, vel:Vector)
+	{
+		return self.velocity = vel; 
+	}
 
 	pub fn resolve_spring_rect_rect(&mut self,p1:&mut RectangleParticle,p2:&mut RectangleParticle) 
 	{
@@ -190,10 +207,12 @@ impl PolyPolyConstraint
 		}
 		self.set_angle(&p1.get_position(),&p2.get_position());
 		self.set_position(&p1.get_position(),&p2.get_position());
+		let mut avg_vel = p1.get_velocity().plus(&p2.get_velocity());
+		avg_vel.div_equals(2.0);
+		self.set_velocity(avg_vel);
 		if self.collidable
 		{
-			println!("Creatiln!ng pending");
-			self.translation = PendingTranslation::new(&self.curr, &self.radian, self.get_rect_id());
+			self.translation = PendingTranslation::new(&self.curr, &self.velocity, &self.radian, self.get_rect_id());
 			self.pending = true;
 		}
 	}
@@ -219,9 +238,12 @@ impl PolyPolyConstraint
 		self.set_angle(&p1.get_position(),&p2.get_position());
 		
 		self.set_position(&p1.get_position(),&p2.get_position());
+		let mut avg_vel = p1.get_velocity().plus(&p2.get_velocity());
+		avg_vel.div_equals(2.0);
+		self.set_velocity(avg_vel);
 		if self.collidable
 		{
-			self.translation = PendingTranslation::new(&self.curr, &self.radian, self.get_rect_id());
+			self.translation = PendingTranslation::new(&self.curr, &self.velocity, &self.radian, self.get_rect_id());
 			self.pending = true;
 		}
 	}
@@ -250,5 +272,13 @@ impl PolyPolyConstraint
 		self.set_angle(&p1.get_position(),&p2.get_position());
 		
 		self.set_position(&p1.get_position(),&p2.get_position());
+		let mut avg_vel = p1.get_velocity().plus(&p2.get_velocity());
+		avg_vel.div_equals(2.0);
+		self.set_velocity(avg_vel);
+		if self.collidable
+		{
+			self.translation = PendingTranslation::new(&self.curr, &self.velocity, &self.radian, self.get_rect_id());
+			self.pending = true;
+		}
 	}
 }
