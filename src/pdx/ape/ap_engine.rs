@@ -155,18 +155,29 @@ impl ApEngine
 		let timespec = time::get_time();
 		let cur = (timespec.sec as f64 * 1000.0) + (timespec.nsec as f64 / 1000.0 / 1000.0);
 
-		let elapsed:f64 = (cur - self.last_step)/1000.0;
+		let mut elapsed:f64 = (cur - self.last_step)/1000.0;
 
 		if elapsed > self.delta
 		{
-			self.time_step = elapsed;
+			self.time_step = self.delta;
 			self.last_step = cur;
+			while elapsed > 0.0
+			{
+				self.step_with_time(self.delta);
+				elapsed -= self.delta;
+			}
+			elapsed += self.delta;
+			self.time_step = elapsed;
+			self.step_with_time(elapsed);
 		}
 		else
 		{
 			return false;
 		}
-		
+		return true;
+	}
+	pub fn step_with_time(&mut self, elapsed:f64 )
+	{
 		self.integrate();
 		for _i in 0..self.constraint_cycles
 		{
@@ -178,7 +189,6 @@ impl ApEngine
 			self.satisfy_pending_collisions();
 			self.satisfy_constraints();
 		}
-		return true;
 	}
 	pub fn satisfy_pending_collisions(&mut self)
 	{

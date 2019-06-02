@@ -99,7 +99,7 @@ fn main()
 
 
     swing_door_create::swing_door_create(&mut swing_door,swing_tuples,col_b, col_d);
-    ap.set_massless_force(Vector::new(0.0,7.0));
+    ap.set_massless_force(Vector::new(0.0,5.0));
 
     let mut car = ParticleCollection::new(ap.get_new_id());
     let wheel_id_1 = ap.get_new_id();
@@ -169,18 +169,19 @@ fn main()
                 }
                 if let Some(Button::Keyboard(key)) = e.press_args()
                 {
-                    
+                    let wheel_speed = 0.3;
                     match key 
                     {
                         Key::A => {
+                            
                             println!("Press A");
-                            speed_up_wheel(wheel_id_1, -0.4, &mut ap);
-                            speed_up_wheel(wheel_id_2, -0.4, &mut ap);
+                            speed_up_wheel(wheel_id_1, -wheel_speed, &mut ap);
+                            speed_up_wheel(wheel_id_2, -wheel_speed, &mut ap);
                             },
                         Key::D => {
                             println!("Press D");
-                            speed_up_wheel(wheel_id_1, 0.4, &mut ap);
-                            speed_up_wheel(wheel_id_2, 0.4, &mut ap);
+                            speed_up_wheel(wheel_id_1, wheel_speed, &mut ap);
+                            speed_up_wheel(wheel_id_2, wheel_speed, &mut ap);
                             },
                         _ => {println!("Press KEY: {:?}", key);}
                     }
