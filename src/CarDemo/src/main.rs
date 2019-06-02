@@ -16,6 +16,7 @@ mod car_create;
 mod capsule_create;
 mod surfaces_create;
 mod bridge_create;
+mod rotator_create;
 
 use piston::window::WindowSettings;
 use piston::event_loop::*;
@@ -68,6 +69,20 @@ fn main()
     );
     bridge_create::bridge_create(&mut bridge,tuple ,col_b.clone(), col_c.clone(), col_d.clone());
 
+    let tuple2 = (ap.get_new_id(), ap.get_new_id(),ap.get_new_id(), ap.get_new_id(),
+    ap.get_new_id(), ap.get_new_id(),ap.get_new_id(), ap.get_new_id(),
+    ap.get_new_id(), ap.get_new_id(),ap.get_new_id(), ap.get_new_id(),
+    );
+
+    let tuple3 = (ap.get_new_id(), ap.get_new_id(),ap.get_new_id(), ap.get_new_id(),ap.get_new_id());
+
+    let rect_composite_id = ap.get_new_id();
+
+    let mut rect = ParticleCollection::new(rect_composite_id.clone());
+    let mut various = ParticleCollection::new(ap.get_new_id());
+
+    rotator_create::rotator_create(&mut rect,&mut various, tuple3, tuple2, col_a, col_b);
+
     let mut surf = ParticleCollection::new(ap.get_new_id());
     surfaces_create::surfaces_create(&mut surf, (
         ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),  
@@ -89,6 +104,8 @@ fn main()
     ap.add_particle_collection(cap);
     ap.add_particle_collection(surf);
     ap.add_particle_collection(bridge);
+    ap.add_particle_collection(various);
+    ap.add_particle_collection(rect);
     
     
     let mut _step:bool = false;
@@ -167,6 +184,7 @@ fn main()
         if _step
         {
            engine_steps += 1;
+           spin_rect_composite(&mut ap,rect_composite_id.clone());
         }
 
         if now.elapsed().as_secs() > 60 || exit
@@ -182,4 +200,11 @@ pub fn speed_up_wheel(i:i64, s:f64, ap:&mut ApEngine)
 {
     let p = &mut ap.get_circle_by_id(i);
     p.set_ang_velocity(s);
+}
+
+pub fn spin_rect_composite( _ap:&mut ApEngine, i:i64)
+{
+    let p = _ap.get_particle_collection_by_id(i);
+    let center = p.get_center().clone();
+     p.rotate_by_radian(0.02, center);
 }

@@ -39,13 +39,13 @@ use opengl_graphics::GlGraphics;
 pub struct ParticleCollection
 {
 	pub collide_internal:bool,
-	circle_particles:Vec<CircleParticle>,
+	pub circle_particles:Vec<CircleParticle>,
 	rectangle_particles:Vec<RectangleParticle>,
 	poly_poly_constraints:Vec<PolyPolyConstraint>,
 	is_composite:bool,
 	center:Vector, 
 	delta:Vector,
-	id:i64,
+	pub id:i64,
 }
 
 impl Paint for ParticleCollection
@@ -80,13 +80,19 @@ pub fn get_relative_angle(delta:&mut Vector, center:&mut Vector, p:&mut Vector) 
 #[allow(dead_code)]
 impl ParticleCollection
 {
+
 	pub fn collide_pending_spring(&mut self, collider:&mut Option<&mut Particle>, pending:OwnerCollision)->bool
 	{
+		let totalLen = self.rectangle_particles.len() + self.circle_particles.len() + self.poly_poly_constraints.len();
 		let mut dist = 0.0;
 		let mut ret = false;
 		let mut rectIndex = 0;
 		let mut rect = loop
 		{
+			if rectIndex >= self.rectangle_particles.len()
+			{
+				panic!("line 97, collide_pending_spring");
+			}
 			if self.rectangle_particles[rectIndex].get_id() == &pending.ownerRect
 			{
 				break self.rectangle_particles.remove(rectIndex);
@@ -98,11 +104,16 @@ impl ParticleCollection
 		let mut constraintIndex:usize = 0;
 		let mut constraint = loop
 		{
+			if constraintIndex >= self.poly_poly_constraints.len()
+			{
+				panic!("line 109, collide_pending_spring, constraintIndex");
+			}
 			if self.poly_poly_constraints[constraintIndex].id == pending.ownerConstraint
 			{
 				break self.poly_poly_constraints.remove(constraintIndex);
 			}
 			constraintIndex+= 1;
+			
 		};
 		if constraint.circ_circ
 		{
@@ -112,20 +123,28 @@ impl ParticleCollection
 			let mut circ1Index = 0;
 			let mut circ1 = loop
 			{
+				if circ1Index >= self.circle_particles.len()
+				{
+					panic!("line 130, collide_pending_spring, circ1Index {}, sibling1 {}", circ1Index, pending.sibling1);
+				}
 				if self.circle_particles[circ1Index].get_id() == &pending.sibling1
 				{
 					break self.circle_particles.remove(circ1Index);
 				}
 				circ1Index+= 1;
 			};
-			let mut circ2Index:usize = 0;
+			let mut circ_2_index:usize = 0;
 			let mut circ2 = loop
 			{
-				if self.circle_particles[circ2Index].get_id() == &pending.sibling2
+				if circ_2_index >= self.circle_particles.len()
 				{
-					break self.circle_particles.remove(circ2Index);
+					panic!("line 141, collide_pending_spring, circ2Index {}, sibling2 {}", circ_2_index, pending.sibling2);
 				}
-				circ2Index+= 1;
+				if self.circle_particles[circ_2_index].get_id() == &pending.sibling2
+				{
+					break self.circle_particles.remove(circ_2_index);
+				}
+				circ_2_index+= 1;
 			};
 			match collider
 			{
@@ -201,8 +220,8 @@ impl ParticleCollection
 				}
 				
 			}
-			self.circle_particles.insert(circ1Index, circ1);
-			self.circle_particles.insert(circ2Index, circ2);
+			self.circle_particles.push(circ1);
+			self.circle_particles.push(circ2);
 
 		}
 		else if constraint.rect_circ
@@ -212,6 +231,10 @@ impl ParticleCollection
 			let mut circ1Index = 0;
 			let mut circ1 = loop
 			{
+				if circ1Index >= self.circle_particles.len()
+				{
+					panic!("line 236, collide_pending_spring, circ1Index");
+				}
 				if self.circle_particles[circ1Index].get_id() == &pending.sibling1 || self.circle_particles[circ1Index].get_id() == &pending.sibling2
 				{
 					break self.circle_particles.remove(circ1Index);
@@ -221,6 +244,10 @@ impl ParticleCollection
 			let mut rect1Index:usize = 0;
 			let mut rect1 = loop
 			{
+				if circ1Index >= self.rectangle_particles.len()
+				{
+					panic!("line 249, collide_pending_spring, rect1Index");
+				}
 				if self.rectangle_particles[rect1Index].get_id() == &pending.sibling2 || self.rectangle_particles[rect1Index].get_id() == &pending.sibling1
 				{
 					break self.rectangle_particles.remove(rect1Index);
@@ -301,8 +328,8 @@ impl ParticleCollection
 				}
 				
 			}
-			self.circle_particles.insert(circ1Index, circ1);
-			self.rectangle_particles.insert(rect1Index, rect1);
+			self.circle_particles.push(circ1);
+			self.rectangle_particles.push(rect1);
 		}
 		else if constraint.rect_rect
 		{
@@ -311,6 +338,10 @@ impl ParticleCollection
 			let mut rect1Index = 0;
 			let mut rect1 = loop
 			{
+				if rect1Index >= self.rectangle_particles.len()
+				{
+					panic!("line 249, collide_pending_spring, rect1Index");
+				}
 				if self.rectangle_particles[rect1Index].get_id() == &pending.sibling1
 				{
 					break self.rectangle_particles.remove(rect1Index);
@@ -400,11 +431,16 @@ impl ParticleCollection
 				}
 				
 			}
-			self.rectangle_particles.insert(rect1Index, rect1);
-			self.rectangle_particles.insert(rect2Index, rect2);
+			self.rectangle_particles.push(rect1);
+			self.rectangle_particles.push(rect2);
 		}
 		self.poly_poly_constraints.insert(constraintIndex, constraint);
 		self.rectangle_particles.insert(rectIndex, rect);
+		
+		if totalLen != self.rectangle_particles.len() + self.circle_particles.len() + self.poly_poly_constraints.len()
+		{
+			panic!(" Something happened... a particle or constraint has gone missing in the pending_spring function");
+		}
 		return ret;
 	}
 	pub fn get_circle_by_id(&mut self, i:&i64)->Option<&mut CircleParticle>
@@ -450,75 +486,7 @@ impl ParticleCollection
 		return Option::None;
 	}
 
-	pub fn get_constraint_and_objects(&mut self, i:&i64, r:&i64, tuple:(i64, i64, i64))->(&mut PolyPolyConstraint, Option<&mut RectangleParticle>, Vec<Option<&mut Particle>>)
-	{
-		let mut constraints = self.poly_poly_constraints.iter_mut();
-		let mut p1 = loop
-		{
-			let c:Option<&mut PolyPolyConstraint> = constraints.next();
-			match c
-			{
-				Some(b)=>
-				{
-					if b.id == *i
-					{
-						break b;
-					}
-				}
-				None=>
-				{
-					
-				}
-			}
-		};
-		let mut v: Vec<Option<&mut Particle>>= Vec::with_capacity(3);
-		for i in 0..3
-		{
-			v.push(None);
-		}
-		let mut r1:Option<&mut RectangleParticle> = None;
-		for p in self.rectangle_particles.iter_mut()
-		{
-			if &p.id == r
-			{
-				r1 = Option::from(p);
-			}
-			else
-			{
-				let t = p as &mut Particle;
-				if t.get_id() == &tuple.0
-				{
-					v[0] = Option::from(t);
-				}
-				else if t.get_id() == &tuple.1
-				{
-					v[1] = Option::from(t);
-				}
-				else if t.get_id() == &tuple.2
-				{
-					v[2] = Option::from(t);
-				}
-			}
-		}
-		
-		for p in self.circle_particles.iter_mut()
-		{
-			let t = p as &mut Particle;
-			if t.get_id() == &tuple.0
-			{
-				v[0] = Option::from(t);
-			}
-			else if t.get_id() == &tuple.1
-			{
-				v[1] = Option::from(t);
-			}
-			else if t.get_id() == &tuple.2
-			{
-				v[2] = Option::from(t);
-			}
-		}
-		return (p1, r1, v);
-	}
+	
 	pub fn get_constraint_by_id(&mut self, i:&i64)->Option<&mut PolyPolyConstraint>
 	{
 		for p in self.poly_poly_constraints.iter_mut()
@@ -529,49 +497,6 @@ impl ParticleCollection
 			}
 		}
 		return Option::None;
-	}
-	pub fn get_three_objects_by_id(&mut self, tuple:(i64,i64, i64))->Vec<Option<&mut Particle>>
-	{
-		let mut v: Vec<Option<&mut Particle>>= Vec::with_capacity(3);
-		for i in 0..3
-		{
-			v.push(None);
-		}
-
-		for p in self.rectangle_particles.iter_mut()
-		{
-			let t = p as &mut Particle;
-			if t.get_id() == &tuple.0
-			{
-				v[0] = Option::from(t);
-			}
-			else if t.get_id() == &tuple.1
-			{
-				v[1] = Option::from(t);
-			}
-			else if t.get_id() == &tuple.2
-			{
-				v[2] = Option::from(t);
-			}
-		}
-		
-		for p in self.circle_particles.iter_mut()
-		{
-			let t = p as &mut Particle;
-			if t.get_id() == &tuple.0
-			{
-				v[0] = Option::from(t);
-			}
-			else if t.get_id() == &tuple.1
-			{
-				v[1] = Option::from(t);
-			}
-			else if t.get_id() == &tuple.2
-			{
-				v[2] = Option::from(t);
-			}
-		}
-		return v;
 	}
 
 	pub fn check_collisions_vs_collection(&mut self, rem2:&mut ParticleCollection, ap:&APValues)
@@ -584,9 +509,9 @@ impl ParticleCollection
 		self.center = v;
 		self.is_composite = true;
 	}
-	pub fn get_center(&mut self)->&Vector
+	pub fn get_center(&mut self)->Vector
 	{
-		return &self.center;
+		return self.center.clone();
 	}
 
 	pub fn set_speed(&mut self, s:f64)
@@ -601,6 +526,24 @@ impl ParticleCollection
 	{
 		for p in self.circle_particles.iter_mut()
 		{
+			if !p.get_move_with_composite()
+			{
+				continue;
+			}
+			let mut c = &mut self.center;
+			let mut d = &mut self.delta;
+			let radius:f64 = p.get_center().distance(c);
+			let angle:f64 = get_relative_angle(&mut d, &mut c, &mut p.get_center()) + angle_radians;
+			p.set_px((angle.cos() * radius) + c.x);
+			p.set_py((angle.sin() * radius) + c.y);
+		}
+
+		for p in self.rectangle_particles.iter_mut()
+		{
+			if !p.get_move_with_composite()
+			{
+				continue;
+			}
 			let mut c = &mut self.center;
 			let mut d = &mut self.delta;
 			let radius:f64 = p.get_center().distance(c);
@@ -713,7 +656,6 @@ impl ParticleCollection
 		{
 			if rect.id == p.id
 			{
-				println!("satisfying pending");
 				rect.set_position(&p.loc);
 				rect.set_radian(p.radian);
 				rect.set_velocity(&p.vel);
@@ -758,11 +700,15 @@ impl ParticleCollection
 		let mut i:usize = 0;
 		let mut p1 = loop
 		{
-			if self.circle_particles[i].get_id() == &tuple.0 || self.circle_particles[i].get_id() == &tuple.0
+			if self.circle_particles[i].get_id() == &tuple.0 || self.circle_particles[i].get_id() == &tuple.1
 			{
 				break self.circle_particles.remove(i);
 			}
 			i+= 1;
+				if i >= self.circle_particles.len()
+			{
+				panic!("Couldn't find circle!");
+			}
 		};
 		_length = self.rectangle_particles.len();
 		i = 0;
@@ -773,11 +719,16 @@ impl ParticleCollection
 				break self.rectangle_particles.remove(i);
 			}
 			i+= 1;
+			if i >= self.rectangle_particles.len()
+			{
+				panic!("Couldn't find rectangle!");
+			}
 		};
 		if constraint.is_spring()
 		{
 			constraint.resolve_spring_circ_rect(&mut p1, &mut p2);
 		}
+		
 		self.circle_particles.push(p1);
 		self.rectangle_particles.push(p2);
 	}	
@@ -826,7 +777,7 @@ impl ParticleCollection
 		for i in 0..length
 		{
 			let mut p = self.rectangle_particles.remove(i);
-			if !p.get_collidable()
+			if !p.get_collidable() || !p.get_collide_internal()
 			{
 				self.rectangle_particles.insert(i, p);
 				continue;
@@ -845,7 +796,7 @@ impl ParticleCollection
 		for i in 0..length
 		{
 			let mut p = self.rectangle_particles.remove(i);
-			if !p.get_collidable()
+			if !p.get_collidable() || !p.get_collide_internal()
 			{
 				self.rectangle_particles.insert(i, p);
 				continue;
@@ -864,7 +815,7 @@ impl ParticleCollection
 		for i in 0..length
 		{
 			let mut p = self.circle_particles.remove(i);
-			if !p.get_collidable()
+			if !p.get_collidable() || !p.get_collide_internal()
 			{
 				self.circle_particles.insert(i, p);
 				continue;
@@ -875,12 +826,32 @@ impl ParticleCollection
 		}
 	}
 
+	pub fn check_circ_rect_internal_collisions(&mut self, ap:&APValues)
+	{
+		
+		let length:usize = self.circle_particles.len();
+		
+		for i in 0..length
+		{
+			let mut p = self.circle_particles.remove(i);
+			if !p.get_collidable() || !p.get_collide_internal()
+			{
+				self.circle_particles.insert(i, p);
+				continue;
+			}
+			let vec = &mut self.rectangle_particles;
+			collision_detector::check_circ_vs_rects(&mut p, vec, ap);
+			self.circle_particles.insert(i, p);
+		}
+	}
+
 	
 	pub fn check_internal_collisions(&mut self, ap:&APValues)
 	{
 		self.check_rect_rect_internal_collisions(ap);
 		self.check_circ_circ_internal_collisions(ap);
 		self.check_rect_circ_internal_collisions(ap);
+		self.check_circ_rect_internal_collisions(ap);
 	}
 	pub fn check_rectangles_vs_collection(&mut self, col:&mut ParticleCollection, ap:&APValues)
 	{

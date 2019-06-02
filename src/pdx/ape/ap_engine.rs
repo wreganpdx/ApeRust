@@ -117,6 +117,23 @@ impl ApEngine
 		}
 		panic!("Couldn't find object!");
 	}
+	pub fn get_particle_collection_by_id(&mut self, i:i64)->&mut ParticleCollection
+	{
+		let mut part_index = 0;
+		let p = loop
+		{
+			if self.part_collection[part_index].id == i
+			{
+				break &mut self.part_collection[part_index];
+			}
+			part_index+= 1;
+			if part_index >= self.part_collection.len()
+			{
+				panic!("Couldn't find collection!");
+			}
+		};
+		return p;
+	}
 	pub fn get_new_id(&mut self)->i64
 	{
 		self.id_count = self.id_count + 1;
@@ -312,13 +329,12 @@ impl ApEngine
 		self.force = Vector::new(0.0,0.0);
 		self.massless_force = Vector::new(0.0,0.0);
 		self.damping = 1.0 - delta;
-		self.constraint_cycles = 1;
-		self.constraint_collision_cycles = 2;
+		self.constraint_cycles = 0;
+		self.constraint_collision_cycles = 1;
 		println!("Ape Engine Initialized");
 		self.id_count = 0;
 		self.background_color =  [79.0/255.0, 36.0/255.0, 59.0/255.0, 1.0];
 	}
-
 	pub fn get_damping(&self) -> &f64
 	{
 		return &self.damping

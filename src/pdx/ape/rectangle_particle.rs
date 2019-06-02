@@ -55,7 +55,6 @@ pub struct RectangleParticle
     elasticity:f64,
     rest_loops:i64,
     rest_count:i64,
-    center:Vector,
     pinned:bool,
     pinned_to: Vec<Box<Particle>>,//to make this work, it had to be a vector, but only one should be stored here.
     pin:Vector,
@@ -82,7 +81,9 @@ pub struct RectangleParticle
     sibling2:i64,
     pub owner_col:OwnerCollision,
     pub collision_pending:bool,
-    width_scale:f64
+    width_scale:f64,
+    collide_internal:bool,
+    move_with_composite:bool
 }
 
 impl RectangleParticle 
@@ -304,6 +305,22 @@ impl PartialEq for RectangleParticle
 
 impl Particle for RectangleParticle 
 {
+    fn get_move_with_composite(&self)->bool
+    {
+        return self.move_with_composite.clone();
+    }
+	fn set_move_with_composite(&mut self, b:bool)
+    {
+        self.move_with_composite = b;
+    }
+    fn get_collide_internal(&self)->bool
+    {
+        return self.collide_internal.clone();
+    }
+	fn set_collide_internal(&mut self, b:bool)
+    {
+        self.collide_internal = b;
+    }
     fn get_spring_contact(&self, center:&Vector, vec1:&Vector, vec2:&Vector) ->f64
     {
         let mut shortest_distance = 10000000.0;
@@ -598,11 +615,11 @@ impl Particle for RectangleParticle
 
 	fn get_center(&self)-> Vector
     {
-        return self.center.clone();
+        return self.curr.clone();
     }
 	fn set_center(&mut self, c:Vector)
     {
-        self.center = c.clone();
+        self.curr = c.clone();
     }
 
 	fn get_multi_sample(&self)-> i64

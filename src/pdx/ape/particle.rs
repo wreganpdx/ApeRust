@@ -28,7 +28,10 @@ use std::any::Any;
 #[allow(unused_variables)]
 pub trait Particle 
 {
-
+	fn get_collide_internal(&self)->bool;
+	fn set_collide_internal(&mut self, b:bool);
+	fn get_move_with_composite(&self)->bool;
+	fn set_move_with_composite(&mut self, b:bool);
 	fn get_spring_contact(&self, center:&Vector, vec1:&Vector, vec2:&Vector)->f64;
 	fn set_primary_color(&mut self, c:[f32;4]);
 	fn set_secondary_color(&mut self, c:[f32;4]);
