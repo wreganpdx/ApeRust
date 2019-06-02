@@ -83,7 +83,8 @@ pub struct CircleParticle
     last_delta:f64,
     collide_internal:bool,
     move_with_composite:bool,
-    moved_flag:bool
+    moved_flag:bool,
+    visible:bool
 }
 
 impl CircleParticle
@@ -104,6 +105,7 @@ impl CircleParticle
     {
 		let mut p = CircleParticle::default();
 		p.set_id(id);
+        p.visible = true;
         return p;
     }
 
@@ -182,6 +184,10 @@ impl Paint for CircleParticle
 {
 	fn paint(&mut self, args: &RenderArgs, gl:&mut GlGraphics)
 	{
+        if !self.visible
+        {
+            return;
+        }
 		use graphics::*;
 
 		let rect = rectangle::rectangle_by_corners(0.0, 0.0, 1.0, 1.0);
@@ -218,6 +224,10 @@ impl PartialEq for CircleParticle
 
 impl Particle for CircleParticle 
 {
+    fn set_visible(&mut self, b:bool)
+    {
+        self.visible = b;
+    }
     fn get_moved_flag(&self)->bool
     {
         return self.moved_flag.clone();

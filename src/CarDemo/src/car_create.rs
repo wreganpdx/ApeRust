@@ -30,6 +30,9 @@ pub fn car_create(part:&mut ParticleCollection, tuple:(i64,i64,i64, i64), col_c:
 
     cp_a.init_wheel(2.0);
     cp_b.init_wheel(2.0);
+
+    cp_a.set_mass(2.0);
+    cp_b.set_mass(2.0);
     
 
     

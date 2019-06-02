@@ -28,6 +28,7 @@ use std::any::Any;
 #[allow(unused_variables)]
 pub trait Particle 
 {
+	fn set_visible(&mut self, b:bool);
 	fn get_moved_flag(&self)->bool;
 	fn get_collide_internal(&self)->bool;
 	fn set_collide_internal(&mut self, b:bool);

@@ -47,6 +47,7 @@ pub struct PolyPolyConstraint
 	collidable:bool,
 	rect_id:i64, 
 	velocity:Vector,
+	visible:bool
 }
 
 impl Paint for PolyPolyConstraint
@@ -67,6 +68,10 @@ impl Paint for PolyPolyConstraint
 
 impl PolyPolyConstraint
 {
+	pub fn set_visible(&mut self, b:bool)
+	{
+		self.visible = b;
+	}
 	pub fn get_fixed_end_limit(&self)->f64
 	{
 		return self.fixed_end_limit.clone();
@@ -122,6 +127,11 @@ impl PolyPolyConstraint
         self.secondary_color = c;
     }
 
+	pub fn set_rest_length(&mut self, t:f64)
+	{
+		self.rest_length = t;
+	}
+
 	pub fn init_spring(&mut self, p:(i64,i64), rest_length:f64, _stiff:f64)
 	{
 		self.particles = p;
@@ -143,6 +153,7 @@ impl PolyPolyConstraint
 		p.is_angular = false;
 		p.is_spring = false;
 		p.set_id(id);
+		p.visible = true;
         return p;
     }
 	pub fn set_id(&mut self, id:i64)

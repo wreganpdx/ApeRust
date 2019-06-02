@@ -17,6 +17,7 @@ mod capsule_create;
 mod surfaces_create;
 mod bridge_create;
 mod rotator_create;
+mod swing_door_create;
 
 use piston::window::WindowSettings;
 use piston::event_loop::*;
@@ -92,7 +93,12 @@ fn main()
         ),
         col_d.clone(), col_b.clone());
 
+    let mut swing_door = ParticleCollection::new(ap.get_new_id());
+    let swing_tuples = (ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),  
+        ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),ap.get_new_id());
 
+
+    swing_door_create::swing_door_create(&mut swing_door,swing_tuples,col_b, col_d);
     ap.set_massless_force(Vector::new(0.0,7.0));
 
     let mut car = ParticleCollection::new(ap.get_new_id());
@@ -106,6 +112,7 @@ fn main()
     ap.add_particle_collection(bridge);
     ap.add_particle_collection(various);
     ap.add_particle_collection(rect);
+    ap.add_particle_collection(swing_door);
     
     
     let mut _step:bool = false;
@@ -187,7 +194,7 @@ fn main()
            spin_rect_composite(&mut ap,rect_composite_id.clone());
         }
 
-        if now.elapsed().as_secs() > 60 || exit
+        if now.elapsed().as_secs() > 600 || exit //stops after 10 minutes or clicking exiting.
         {
             break;
         }

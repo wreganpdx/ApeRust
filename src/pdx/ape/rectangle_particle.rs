@@ -84,7 +84,8 @@ pub struct RectangleParticle
     width_scale:f64,
     collide_internal:bool,
     move_with_composite:bool,
-    moved_flag:bool
+    moved_flag:bool,
+    visible:bool
 }
 
 impl RectangleParticle 
@@ -134,6 +135,7 @@ impl RectangleParticle
     {
 		let mut p = RectangleParticle::default();
 		p.set_id(id);
+        p.visible = true;
         return p;
     }
 
@@ -285,6 +287,10 @@ impl Paint for RectangleParticle
 {
 	fn paint(&mut self, args: &RenderArgs, gl:&mut GlGraphics)
 	{
+         if !self.visible
+        {
+            return;
+        }
 		use graphics::*;
         let width = self.width * self.width_scale;
 		let rect = rectangle::rectangle_by_corners(0.0, 0.0, width, self.get_height());
@@ -306,6 +312,10 @@ impl PartialEq for RectangleParticle
 
 impl Particle for RectangleParticle 
 {
+    fn set_visible(&mut self, b:bool)
+    {
+        self.visible = b;
+    }
     fn get_moved_flag(&self)->bool
     {
         return self.moved_flag.clone();
