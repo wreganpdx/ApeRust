@@ -188,7 +188,7 @@ impl PolyPolyConstraint
 
 	pub fn resolve_spring_rect_rect(&mut self,p1:&mut RectangleParticle,p2:&mut RectangleParticle) 
 	{
-		if p1.get_fixed() && p2.get_fixed()
+		if p1.get_fixed() && p2.get_fixed() && !p2.get_moved_flag() && !p1.get_moved_flag()
 		{ return;}
 		self.curr_length = p1.get_position().distance(&p2.get_position());
 		self.delta = p1.get_position().minus(&p2.get_position());
@@ -219,7 +219,7 @@ impl PolyPolyConstraint
 
 	pub fn resolve_spring_circ_circ(&mut self,p1:&mut CircleParticle,p2:&mut CircleParticle) 
 	{
-		if p1.get_fixed() && p2.get_fixed()
+		if p1.get_fixed() && p2.get_fixed() && !p2.get_moved_flag() && !p1.get_moved_flag()
 		{ return;}
 		self.curr_length = p1.get_position().distance(&p2.get_position());
 		self.delta = p1.get_position().minus(&p2.get_position());
@@ -250,7 +250,7 @@ impl PolyPolyConstraint
 
 	pub fn resolve_spring_circ_rect(&mut self,p1:&mut CircleParticle,p2:&mut RectangleParticle) 
 	{
-		if p1.get_fixed() && p2.get_fixed()
+		if p1.get_fixed() && p2.get_fixed() && !p2.get_moved_flag() && !p1.get_moved_flag()
 		{ return;}
 		self.curr_length = p1.get_position().distance(&p2.get_position());
 		self.delta = p1.get_position().minus(&p2.get_position());

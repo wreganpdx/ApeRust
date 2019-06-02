@@ -166,8 +166,6 @@ impl ApEngine
 		{
 			return false;
 		}
-		
-		self.integrate();
 		for _i in 0..self.constraint_cycles
 		{
 			self.satisfy_constraints();
@@ -178,6 +176,7 @@ impl ApEngine
 			self.satisfy_pending_collisions();
 			self.satisfy_constraints();
 		}
+		self.integrate();
 		return true;
 	}
 	pub fn satisfy_pending_collisions(&mut self)

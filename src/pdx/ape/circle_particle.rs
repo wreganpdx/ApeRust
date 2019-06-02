@@ -82,7 +82,8 @@ pub struct CircleParticle
     secondary_color:[f32; 4],
     last_delta:f64,
     collide_internal:bool,
-    move_with_composite:bool
+    move_with_composite:bool,
+    moved_flag:bool
 }
 
 impl CircleParticle
@@ -117,7 +118,7 @@ impl CircleParticle
 		self.mass = 1.0;
 		self.inv_mass = self.mass/1.0;
 		self.radius = radius;
-         self.primary_color =  [39.0/255.0, 36.0/255.0, 39.0/255.0, 1.0];
+        self.primary_color =  [39.0/255.0, 36.0/255.0, 39.0/255.0, 1.0];
         self.secondary_color =  [139.0/255.0, 136.0/255.0, 139.0/255.0, 1.0];
 	}
 
@@ -217,6 +218,10 @@ impl PartialEq for CircleParticle
 
 impl Particle for CircleParticle 
 {
+    fn get_moved_flag(&self)->bool
+    {
+        return self.moved_flag.clone();
+    }
     fn get_move_with_composite(&self)->bool
     {
         return self.move_with_composite.clone();
@@ -284,6 +289,7 @@ impl Particle for CircleParticle
     }
 	fn set_curr(&mut self, c:&Vector)
     {
+        self.moved_flag = true;
         self.curr.copy(c);
     }
 
@@ -293,6 +299,7 @@ impl Particle for CircleParticle
     }
 	fn set_position(&mut self, c:&Vector)
     {
+        self.moved_flag = true;
         self.curr.copy(c);
         self.prev.copy(c);
     }
@@ -602,6 +609,7 @@ impl Particle for CircleParticle
     {
             if self.fixed
             {
+                //self.moved_flag = false;
                 return;
             }
 			

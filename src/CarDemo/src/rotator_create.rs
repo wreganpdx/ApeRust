@@ -90,7 +90,7 @@ pub fn rect_composite_create(part:&mut ParticleCollection, tuple:(i64,i64,i64, i
     cp_a.set_collide_internal(false);
     cp_a.init_circle(rad);
     cp_a.set_collidable(true);
-    cp_a.set_primary_color(col_a);
+    cp_a.set_primary_color(col_b);
     cp_a.set_fixed(true);
     cp_a.set_move_with_composite(true);
 
@@ -99,7 +99,7 @@ pub fn rect_composite_create(part:&mut ParticleCollection, tuple:(i64,i64,i64, i
     cp_b.set_collide_internal(false);
     cp_b.init_circle(rad);
     cp_b.set_collidable(true);
-    cp_b.set_primary_color(col_a);
+    cp_b.set_primary_color(col_b);
     cp_b.set_fixed(true);
     cp_b.set_move_with_composite(true);
 
@@ -108,7 +108,7 @@ pub fn rect_composite_create(part:&mut ParticleCollection, tuple:(i64,i64,i64, i
     cp_c.set_collide_internal(false);
     cp_c.init_circle(rad);
     cp_c.set_collidable(true);
-    cp_c.set_primary_color(col_a);
+    cp_c.set_primary_color(col_b);
     cp_c.set_fixed(true);
     cp_c.set_move_with_composite(true);
 
@@ -117,7 +117,7 @@ pub fn rect_composite_create(part:&mut ParticleCollection, tuple:(i64,i64,i64, i
     cp_d.set_collide_internal(false);
     cp_d.init_circle(rad);
     cp_d.set_collidable(true);
-    cp_d.set_primary_color(col_a);
+    cp_d.set_primary_color(col_b);
     cp_d.set_fixed(true);
     cp_d.set_move_with_composite(true);
 
@@ -138,7 +138,7 @@ pub fn rect_composite_create(part:&mut ParticleCollection, tuple:(i64,i64,i64, i
     	
 
     let mut spr_b = PolyPolyConstraint::new(tuple.6);
-    spr_b.init_spring((cp_a.id.clone(), cp_b.id.clone()), cp_a.get_position().distance(&cp_b.get_position()), 0.5);
+    spr_b.init_spring((cp_b.id.clone(), cp_c.id.clone()), cp_b.get_position().distance(&cp_c.get_position()), 0.5);
     spr_b.set_collidable(true);
     spr_b.set_primary_color(col_b);
     spr_b.set_height(rad*2.0);
@@ -153,7 +153,7 @@ pub fn rect_composite_create(part:&mut ParticleCollection, tuple:(i64,i64,i64, i
     spr_b_r.set_fixed(true);
 
     let mut spr_c = PolyPolyConstraint::new(tuple.8);
-    spr_c.init_spring((cp_a.id.clone(), cp_b.id.clone()), cp_a.get_position().distance(&cp_b.get_position()), 0.5);
+    spr_c.init_spring((cp_c.id.clone(), cp_d.id.clone()), cp_c.get_position().distance(&cp_d.get_position()), 0.5);
     spr_c.set_collidable(true);
     spr_c.set_primary_color(col_b);
     spr_c.set_height(rad*2.0);
@@ -169,7 +169,7 @@ pub fn rect_composite_create(part:&mut ParticleCollection, tuple:(i64,i64,i64, i
     spr_c_r.set_fixed(true);
 
     let mut spr_d = PolyPolyConstraint::new(tuple.10);
-    spr_d.init_spring((cp_a.id.clone(), cp_b.id.clone()), cp_a.get_position().distance(&cp_b.get_position()), 0.5);
+    spr_d.init_spring((cp_d.id.clone(), cp_a.id.clone()), cp_d.get_position().distance(&cp_a.get_position()), 0.5);
     spr_d.set_collidable(true);
     
     spr_d.set_primary_color(col_b);
@@ -200,7 +200,8 @@ pub fn rect_composite_create(part:&mut ParticleCollection, tuple:(i64,i64,i64, i
     part.add_poly_poly_constraint(spr_c);
     part.add_poly_poly_constraint(spr_d);
 
-    part.set_collide_internal(false);
+    part.set_collide_internal(true);
+
 
     return (cp_a, cp_b);
 }

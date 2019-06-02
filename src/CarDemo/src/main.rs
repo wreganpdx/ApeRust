@@ -81,7 +81,7 @@ fn main()
     let mut rect = ParticleCollection::new(rect_composite_id.clone());
     let mut various = ParticleCollection::new(ap.get_new_id());
 
-    rotator_create::rotator_create(&mut rect,&mut various, tuple3, tuple2, col_a, col_b);
+    rotator_create::rotator_create(&mut rect,&mut various, tuple3, tuple2, col_c, col_b);
 
     let mut surf = ParticleCollection::new(ap.get_new_id());
     surfaces_create::surfaces_create(&mut surf, (

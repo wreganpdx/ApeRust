@@ -83,7 +83,8 @@ pub struct RectangleParticle
     pub collision_pending:bool,
     width_scale:f64,
     collide_internal:bool,
-    move_with_composite:bool
+    move_with_composite:bool,
+    moved_flag:bool
 }
 
 impl RectangleParticle 
@@ -305,6 +306,10 @@ impl PartialEq for RectangleParticle
 
 impl Particle for RectangleParticle 
 {
+    fn get_moved_flag(&self)->bool
+    {
+        return self.moved_flag.clone();
+    }
     fn get_move_with_composite(&self)->bool
     {
         return self.move_with_composite.clone();
@@ -380,6 +385,7 @@ impl Particle for RectangleParticle
     }
 	fn set_curr(&mut self, c:&Vector)
     {
+        self.moved_flag = true;
         self.curr.copy(c);
     }
 
@@ -389,6 +395,7 @@ impl Particle for RectangleParticle
     }
 	fn set_position(&mut self, c:&Vector)
     {
+        self.moved_flag = true;
         self.curr.copy(c);
         self.prev.copy(c);
     }
@@ -715,8 +722,9 @@ impl Particle for RectangleParticle
 
 	fn update(&mut self, ap:&APValues)
     {
-            if self.fixed
+            if self.fixed   
             {
+            //self.moved_flag = false;
                 return;
             }
 			
