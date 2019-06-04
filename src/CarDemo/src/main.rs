@@ -55,11 +55,6 @@ fn main() {
     );
 
     let mut bridge = ParticleCollection::new(ap.get_new_id());
-    //col_b:[f32; 4], col_c:[f32; 4], col_d:[f32; 4])
-    /*let tuple =  (ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),
-    ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),ap.get_new_id()
-    ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),ap.get_new_id()
-    ap.get_new_id(),ap.get_new_id(),ap.get_new_id(),ap.get_new_id()); */
 
     let tuple = (
         ap.get_new_id(),

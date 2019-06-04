@@ -68,6 +68,13 @@ fn main()
     top.set_fixed(true);
     bottom.set_fixed(true);
 
+    left.set_elasticity(0.29);
+    right.set_elasticity(0.29);
+    top.set_elasticity(0.29);
+    bottom.set_elasticity(0.29);
+
+
+
     //objects
     let mut rect: RectangleParticle = RectangleParticle::new(ap.get_new_id());
     let mut circ: CircleParticle = CircleParticle::new(ap.get_new_id());
@@ -91,17 +98,18 @@ fn main()
     wheel.set_collidable(true);
     p_circle.set_collidable(true);
 
-    rect.set_elasticity(0.9);
-    circ.set_elasticity(0.9);
-    wheel.set_elasticity(0.9);
+    rect.set_elasticity(0.29);
+    circ.set_elasticity(0.29);
+    p_circle.set_elasticity(0.29);
+    wheel.set_elasticity(0.29);
 
     circ.set_position(&Vector::new(600.0,415.0));
     rect.set_position(&Vector::new(225.0,415.0));
     wheel.set_position(&Vector::new(400.0,215.0));
 
-    rect.set_velocity(&Vector::new(25.0,70.0));
-    circ.set_velocity(&Vector::new(10.0,-4.000));
-    wheel.set_velocity(&Vector::new(-100.0,-4.0));
+    rect.set_velocity(&Vector::new(0.0,0.0));
+    circ.set_velocity(&Vector::new(0.0,-0.000));
+    wheel.set_velocity(&Vector::new(-0.0,-0.0));
 
     let mut p3 = ParticleCollection::new(ap.get_new_id());
     p3.init_composite(Vector::new(400.0, 415.0));
@@ -130,12 +138,11 @@ fn main()
     ap.add_particle_collection(list);
    // ap.add_particle_collection(p3);
 
-    ap.set_force(Vector::new(0.0,20.0));
+    ap.set_force(Vector::new(0.0,1.0));
     
-    let mut _step:bool = false;
+        let mut _step: bool = false;
     _step = ap.step();
     _step = ap.step();
-    //let mut i:i32 = 0;
     let mut events = Events::new(EventSettings::new());
     let now = Instant::now();
     let mut now_render = Instant::now();
@@ -143,38 +150,81 @@ fn main()
     let mut steps = 0;
     let mut engine_steps = 0;
     let mut frames_rendered = 0;
-    loop
-    {
+
+    loop {
         _step = ap.step();
-        if now_render.elapsed().as_millis() * 3 > 100
-        {
-            while let Some(e) = events.next(&mut window) 
-            {
-                if let Some(_r) = e.render_args() 
-                {
-                    ap.paint(&_r, &mut gl); 
+
+        if now_render.elapsed().as_millis() * 3 > 100 {
+            while let Some(e) = events.next(&mut window) {
+                if let Some(_r) = e.render_args() {
+                    ap.paint(&_r, &mut gl);
                     now_render = Instant::now();
                     frames_rendered += 1;
                     break;
                 }
 
-                if let Some(_r) = e.close_args()
-                {
+                if let Some(_r) = e.close_args() {
                     exit = true;
+                }
+                if let Some(Button::Keyboard(key)) = e.release_args() {
+                    match key {
+                        Key::A => {
+                            println!("Release A");
+                            do_something(&mut ap);
+                            do_something(&mut ap);
+                        }
+                        Key::D => {
+                            println!("Release D");
+                            do_something(&mut ap);
+                            do_something(&mut ap);
+                        }
+                        _ => {
+                            println!("Release KEY: {:?}", key);
+                        }
+                    }
+                }
+                if let Some(Button::Keyboard(key)) = e.press_args() {
+                    let wheel_speed = 0.3;
+                    match key {
+                        Key::A => {
+                            println!("Press A");
+                            do_something(&mut ap);
+                            do_something(&mut ap);
+                        }
+                        Key::D => {
+                            println!("Press D");
+                            do_something(&mut ap);
+                            do_something(&mut ap);
+                        }
+                        _ => {
+                            println!("Press KEY: {:?}", key);
+                        }
+                    }
                 }
             }
         }
-        if _step
-        {
-           engine_steps += 1;
+        if _step {
+            engine_steps += 1;
+            do_something_2(&mut ap);
         }
 
-        if now.elapsed().as_secs() > 30 || exit
+        if now.elapsed().as_secs() > 600 || exit
+        //stops after 10 minutes or clicking exiting.
         {
-            
             break;
         }
         steps = steps + 1;
     }
-    println!("Engine steps: {}, Frames Rendered: {}, Total Steps: {}, Seconds: {}", engine_steps, frames_rendered, steps, now.elapsed().as_secs());
+    println!(
+        "Engine steps: {}, Frames Rendered: {}, Total Steps: {}, Seconds: {}",
+        engine_steps,
+        frames_rendered,
+        steps,
+        now.elapsed().as_secs()
+    );
+}
+
+pub fn do_something(ap: &mut ApEngine) {
+}
+pub fn do_something_2(_ap: &mut ApEngine) {
 }
