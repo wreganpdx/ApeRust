@@ -630,7 +630,6 @@ impl Particle for RectangleParticle {
             return;
         }
 
-        //self.last_delta = ap.time_step;
         // global forces
         self.add_force(ap.force.clone());
         self.add_massless_force(ap.massless_force.clone());
@@ -643,6 +642,8 @@ impl Particle for RectangleParticle {
         self.curr.plus_equals(&nv);
 
         self.set_prev(&self.get_temp());
+
+        // clear the forces
         self.forces.set_to(0.0, 0.0);
 
         if self.owned {}
@@ -666,7 +667,7 @@ impl Particle for RectangleParticle {
     ) {
         if !self.fixed && !self.owned {
             self.curr.plus_equals(mtd);
-            self.get_velocity().copy(vel);
+            self.set_velocity(vel);
         }
 
         if self.owned {

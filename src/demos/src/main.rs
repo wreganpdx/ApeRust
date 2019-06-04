@@ -72,6 +72,9 @@ fn main()
     p.create_rectangle(40.0,40.0);
     p2.create_rectangle(40.0,15.0);
 
+    p.set_elasticity(0.49);
+    p2.set_elasticity(0.49);
+
     //p.set_radian(PI /2.0);
     //p2.set_radian(PI /2.0);
 
@@ -84,8 +87,8 @@ fn main()
     p.set_position(&Vector::new(200.0,415.0));
     p2.set_position(&Vector::new(600.0,415.0));
 
-    p.set_velocity(&Vector::new(100.0,0.0));
-    p2.set_velocity(&Vector::new(-100.0,0.000));
+    p.set_velocity(&Vector::new(2.0,0.0));
+    p2.set_velocity(&Vector::new(-2.0,0.0));
 
     //let mut p_circle: CircleParticle = CircleParticle::new(ap.get_new_id());
     //p_circle.init_circle(25.0);
@@ -115,6 +118,7 @@ fn main()
     list.set_collide_internal(true);
 
     ap.add_particle_collection(list);
+   // ap.add_particle_collection(p3);
     let mut _step:bool = false;
     _step = ap.step();
     _step = ap.step();

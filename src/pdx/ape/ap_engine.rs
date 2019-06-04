@@ -168,10 +168,6 @@ impl ApEngine {
         }
     }
     pub fn satisfy_pending_collisions(&mut self) {
-        let vals = self.get_ap_values();
-        let mut constraints: Vec<&mut PolyPolyConstraint> = Vec::new();
-        let mut objects: Vec<Vec<Option<&mut Particle>>> = Vec::new();
-        let mut colliders: Vec<i64> = Vec::new();
         let mut collisions: Vec<OwnerCollision> = Vec::new();
         let mut indexs: Vec<usize> = Vec::new();
         for i in 0..self.part_collection.len() {
