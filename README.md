@@ -27,9 +27,9 @@ Some basic circle collisions
 
 First try Car Demo and Circle Demo. If you are successfully able to run one of these projects, you
 are free to build off of either or use the general pattern
-exhibited there to port ApEngine to your own project, distribution
-pattern exhibited there. As of now there is no official
-downloaded crate
+exhibited there to port ApEngine to install the library in your 
+own project using the same pattern exhibted by our demos. 
+As of now there is no official crate distribution other than that.
 
 # License
 Copyright (c) 2019 
