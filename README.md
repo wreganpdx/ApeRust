@@ -12,12 +12,6 @@ git clone https://github.com/wreganpdx/ApeRust.git
 src/CarDemo	 
 
 src/circle	
-
-src/demos	 
-
-src/drawtest 	
-
-src/multi  
   
 ### then, cargo run
 
@@ -28,20 +22,17 @@ This an attempt to emulate the APE Engine original demo. Still many bugs to fix
 ## Circle
 Some basic circle collisions
 
-## demos
-A Basic collsion demo
-
-## multi
-A Testing environment for colliding multiple types of objects
-
-
 
 # To Install ApeRust as a library:
 
-Coming soon...
+First try Car Demo and Circle Demo. If you are successfully able to run one of these projects, you
+are free to build off of either or use the general pattern
+exhibited there to port ApEngine to your own project, distribution
+pattern exhibited there. As of now there is no official
+downloaded crate
 
 # License
-Copyright (c) <year> <copyright holders>
+Copyright (c) 2019 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy  
 of this software and associated documentation files (the "Software"), to deal  
