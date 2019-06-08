@@ -7,8 +7,8 @@ pub struct OwnerCollision {
     pub n: Vector,
     pub d: f64,
     pub o: i32,
-    pub ownerRect: i64,
-    pub ownerConstraint: i64,
+    pub owner_rect: i64,
+    pub owner_constraint: i64,
     pub sibling1: i64,
     pub sibling2: i64,
     pub collider: i64,
@@ -22,8 +22,8 @@ impl OwnerCollision {
         d: f64,
         o: i32,
         collider: i64,
-        ownerRect: i64,
-        ownerConstraint: i64,
+        owner_rect: i64,
+        owner_constraint: i64,
         sibling1: i64,
         sibling2: i64,
     ) -> OwnerCollision {
@@ -32,8 +32,8 @@ impl OwnerCollision {
         let n: Vector = n.clone();
         let d: f64 = d.clone();
         let o: i32 = o.clone();
-        let ownerRect: i64 = ownerRect.clone();
-        let ownerConstraint: i64 = ownerConstraint.clone();
+        let owner_rect: i64 = owner_rect.clone();
+        let owner_constraint: i64 = owner_constraint.clone();
         let sibling1: i64 = sibling1.clone();
         let sibling2: i64 = sibling2.clone();
         let collider: i64 = collider.clone();
@@ -44,8 +44,8 @@ impl OwnerCollision {
             d: d,
             o: o,
             collider: collider,
-            ownerRect: ownerRect,
-            ownerConstraint: ownerConstraint,
+            owner_rect: owner_rect,
+            owner_constraint: owner_constraint,
             sibling1: sibling1,
             sibling2: sibling2,
         }
@@ -57,8 +57,8 @@ impl OwnerCollision {
         let n: Vector = self.n.clone();
         let d: f64 = self.d.clone();
         let o: i32 = self.o.clone();
-        let ownerRect: i64 = self.ownerRect.clone();
-        let ownerConstraint: i64 = self.ownerConstraint.clone();
+        let owner_rect: i64 = self.owner_rect.clone();
+        let owner_constraint: i64 = self.owner_constraint.clone();
         let sibling1: i64 = self.sibling1.clone();
         let sibling2: i64 = self.sibling2.clone();
         let collider: i64 = self.collider.clone();
@@ -69,8 +69,8 @@ impl OwnerCollision {
             d: d,
             o: o,
             collider: collider,
-            ownerRect: ownerRect,
-            ownerConstraint: ownerConstraint,
+            owner_rect: owner_rect,
+            owner_constraint: owner_constraint,
             sibling1: sibling1,
             sibling2: sibling2,
         }

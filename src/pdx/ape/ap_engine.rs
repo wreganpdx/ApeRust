@@ -24,9 +24,7 @@ use piston::input::*;
 
 use crate::circle_particle::CircleParticle;
 use crate::owner_collision::OwnerCollision;
-use crate::particle::Particle;
 use crate::particle_collection::ParticleCollection;
-use crate::poly_poly_constraint::PolyPolyConstraint;
 use crate::vector::Vector;
 extern crate time;
 
@@ -156,6 +154,7 @@ impl ApEngine {
         }
         return true;
     }
+    ///a function that does one time step.
     pub fn step_with_time(&mut self) {
         self.integrate();
         for _i in 0..self.constraint_cycles {
@@ -167,6 +166,15 @@ impl ApEngine {
             self.satisfy_constraints();
         }
     }
+    ///
+    /// 
+    /// ## Satisfiy Pending Collisions
+    /// After checking collisions, there 
+    /// can likely be PolyPolyConstraints which
+    /// did not satisfy all their collisions
+    /// due to being attached to other objects
+    /// this function resolves all pending collisions 
+    /// as well.
     pub fn satisfy_pending_collisions(&mut self) {
         let mut collisions: Vec<OwnerCollision> = Vec::new();
         let mut indexs: Vec<usize> = Vec::new();
@@ -206,13 +214,27 @@ impl ApEngine {
             self.part_collection.insert(index, part);
         }
     }
-
+    ///
+    /// ## Satisfy Constraints
+    /// Satisfy constraints in a basic way, according
+    /// to each particle collection
+    /// 
     pub fn satisfy_constraints(&mut self) {
         let vals = self.get_ap_values();
         for pc in self.part_collection.iter_mut() {
             pc.satisfy_constraints(&vals);
         }
     }
+
+    ///
+    /// ## Check Collisions
+    /// Check collisions for
+    /// each particle collection internally
+    /// and then check them against
+    /// other collections of objects
+    /// 
+    /// 
+    /// 
     pub fn check_collisions(&mut self) {
         let values: APValues = self.get_ap_values();
         let length = self.part_collection.len();
@@ -231,13 +253,28 @@ impl ApEngine {
             self.part_collection.insert(i, rem);
         }
     }
+
+    ///
+    /// ## Integerate
+    /// Integrate calls intergrate on 
+    /// all particle collections
+    /// which should intern allow objects
+    /// which have velocity to keep moving in
+    /// the direction they are
+    /// currently moving in and for 
+    /// outside forces, to act upon them,
+    /// like damping or gravity, etc
+    /// 
+    /// 
     pub fn integrate(&mut self) {
         let values: APValues = self.get_ap_values();
         for i in 0..self.part_collection.len() {
             self.part_collection[i].integrate(&values);
         }
     }
-
+    ///
+    /// ## Init
+    /// Initialize the ApEngine
     pub fn init(&mut self, delta: f64) {
         /*in our case, delta is the ideal amount of time in seconds we want between engine steps*/
         self.delta = delta;
@@ -254,27 +291,58 @@ impl ApEngine {
         self.id_count = 0;
         self.background_color = [79.0 / 255.0, 36.0 / 255.0, 59.0 / 255.0, 1.0];
     }
+
+    ///
+    /// ## Get Damping
+    /// return the engine damping
+    /// Used to slow down momentum
+    /// so objects do not move eternally
+    /// 
     pub fn get_damping(&self) -> &f64 {
         return &self.damping;
     }
 
+    ///
+    /// ## new
+    /// Should be called once
+    /// to initialize an ApEngine 
+    /// unless There is some 
+    /// special case where the user
+    /// thinks they need two (not tested)
+    /// 
     pub fn new() -> ApEngine {
         let mut ap = ApEngine::default();
         ap.background_color = [0.6, 0.6, 0.6, 1.0];
         return ap;
     }
 
+    ///## Set Background Color
+    /// 
+    /// Used to set the color of the background
+    /// 
     pub fn set_background_color(&mut self, col: [f32; 4]) {
         self.background_color = col;
     }
 
+    /// Add Particle Collection
+    /// Adds a particle collection
+    /// to the ApEngine
+    /// Particle Collections should be owned
+    /// by the ApEngine
     pub fn add_particle_collection(&mut self, pc: ParticleCollection) {
         self.part_collection.push(pc);
     }
 
+    /// ## Set Massless Force
+    /// Sets a massless force to be acted upon each update
+    /// 
     pub fn set_massless_force(&mut self, v: Vector) {
         self.massless_force = v;
     }
+
+    /// ## Set Force
+    /// Sets a force to be acted upon each update
+    /// 
     pub fn set_force(&mut self, v: Vector) {
         self.force = v;
     }

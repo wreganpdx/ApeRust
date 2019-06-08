@@ -21,8 +21,7 @@ pub fn resolve_circle_circle(
 
     let mtd: Vector = normal.mult(depth);
 
-    let mut te: f64 = pa.get_elasticity() + pb.get_elasticity();
-    // te = collision_resolver::clamp(te, 0.0, 1.0);
+    let te: f64 = pa.get_elasticity() + pb.get_elasticity();
     let mut tf: f64 = 1.0 - (pa.get_friction() + pb.get_friction());
     tf = collision_resolver::clamp(tf, 0.0, 1.0);
 
@@ -68,7 +67,7 @@ pub fn resolve_collision_rect_rect(
 
     let mtd: Vector = normal.mult(depth);
 
-    let mut te: f64 = pa.get_elasticity() + pb.get_elasticity();
+    let te: f64 = pa.get_elasticity() + pb.get_elasticity();
 
     let mut tf: f64 = 1.0 - (pa.get_friction() + pb.get_friction());
     tf = collision_resolver::clamp(tf, 0.0, 1.0);
@@ -115,7 +114,7 @@ pub fn resolve_collision_rect_circ(
 
     let mtd: Vector = normal.mult(depth);
 
-    let mut te: f64 = pa.get_elasticity() + pb.get_elasticity();
+    let te: f64 = pa.get_elasticity() + pb.get_elasticity();
     // te = collision_resolver::clamp(te, 0.0, 1.0);
     let mut tf: f64 = 1.0 - (pa.get_friction() + pb.get_friction());
     tf = collision_resolver::clamp(tf, 0.0, 1.0);
@@ -148,12 +147,12 @@ pub fn resolve_collision_rect_circ(
     pb.resolve_collision(&mtd_b, &vn_b, &normal, depth, 1, pa.id.clone());
 }
 pub fn resolve_spring_collision(
-    mtd: &Vector,
-    vel: &Vector,
+    _mtd: &Vector,
+    _vel: &Vector,
     _n: &Vector,
     _d: f64,
     _o: i32,
-    stuff: (
+    _stuff: (
         &mut PolyPolyConstraint,
         Option<&mut RectangleParticle>,
         Vec<Option<&mut Particle>>,

@@ -73,47 +73,47 @@ impl ParticleCollection {
         collider: &mut Option<&mut Particle>,
         pending: OwnerCollision,
     ) -> bool {
-        let totalLen = self.rectangle_particles.len()
+        let total_len = self.rectangle_particles.len()
             + self.circle_particles.len()
             + self.poly_poly_constraints.len();
         let mut dist = 0.0;
         let mut ret = false;
-        let mut rectIndex = 0;
-        let mut rect = loop {
-            if rectIndex >= self.rectangle_particles.len() {
+        let mut rect_index = 0;
+        let rect = loop {
+            if rect_index >= self.rectangle_particles.len() {
                 panic!("line 97, collide_pending_spring");
             }
-            if self.rectangle_particles[rectIndex].get_id() == &pending.ownerRect {
-                break self.rectangle_particles.remove(rectIndex);
+            if self.rectangle_particles[rect_index].get_id() == &pending.owner_rect {
+                break self.rectangle_particles.remove(rect_index);
             }
-            rectIndex += 1;
+            rect_index += 1;
         };
 
-        let mut constraintIndex: usize = 0;
-        let mut constraint = loop {
-            if constraintIndex >= self.poly_poly_constraints.len() {
+        let mut constraint_index: usize = 0;
+        let constraint = loop {
+            if constraint_index >= self.poly_poly_constraints.len() {
                 panic!("line 109, collide_pending_spring, constraintIndex");
             }
-            if self.poly_poly_constraints[constraintIndex].id == pending.ownerConstraint {
-                break self.poly_poly_constraints.remove(constraintIndex);
+            if self.poly_poly_constraints[constraint_index].id == pending.owner_constraint {
+                break self.poly_poly_constraints.remove(constraint_index);
             }
-            constraintIndex += 1;
+            constraint_index += 1;
         };
         if constraint.circ_circ {
             let c1 = 1.0 - dist;
             let c2 = dist.clone();
-            let mut circ1Index = 0;
+            let mut circ_1_index = 0;
             let mut circ1 = loop {
-                if circ1Index >= self.circle_particles.len() {
+                if circ_1_index >= self.circle_particles.len() {
                     panic!(
                         "line 130, collide_pending_spring, circ1Index {}, sibling1 {}",
-                        circ1Index, pending.sibling1
+                        circ_1_index, pending.sibling1
                     );
                 }
-                if self.circle_particles[circ1Index].get_id() == &pending.sibling1 {
-                    break self.circle_particles.remove(circ1Index);
+                if self.circle_particles[circ_1_index].get_id() == &pending.sibling1 {
+                    break self.circle_particles.remove(circ_1_index);
                 }
-                circ1Index += 1;
+                circ_1_index += 1;
             };
             let mut circ_2_index: usize = 0;
             let mut circ2 = loop {
@@ -182,29 +182,29 @@ impl ParticleCollection {
         } else if constraint.rect_circ {
             let c1 = 1.0 - dist;
             let c2 = dist.clone();
-            let mut circ1Index = 0;
+            let mut circ_1_index = 0;
             let mut circ1 = loop {
-                if circ1Index >= self.circle_particles.len() {
+                if circ_1_index >= self.circle_particles.len() {
                     panic!("line 236, collide_pending_spring, circ1Index");
                 }
-                if self.circle_particles[circ1Index].get_id() == &pending.sibling1
-                    || self.circle_particles[circ1Index].get_id() == &pending.sibling2
+                if self.circle_particles[circ_1_index].get_id() == &pending.sibling1
+                    || self.circle_particles[circ_1_index].get_id() == &pending.sibling2
                 {
-                    break self.circle_particles.remove(circ1Index);
+                    break self.circle_particles.remove(circ_1_index);
                 }
-                circ1Index += 1;
+                circ_1_index += 1;
             };
-            let mut rect1Index: usize = 0;
+            let mut rect_1_index: usize = 0;
             let mut rect1 = loop {
-                if circ1Index >= self.rectangle_particles.len() {
+                if circ_1_index >= self.rectangle_particles.len() {
                     panic!("line 249, collide_pending_spring, rect1Index");
                 }
-                if self.rectangle_particles[rect1Index].get_id() == &pending.sibling2
-                    || self.rectangle_particles[rect1Index].get_id() == &pending.sibling1
+                if self.rectangle_particles[rect_1_index].get_id() == &pending.sibling2
+                    || self.rectangle_particles[rect_1_index].get_id() == &pending.sibling1
                 {
-                    break self.rectangle_particles.remove(rect1Index);
+                    break self.rectangle_particles.remove(rect_1_index);
                 }
-                rect1Index += 1;
+                rect_1_index += 1;
             };
             match collider {
                 Some(t) => {
@@ -260,22 +260,22 @@ impl ParticleCollection {
         } else if constraint.rect_rect {
             let c1 = 1.0 - dist;
             let c2 = dist.clone();
-            let mut rect1Index = 0;
+            let mut rect_1_index = 0;
             let mut rect1 = loop {
-                if rect1Index >= self.rectangle_particles.len() {
+                if rect_1_index >= self.rectangle_particles.len() {
                     panic!("line 249, collide_pending_spring, rect1Index");
                 }
-                if self.rectangle_particles[rect1Index].get_id() == &pending.sibling1 {
-                    break self.rectangle_particles.remove(rect1Index);
+                if self.rectangle_particles[rect_1_index].get_id() == &pending.sibling1 {
+                    break self.rectangle_particles.remove(rect_1_index);
                 }
-                rect1Index += 1;
+                rect_1_index += 1;
             };
-            let mut rect2Index: usize = 0;
+            let mut rect_2_index: usize = 0;
             let mut rect2 = loop {
-                if self.rectangle_particles[rect2Index].get_id() == &pending.sibling2 {
-                    break self.rectangle_particles.remove(rect2Index);
+                if self.rectangle_particles[rect_2_index].get_id() == &pending.sibling2 {
+                    break self.rectangle_particles.remove(rect_2_index);
                 }
-                rect2Index += 1;
+                rect_2_index += 1;
             };
             match collider {
                 Some(t) => {
@@ -330,10 +330,10 @@ impl ParticleCollection {
             self.rectangle_particles.push(rect2);
         }
         self.poly_poly_constraints
-            .insert(constraintIndex, constraint);
-        self.rectangle_particles.insert(rectIndex, rect);
+            .insert(constraint_index, constraint);
+        self.rectangle_particles.insert(rect_index, rect);
 
-        if totalLen
+        if total_len
             != self.rectangle_particles.len()
                 + self.circle_particles.len()
                 + self.poly_poly_constraints.len()

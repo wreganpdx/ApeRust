@@ -35,21 +35,60 @@ use std::f64;
 #[allow(unused_variables)]
 #[derive(Default)]
 pub struct CircleParticle {
+
+    ///
+    /// ## id
+    /// This is a basic id (unique)
+    /// it should be recieved from the 
+    /// ApEngine and passed in as the CircleParticle
+    /// is created.
     pub id: i64,
+    ///
+    /// ## Radian
+    /// This value represents the rotation of the particle
+    /// ignore this value for normal circles
+    /// but with "Wheels" the radian value is actively
+    /// used to show the wheel rotating
     radian: f64,
     density: f64,
     original_vertices: Vec<Vector>,
     vertices: Vec<Vector>,
     num_vertices: usize,
     axes: Vec<Vector>,
+    /// ## Curr
+    /// The current location of the particle
+    /// Careful with this value, as
+    /// it is used to determine Velocity 
+    /// as well. Set Position can
+    /// be used to relocate the circle over vast distances
     curr: Vector,
+    /// ## Prev
+    /// Used to determine velocity of the particle
     prev: Vector,
+    /// ## Temp
+    /// Used to hold temporary values
     temp: Vector,
+    /// ## Samp
+    /// Used to sample positions for 
+    /// temporary calculations
     samp: Vector,
+    /// ## Forces
+    /// Used to determine what forces will push the object
+    /// at the end of every step. Forces
+    /// are cleared after every step
     forces: Vector,
+    /// ## Velocity
+    /// Not used currently
     velocity: Vector,
+    /// ## Mass
+    /// Used to determine movement when colliding with another ojbect
+    /// of mass
     mass: f64,
+    /// ## Friction
+    /// Used to determine slipperyness when colliding against objects
     friction: f64,
+    /// ## Elasticity
+    /// Used to determine bounciness when colliding with objects
     elasticity: f64,
     rest_loops: i64,
     rest_count: i64,
@@ -70,22 +109,32 @@ pub struct CircleParticle {
     collidable: bool,
     width: f64,
     height: f64,
+    /// ## Radius
+    /// The size of the circle's radius
     radius: f64,
     is_wheel: bool,
     rim: RimParticle,
     traction: f64,
     norm_slip: Vector,
     orientation: Vector,
+    /// ## Primary Color
+    /// The color of the particle
     primary_color: [f32; 4],
     secondary_color: [f32; 4],
     last_delta: f64,
     collide_internal: bool,
     move_with_composite: bool,
     moved_flag: bool,
+    /// ## Visible
+    /// Used to determine if the
+    /// particle should be rendered by the
+    /// paint method when it is called
     visible: bool,
 }
 
 impl CircleParticle {
+    /// ## Init Wheel
+    /// To turn this circle into a wheel object
     pub fn init_wheel(&mut self, mt: f64) {
         self.rim = RimParticle::new();
         self.rim.init(self.radius, mt);
@@ -95,6 +144,10 @@ impl CircleParticle {
         self.is_wheel = true;
         self.orientation = Vector::new(0.0, 0.0);
     }
+
+    /// # New
+    /// To create new circle objects
+    /// Params: unique id (should be assigned by the engine)
     pub fn new(id: i64) -> CircleParticle {
         let mut p = CircleParticle::default();
         p.set_id(id);
@@ -102,6 +155,9 @@ impl CircleParticle {
         return p;
     }
 
+    /// # Init Circle
+    /// Used to set basic values of the circle
+    /// params: Radius 
     pub fn init_circle(&mut self, radius: f64) {
         self.primary_color = [0.2, 0.2, 0.8, 1.0];
         self.secondary_color = [0.1, 0.1, 0.5, 1.0];
@@ -116,20 +172,31 @@ impl CircleParticle {
         self.secondary_color = [139.0 / 255.0, 136.0 / 255.0, 139.0 / 255.0, 1.0];
         self.collide_internal = true;
     }
-
+    /// # Get Interval X
+    /// Used to find out where the object is on the x axis
+    /// for some basic collision inquiries 
+    /// 
     pub fn get_interval_x(&mut self) -> &Interval {
         self.interval.min = self.curr.x - self.radius;
         self.interval.max = self.curr.x + self.radius;
         return &self.interval;
     }
 
+    ///
+    /// # Get Interval Y
+    /// Used to find out where the object is on the
+    /// y axis for some basic collision inquiries
+    /// 
     pub fn get_interval_y(&mut self) -> &Interval {
         self.interval.min = self.curr.y - self.radius;
         self.interval.max = self.curr.y + self.radius;
         return &self.interval;
     }
 
-    pub fn get_radius(&mut self) -> &f64 {
+    ///
+    /// # Get Radius
+    /// get the radius value for this object
+    pub fn get_radius(&self) -> &f64 {
         return &self.radius;
     }
 

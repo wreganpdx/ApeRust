@@ -100,10 +100,10 @@ impl RectangleParticle {
         _n: &Vector,
         _d: f64,
         _o: i32,
-        p1: Option<&mut Particle>,
-        p2: Option<&mut Particle>,
-        collider: Option<&mut Particle>,
-        owner: &mut PolyPolyConstraint,
+        _p1: Option<&mut Particle>,
+        _p2: Option<&mut Particle>,
+        _collider: Option<&mut Particle>,
+        _owner: &mut PolyPolyConstraint,
     ) {
         if !self.fixed && !self.owned {
             self.curr.plus_equals(mtd);
@@ -114,7 +114,6 @@ impl RectangleParticle {
             let ev: f64 = vel.magnitude();
             if ev > self.max_exit_velocity {
                 //note: These smash events are probably not necessary.
-                //dispatchEvent(new SmashEvent(SmashEvent.COLLISION, ev));
             }
         }
     }
@@ -317,7 +316,7 @@ impl Particle for RectangleParticle {
     fn set_collide_internal(&mut self, b: bool) {
         self.collide_internal = b;
     }
-    fn get_spring_contact(&self, center: &Vector, vec1: &Vector, vec2: &Vector) -> f64 {
+    fn get_spring_contact(&self, _center: &Vector, vec1: &Vector, vec2: &Vector) -> f64 {
         let mut shortest_distance = 10000000.0;
         for i in 0..4 {
             let tuple = self.get_corners(i);
