@@ -17,7 +17,7 @@ src/circle
 
 # Examples include:
 ## CarDemo:
-This an attempt to emulate the APE Engine original demo. Still many bugs to fix
+This an attempt to emulate the APE Engine original demo. 
 
 ## Circle
 Some basic circle collisions
