@@ -31,9 +31,6 @@ Some basic circle collisions
 ## demos
 A Basic collsion demo
 
-## drawtest
-A Testing environment for trying new draw functions using piston engine
-
 ## multi
 A Testing environment for colliding multiple types of objects
 
